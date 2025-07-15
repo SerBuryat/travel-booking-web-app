@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 import { Navbar } from '@/components/navbar/Navbar';
+import CatalogIcon from '@/components/navbar/CatalogIcon';
+import MyServiceIcon from '@/components/navbar/MyServiceIcon';
 
 const services = [
   { name: 'City Tour', price: '$50', rating: 4.5, description: 'Explore the city highlights with a local guide.' },
@@ -13,12 +14,12 @@ const services = [
 const navbarButtons = [
   {
     href: '/catalog',
-    icon: <Image src="/catalog-icon.svg" alt="Catalog" width={28} height={28} color='#007AFF'/>,
+    icon: CatalogIcon,
     title: 'Catalog',
   },
   {
     href: '/my-service',
-    icon: <Image src="/my-service-icon.svg" alt="My Service" width={28} height={28} />,
+    icon: MyServiceIcon,
     title: 'My services',
   },
 ];

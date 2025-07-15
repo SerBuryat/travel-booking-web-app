@@ -3,10 +3,11 @@
 import React from 'react';
 import { usePathname } from 'next/navigation';
 import { NavbarButton } from './NavbarButton';
+import { SvgIconProps } from '@mui/material/SvgIcon';
 
 export interface NavbarButtonConfig {
   href: string;
-  icon: React.ReactNode;
+  icon: React.ComponentType<SvgIconProps>;
   title: string;
 }
 
