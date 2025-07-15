@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Navbar } from '@/components/navbar/Navbar';
+import HomeIcon from '@/components/navbar/HomeIcon';
 import CatalogIcon from '@/components/navbar/CatalogIcon';
 import MyServiceIcon from '@/components/navbar/MyServiceIcon';
 import MyProfileIcon from '@/components/navbar/MyProfileIcon';
@@ -14,6 +15,11 @@ const myServices = [
 
 const navbarButtons = [
   {
+    href: '/home',
+    icon: HomeIcon,
+    title: 'Home',
+  },
+  {
     href: '/catalog',
     icon: CatalogIcon,
     title: 'Catalog',
@@ -21,12 +27,12 @@ const navbarButtons = [
   {
     href: '/my-service',
     icon: MyServiceIcon,
-    title: 'My services',
+    title: 'Services',
   },
   {
     href: '/my-profile',
     icon: MyProfileIcon,
-    title: 'My Profile',
+    title: 'Profile',
     badgeContent: 4,
   },
 ];

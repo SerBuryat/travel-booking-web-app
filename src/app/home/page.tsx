@@ -7,10 +7,10 @@ import CatalogIcon from '@/components/navbar/CatalogIcon';
 import MyServiceIcon from '@/components/navbar/MyServiceIcon';
 import MyProfileIcon from '@/components/navbar/MyProfileIcon';
 
-const services = [
-  { name: 'City Tour', price: '$50', rating: 4.5, description: 'Explore the city highlights with a local guide.' },
-  { name: 'Mountain Hike', price: '$120', rating: 4.8, description: 'Guided hike in the beautiful mountains.' },
-  { name: 'Beach Relax', price: '$80', rating: 4.2, description: 'Day at the private beach with amenities.' },
+const homeData = [
+  { title: 'Welcome Back!', subtitle: 'Ready to explore today?', status: 'Active' },
+  { title: 'Recent Activity', subtitle: '3 new notifications', status: 'New' },
+  { title: 'Quick Actions', subtitle: 'Book your next adventure', status: 'Available' },
 ];
 
 const navbarButtons = [
@@ -37,7 +37,7 @@ const navbarButtons = [
   },
 ];
 
-export default function CatalogPage() {
+export default function HomePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pb-24 sm:pb-0">
       {/* Hamburger for large screens */}
@@ -47,15 +47,15 @@ export default function CatalogPage() {
         </button>
       </div>
       <div className="max-w-md mx-auto pt-8 px-4">
-        <h1 className="text-2xl font-bold mb-4">Catalog</h1>
+        <h1 className="text-2xl font-bold mb-4">Home</h1>
         <ul className="space-y-4">
-          {services.map((s, i) => (
+          {homeData.map((item, i) => (
             <li key={i} className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-800">
-              <div className="font-semibold text-lg">{s.name}</div>
-              <div className="text-sm text-gray-500">{s.description}</div>
+              <div className="font-semibold text-lg">{item.title}</div>
+              <div className="text-sm text-gray-500">{item.subtitle}</div>
               <div className="flex justify-between mt-2 text-sm">
-                <span>Price: {s.price}</span>
-                <span>⭐ {s.rating}</span>
+                <span>Status: {item.status}</span>
+                <span className="text-blue-600">→</span>
               </div>
             </li>
           ))}
