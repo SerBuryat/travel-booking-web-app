@@ -2,39 +2,12 @@
 
 import React from 'react';
 import { Navbar } from '@/components/navbar/Navbar';
-import HomeIcon from '@/components/navbar/HomeIcon';
-import CatalogIcon from '@/components/navbar/CatalogIcon';
-import MyServiceIcon from '@/components/navbar/MyServiceIcon';
-import MyProfileIcon from '@/components/navbar/MyProfileIcon';
+import { getNavbarButtons } from '@/components/navbar/navbarConfig';
 
 const profileData = [
   { name: 'John Doe', email: 'john.doe@example.com', phone: '+1 234 567 8900' },
   { name: 'Jane Smith', email: 'jane.smith@example.com', phone: '+1 234 567 8901' },
   { name: 'Bob Johnson', email: 'bob.johnson@example.com', phone: '+1 234 567 8902' },
-];
-
-const navbarButtons = [
-  {
-    href: '/home',
-    icon: HomeIcon,
-    title: 'Home',
-  },
-  {
-    href: '/catalog',
-    icon: CatalogIcon,
-    title: 'Catalog',
-  },
-  {
-    href: '/my-service',
-    icon: MyServiceIcon,
-    title: 'Services',
-  },
-  {
-    href: '/my-profile',
-    icon: MyProfileIcon,
-    title: 'Profile',
-    badgeContent: 4,
-  },
 ];
 
 export default function MyProfilePage() {
@@ -58,7 +31,7 @@ export default function MyProfilePage() {
           ))}
         </ul>
       </div>
-      <Navbar buttons={navbarButtons} />
+      <Navbar buttons={getNavbarButtons()} />
     </div>
   );
 } 

@@ -2,39 +2,12 @@
 
 import React from 'react';
 import { Navbar } from '@/components/navbar/Navbar';
-import HomeIcon from '@/components/navbar/HomeIcon';
-import CatalogIcon from '@/components/navbar/CatalogIcon';
-import MyServiceIcon from '@/components/navbar/MyServiceIcon';
-import MyProfileIcon from '@/components/navbar/MyProfileIcon';
+import { getNavbarButtons } from '@/components/navbar/navbarConfig';
 
 const services = [
   { name: 'City Tour', price: '$50', rating: 4.5, description: 'Explore the city highlights with a local guide.' },
   { name: 'Mountain Hike', price: '$120', rating: 4.8, description: 'Guided hike in the beautiful mountains.' },
   { name: 'Beach Relax', price: '$80', rating: 4.2, description: 'Day at the private beach with amenities.' },
-];
-
-const navbarButtons = [
-  {
-    href: '/home',
-    icon: HomeIcon,
-    title: 'Home',
-  },
-  {
-    href: '/catalog',
-    icon: CatalogIcon,
-    title: 'Catalog',
-  },
-  {
-    href: '/my-service',
-    icon: MyServiceIcon,
-    title: 'Services',
-  },
-  {
-    href: '/my-profile',
-    icon: MyProfileIcon,
-    title: 'Profile',
-    badgeContent: 4,
-  },
 ];
 
 export default function CatalogPage() {
@@ -61,7 +34,7 @@ export default function CatalogPage() {
           ))}
         </ul>
       </div>
-      <Navbar buttons={navbarButtons} />
+      <Navbar buttons={getNavbarButtons()} />
     </div>
   );
 } 

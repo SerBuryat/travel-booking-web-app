@@ -2,39 +2,12 @@
 
 import React from 'react';
 import { Navbar } from '@/components/navbar/Navbar';
-import HomeIcon from '@/components/navbar/HomeIcon';
-import CatalogIcon from '@/components/navbar/CatalogIcon';
-import MyServiceIcon from '@/components/navbar/MyServiceIcon';
-import MyProfileIcon from '@/components/navbar/MyProfileIcon';
+import { getNavbarButtons } from '@/components/navbar/navbarConfig';
 
 const homeData = [
   { title: 'Welcome Back!', subtitle: 'Ready to explore today?', status: 'Active' },
   { title: 'Recent Activity', subtitle: '3 new notifications', status: 'New' },
   { title: 'Quick Actions', subtitle: 'Book your next adventure', status: 'Available' },
-];
-
-const navbarButtons = [
-  {
-    href: '/home',
-    icon: HomeIcon,
-    title: 'Home',
-  },
-  {
-    href: '/catalog',
-    icon: CatalogIcon,
-    title: 'Catalog',
-  },
-  {
-    href: '/my-service',
-    icon: MyServiceIcon,
-    title: 'Services',
-  },
-  {
-    href: '/my-profile',
-    icon: MyProfileIcon,
-    title: 'Profile',
-    badgeContent: 4,
-  },
 ];
 
 export default function HomePage() {
@@ -61,7 +34,7 @@ export default function HomePage() {
           ))}
         </ul>
       </div>
-      <Navbar buttons={navbarButtons} />
+      <Navbar buttons={getNavbarButtons()} />
     </div>
   );
 } 
