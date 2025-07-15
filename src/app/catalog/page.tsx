@@ -4,6 +4,7 @@ import React from 'react';
 import { Navbar } from '@/components/navbar/Navbar';
 import CatalogIcon from '@/components/navbar/CatalogIcon';
 import MyServiceIcon from '@/components/navbar/MyServiceIcon';
+import MyProfileIcon from '@/components/navbar/MyProfileIcon';
 
 const services = [
   { name: 'City Tour', price: '$50', rating: 4.5, description: 'Explore the city highlights with a local guide.' },
@@ -21,6 +22,12 @@ const navbarButtons = [
     href: '/my-service',
     icon: MyServiceIcon,
     title: 'My services',
+  },
+  {
+    href: '/my-profile',
+    icon: MyProfileIcon,
+    title: 'My Profile',
+    badgeContent: 4,
   },
 ];
 

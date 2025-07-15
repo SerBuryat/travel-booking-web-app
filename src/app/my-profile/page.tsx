@@ -6,10 +6,10 @@ import CatalogIcon from '@/components/navbar/CatalogIcon';
 import MyServiceIcon from '@/components/navbar/MyServiceIcon';
 import MyProfileIcon from '@/components/navbar/MyProfileIcon';
 
-const myServices = [
-  { name: 'Airport Transfer', price: '$30', rating: 4.7, description: 'Private transfer from airport to hotel.' },
-  { name: 'Safari Adventure', price: '$200', rating: 4.9, description: 'Full-day safari with lunch included.' },
-  { name: 'Wine Tasting', price: '$60', rating: 4.6, description: 'Tour of local vineyards and wine tasting.' },
+const profileData = [
+  { name: 'John Doe', email: 'john.doe@example.com', phone: '+1 234 567 8900' },
+  { name: 'Jane Smith', email: 'jane.smith@example.com', phone: '+1 234 567 8901' },
+  { name: 'Bob Johnson', email: 'bob.johnson@example.com', phone: '+1 234 567 8902' },
 ];
 
 const navbarButtons = [
@@ -31,7 +31,7 @@ const navbarButtons = [
   },
 ];
 
-export default function MyServicePage() {
+export default function MyProfilePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pb-24 sm:pb-0">
       {/* Hamburger for large screens */}
@@ -41,16 +41,13 @@ export default function MyServicePage() {
         </button>
       </div>
       <div className="max-w-md mx-auto pt-8 px-4">
-        <h1 className="text-2xl font-bold mb-4">My Service</h1>
+        <h1 className="text-2xl font-bold mb-4">My Profile</h1>
         <ul className="space-y-4">
-          {myServices.map((s, i) => (
+          {profileData.map((profile, i) => (
             <li key={i} className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-800">
-              <div className="font-semibold text-lg">{s.name}</div>
-              <div className="text-sm text-gray-500">{s.description}</div>
-              <div className="flex justify-between mt-2 text-sm">
-                <span>Price: {s.price}</span>
-                <span>⭐ {s.rating}</span>
-              </div>
+              <div className="font-semibold text-lg">{profile.name}</div>
+              <div className="text-sm text-gray-500">{profile.email}</div>
+              <div className="text-sm text-gray-500">{profile.phone}</div>
             </li>
           ))}
         </ul>
