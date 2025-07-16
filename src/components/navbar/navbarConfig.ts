@@ -1,14 +1,14 @@
 import { NavbarButtonConfig } from './Navbar';
 import HomeIcon from './HomeIcon';
 import CatalogIcon from './CatalogIcon';
-import MyServiceIcon from './MyServiceIcon';
-import MyProfileIcon from './MyProfileIcon';
+import ServicesIcon from './ServicesIcon';
+import ProfileIcon from './ProfileIcon';
 
 // Constants for each page
 export const HOME = '/home';
 export const CATALOG = '/catalog';
-export const SERVICES = '/my-service';
-export const PROFILE = '/my-profile';
+export const SERVICES = '/services';
+export const PROFILE = '/profile';
 
 // Individual button configurations
 export const HOME_BUTTON: NavbarButtonConfig = {
@@ -25,13 +25,13 @@ export const CATALOG_BUTTON: NavbarButtonConfig = {
 
 export const SERVICES_BUTTON: NavbarButtonConfig = {
   href: SERVICES,
-  icon: MyServiceIcon,
+  icon: ServicesIcon,
   title: 'Services',
 };
 
 export const PROFILE_BUTTON: NavbarButtonConfig = {
   href: PROFILE,
-  icon: MyProfileIcon,
+  icon: ProfileIcon,
   title: 'Profile',
   badgeContent: 4,
 };

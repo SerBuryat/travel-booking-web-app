@@ -1,10 +1,10 @@
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 
-const MyServiceIcon = (props: SvgIconProps) => (
+const ServicesIcon = (props: SvgIconProps) => (
     <SvgIcon {...props} sx={{width:"22", height: "24", viewBox:"0 0 22 24", fill:"none", xmlns:"http://www.w3.org/2000/svg"}}>
       <path d="M1.25 13.0833V10.9166C1.25 6.85413 1.25 4.82288 2.28458 3.39938C2.61832 2.93969 3.02228 2.53536 3.48167 2.20121C4.90625 1.16663 6.93858 1.16663 11 1.16663C15.0614 1.16663 17.0937 1.16663 18.5172 2.20121C18.977 2.53527 19.3814 2.9396 19.7154 3.39938C20.75 4.82288 20.75 6.85521 20.75 10.9166V13.0833C20.75 17.1458 20.75 19.177 19.7154 20.6005C19.3814 21.0603 18.977 21.4647 18.5172 21.7987C17.0937 22.8333 15.0614 22.8333 11 22.8333C6.93858 22.8333 4.90625 22.8333 3.48275 21.7987C3.02298 21.4647 2.61864 21.0603 2.28458 20.6005C1.70933 19.8086 1.45367 18.8293 1.341 17.4166M5.58333 8.74996H16.4167"
             stroke="currentColor" strokeOpacity="0.65" strokeWidth="1.5" strokeLinecap="round"/>
     </SvgIcon>
 );
 
-export default MyServiceIcon;
+export default ServicesIcon; 

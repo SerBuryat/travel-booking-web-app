@@ -10,7 +10,7 @@ const profileData = [
   { name: 'Bob Johnson', email: 'bob.johnson@example.com', phone: '+1 234 567 8902' },
 ];
 
-export default function MyProfilePage() {
+export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 pb-24 sm:pb-0">
       {/* Hamburger for large screens */}
@@ -20,7 +20,7 @@ export default function MyProfilePage() {
         </button>
       </div>
       <div className="max-w-md mx-auto pt-8 px-4">
-        <h1 className="text-2xl font-bold mb-4">My Profile</h1>
+        <h1 className="text-2xl font-bold mb-4">Profile</h1>
         <ul className="space-y-4">
           {profileData.map((profile, i) => (
             <li key={i} className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-800">
