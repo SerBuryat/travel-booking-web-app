@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import {testDatabaseConnection} from "@/lib/sshPrisma";
+import { prisma } from '@/lib/prisma';
 
 export async function GET(req: NextRequest) {
   try {
     console.log('🧪 Testing database connection...');
     
     // Test the connection by running a simple query
-    const result = await testDatabaseConnection();
+    const result = await prisma.$queryRaw`SELECT 1 as test`;
     
     console.log('✅ Database connection successful:', result);
     

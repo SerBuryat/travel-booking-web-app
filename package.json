@@ -9,12 +9,19 @@
     "lint": "next lint",
     "tunnel": "bash scripts/tunnel.sh",
     "tunnel:win": "scripts\\tunnel.bat",
+    "tunnel:wsl": "scripts\\tunnel-wsl.bat",
     "tunnel:unix": "chmod +x scripts/tunnel.sh && ./scripts/tunnel.sh",
     "db:test": "node scripts/test-db.js",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
     "db:pull": "npx prisma db pull",
-    "db:push": "npx prisma db push"
+    "db:push": "npx prisma db push",
+    "db:sync": "npx prisma db pull && npx prisma generate",
+    "dev:full": "npm run tunnel & npm run dev",
+    "dev:win": "start npm run tunnel:win && npm run dev",
+
+    "dev:full:win": "npm run tunnel:win && npm run db:sync && npm run dev",
+    "dev:full:linux": "npm run tunnel && npm run db:sync && npm run dev"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -25,8 +32,7 @@
     "next": "15.3.5",
     "prisma": "^6.12.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tunnel-ssh": "^5.2.0"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
