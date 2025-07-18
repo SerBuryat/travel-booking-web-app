@@ -12,21 +12,15 @@ const profileData = [
 
 export default function ProfilePage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pb-24 sm:pb-0">
-      {/* Hamburger for large screens */}
-      <div className="hidden sm:block fixed top-4 left-4 z-50">
-        <button className="rounded-full p-2 bg-transparent">
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect y="5" width="24" height="3" rx="1.5" fill="#222" /><rect y="10.5" width="24" height="3" rx="1.5" fill="#222" /><rect y="16" width="24" height="3" rx="1.5" fill="#222" /></svg>
-        </button>
-      </div>
+    <div className="min-h-screen bg-white pb-24 sm:pb-0">
       <div className="max-w-md mx-auto pt-8 px-4">
-        <h1 className="text-2xl font-bold mb-4">Profile</h1>
+        <h1 className="text-2xl font-bold mb-4 text-black">Profile</h1>
         <ul className="space-y-4">
           {profileData.map((profile, i) => (
-            <li key={i} className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-800">
-              <div className="font-semibold text-lg">{profile.name}</div>
+            <li key={i} className="rounded-lg border p-4 bg-gray-50">
+              <div className="font-semibold text-lg text-black">{profile.name}</div>
               <div className="text-sm text-gray-500">{profile.email}</div>
-              <div className="text-sm text-gray-500">{profile.phone}</div>
+              <div className="text-sm text-blue-600">{profile.phone}</div>
             </li>
           ))}
         </ul>

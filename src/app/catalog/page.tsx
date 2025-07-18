@@ -1,40 +1,136 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navbar } from '@/components/navbar/Navbar';
 import { getNavbarButtons } from '@/components/navbar/navbarConfig';
+import { CategoryItem } from '@/components/CategoryItem';
+import { SearchBar } from '@/components/SearchBar';
 
-const services = [
-  { name: 'City Tour', price: '$50', rating: 4.5, description: 'Explore the city highlights with a local guide.' },
-  { name: 'Mountain Hike', price: '$120', rating: 4.8, description: 'Guided hike in the beautiful mountains.' },
-  { name: 'Beach Relax', price: '$80', rating: 4.2, description: 'Day at the private beach with amenities.' },
-];
+interface Category {
+  id: number;
+  name: string;
+  code: string;
+  photo?: string | null;
+}
+
+interface Service {
+  id: number;
+  description: string;
+  tcategories_id: number;
+  price: string;
+}
 
 export default function CatalogPage() {
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalCategory, setModalCategory] = useState<Category | null>(null);
+  const [services, setServices] = useState<Service[]>([]);
+  const [servicesLoading, setServicesLoading] = useState(false);
+  const [servicesError, setServicesError] = useState<string | null>(null);
+  const [searchValue, setSearchValue] = useState('');
+
+  useEffect(() => {
+    fetch('/api/catalog/categories')
+      .then(res => res.json())
+      .then(data => {
+        setCategories(data.data || []);
+        setLoading(false);
+      });
+  }, []);
+
+  const handleCategoryClick = (category: Category) => {
+    setModalCategory(category);
+    setModalOpen(true);
+    setServices([]);
+    setServicesError(null);
+    setServicesLoading(true);
+    fetch(`/api/catalog/services?tcategories_id=${category.id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          setServices(data.data);
+        } else {
+          setServicesError('Failed to load services');
+        }
+      })
+      .catch(() => setServicesError('Failed to load services'))
+      .finally(() => setServicesLoading(false));
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalCategory(null);
+    setServices([]);
+    setServicesError(null);
+  };
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 pb-24 sm:pb-0">
-      {/* Hamburger for large screens */}
-      <div className="hidden sm:block fixed top-4 left-4 z-50">
-        <button className="rounded-full p-2 bg-transparent">
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24"><rect y="5" width="24" height="3" rx="1.5" fill="#222" /><rect y="10.5" width="24" height="3" rx="1.5" fill="#222" /><rect y="16" width="24" height="3" rx="1.5" fill="#222" /></svg>
-        </button>
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
+      {/* Sticky SearchBar */}
+      <div className="sticky top-0 z-40 bg-white pt-8 px-4 pb-4">
+        <div className="max-w-md mx-auto">
+          <SearchBar value={searchValue} onChange={setSearchValue} />
+          {searchValue && (
+            <div className="mt-2 text-sm text-gray-500 text-center">
+              You typed: &#34;{searchValue}&#34;
+            </div>
+          )}
+        </div>
       </div>
-      <div className="max-w-md mx-auto pt-8 px-4">
-        <h1 className="text-2xl font-bold mb-4">Catalog</h1>
-        <ul className="space-y-4">
-          {services.map((s, i) => (
-            <li key={i} className="rounded-lg border p-4 bg-gray-50 dark:bg-gray-800">
-              <div className="font-semibold text-lg">{s.name}</div>
-              <div className="text-sm text-gray-500">{s.description}</div>
-              <div className="flex justify-between mt-2 text-sm">
-                <span>Price: {s.price}</span>
-                <span>⭐ {s.rating}</span>
-              </div>
-            </li>
-          ))}
-        </ul>
+      
+      {/* Categories List */}
+      <div className="px-4 pb-32">
+        <div className="max-w-xs mx-auto">
+          {loading ? (
+            <div className="text-center py-8 text-gray-400">Loading categories...</div>
+          ) : (
+            <div className="overflow-y-auto">
+              {categories.length === 0 ? (
+                <div className="text-center py-8 text-gray-400">No categories found.</div>
+              ) : (
+                <ul>
+                  {categories.map((cat) => (
+                    <li key={cat.id} className="relative">
+                      <CategoryItem {...cat} onClick={handleCategoryClick} />
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
+        </div>
       </div>
+      
       <Navbar buttons={getNavbarButtons()} />
+      
+      {/* Modal */}
+      {modalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative" style={{ fontFamily: 'Inter, sans-serif' }}>
+            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={closeModal}>&times;</button>
+            <h2 className="text-xl font-semibold mb-2">Services for: {modalCategory?.name}</h2>
+            {servicesLoading ? (
+              <div className="text-center py-4 text-gray-400">Loading services...</div>
+            ) : servicesError ? (
+              <div className="text-center py-4 text-red-500">{servicesError}</div>
+            ) : services.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                no services found for category: {modalCategory?.id} - {modalCategory?.code} - {modalCategory?.name}
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-200">
+                {services.map((s) => (
+                  <li key={s.id} className="py-2">
+                    <div className="font-medium">{s.description}</div>
+                    <div className="text-sm text-gray-500">Price: {s.price}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
