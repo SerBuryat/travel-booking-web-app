@@ -6,16 +6,27 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "tunnel": "bash scripts/tunnel.sh",
+    "tunnel:win": "scripts\\tunnel.bat",
+    "tunnel:unix": "chmod +x scripts/tunnel.sh && ./scripts/tunnel.sh",
+    "db:test": "node scripts/test-db.js",
+    "db:studio": "npx prisma studio",
+    "db:generate": "npx prisma generate",
+    "db:pull": "npx prisma db pull",
+    "db:push": "npx prisma db push"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
     "@mui/material": "^7.2.0",
-    "lowdb": "^7.0.1",
+    "@prisma/client": "^6.12.0",
+    "dotenv": "^17.2.0",
     "next": "15.3.5",
+    "prisma": "^6.12.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "tunnel-ssh": "^5.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
