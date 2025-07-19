@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CategoryItem } from '@/components/CategoryItem';
 import { SearchBar } from '@/components/SearchBar';
 import { Header } from '@/components/Header';
@@ -20,6 +21,7 @@ interface Service {
 }
 
 export default function CatalogPage() {
+  const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -39,22 +41,8 @@ export default function CatalogPage() {
   }, []);
 
   const handleCategoryClick = (category: Category) => {
-    setModalCategory(category);
-    setModalOpen(true);
-    setServices([]);
-    setServicesError(null);
-    setServicesLoading(true);
-    fetch(`/api/catalog/services?tcategories_id=${category.id}`)
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          setServices(data.data);
-        } else {
-          setServicesError('Failed to load services');
-        }
-      })
-      .catch(() => setServicesError('Failed to load services'))
-      .finally(() => setServicesLoading(false));
+    // Navigate to services page using Next.js router
+    router.push(`/catalog/${category.id}/services`);
   };
 
   const closeModal = () => {
@@ -98,7 +86,10 @@ export default function CatalogPage() {
         </div>
       </div>
       
-      {/* Modal */}
+      {/* White blur effect near navbar */}
+      <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
+      
+      {/* Modal (keeping for backward compatibility) */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
           <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative" style={{ fontFamily: 'Inter, sans-serif' }}>
