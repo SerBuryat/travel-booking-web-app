@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Navbar } from '@/components/navbar/Navbar';
-import { getNavbarButtons } from '@/components/navbar/navbarConfig';
 import { CategoryItem } from '@/components/CategoryItem';
 import { SearchBar } from '@/components/SearchBar';
+import { Header } from '@/components/Header';
 
 interface Category {
   id: number;
@@ -67,17 +66,14 @@ export default function CatalogPage() {
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
-      {/* Sticky SearchBar */}
-      <div className="sticky top-0 z-40 bg-white pt-8 px-4 pb-4">
-        <div className="max-w-md mx-auto">
-          <SearchBar value={searchValue} onChange={setSearchValue} />
-          {searchValue && (
-            <div className="mt-2 text-sm text-gray-500 text-center">
-              You typed: &#34;{searchValue}&#34;
-            </div>
-          )}
-        </div>
-      </div>
+      <Header>
+        <SearchBar value={searchValue} onChange={setSearchValue} />
+        {searchValue && (
+          <div className="mt-2 text-sm text-gray-500 text-center">
+            You typed: &#34;{searchValue}&#34;
+          </div>
+        )}
+      </Header>
       
       {/* Categories List */}
       <div className="px-4 pb-32">
@@ -101,8 +97,6 @@ export default function CatalogPage() {
           )}
         </div>
       </div>
-      
-      <Navbar buttons={getNavbarButtons()} />
       
       {/* Modal */}
       {modalOpen && (

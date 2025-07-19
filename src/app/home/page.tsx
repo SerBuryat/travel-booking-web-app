@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Navbar } from '@/components/navbar/Navbar';
-import { getNavbarButtons } from '@/components/navbar/navbarConfig';
 
 const homeData = [
   { title: 'Welcome Back!', subtitle: 'Ready to explore today?', status: 'Active' },
@@ -28,7 +26,6 @@ export default function HomePage() {
           ))}
         </ul>
       </div>
-      <Navbar buttons={getNavbarButtons()} />
     </div>
   );
 } 

@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Navbar } from '@/components/navbar/Navbar';
-import { getNavbarButtons } from '@/components/navbar/navbarConfig';
 
 const profileData = [
   { name: 'John Doe', email: 'john.doe@example.com', phone: '+1 234 567 8900' },
@@ -25,7 +23,6 @@ export default function ProfilePage() {
           ))}
         </ul>
       </div>
-      <Navbar buttons={getNavbarButtons()} />
     </div>
   );
 } 

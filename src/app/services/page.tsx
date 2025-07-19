@@ -1,8 +1,6 @@
 'use client';
 
 import React from 'react';
-import { Navbar } from '@/components/navbar/Navbar';
-import { getNavbarButtons } from '@/components/navbar/navbarConfig';
 
 const services = [
   { name: 'Airport Transfer', price: '$30', rating: 4.7, description: 'Private transfer from airport to hotel.' },
@@ -28,7 +26,6 @@ export default function ServicesPage() {
           ))}
         </ul>
       </div>
-      <Navbar buttons={getNavbarButtons()} />
     </div>
   );
 } 

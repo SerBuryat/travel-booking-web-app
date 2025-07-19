@@ -43,6 +43,3 @@ export const NAVBAR_BUTTONS: NavbarButtonConfig[] = [
   SERVICES_BUTTON,
   PROFILE_BUTTON,
 ];
-
-// Function to get all navbar buttons
-export const getNavbarButtons = (): NavbarButtonConfig[] => NAVBAR_BUTTONS; 
