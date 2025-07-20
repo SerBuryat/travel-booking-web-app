@@ -3,12 +3,13 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
-    const categoryId = parseInt(params.categoryId);
+    const { categoryId } = await params;
+    const categoryIdNum = parseInt(categoryId);
     
-    if (isNaN(categoryId)) {
+    if (isNaN(categoryIdNum)) {
       return NextResponse.json(
         { success: false, error: 'Invalid category ID' },
         { status: 400 }
@@ -16,7 +17,7 @@ export async function GET(
     }
 
     const category = await prisma.tcategories.findUnique({
-      where: { id: categoryId },
+      where: { id: categoryIdNum },
       select: {
         id: true,
         name: true,

@@ -28,6 +28,13 @@ photo`
 - create api `/catalog/[categoryId]/services` to fetch `services` by `categoryId`
 - make `ShortViewServiceComponent` clickable, after click just show modal windows with `service`: `name`, 
   `description`, etc.
+- `tcategories` has `parent_id` when we click on `category` and fetch `/category/{categoryId}/services` if 
+  `category` has children we must find all children `category` and find `services` by list of `categoryId`
+```sql
+-- query example
+select * from tservices
+where tcategories_id in (select id from tcategories where parent_id = 2)
+```
 
 ## Recommendations
 

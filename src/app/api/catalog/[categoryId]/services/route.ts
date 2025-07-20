@@ -3,20 +3,35 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { categoryId: string } }
+  { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
-    const categoryId = parseInt(params.categoryId);
+    const { categoryId } = await params;
+    const categoryIdNum = parseInt(categoryId);
     
-    if (isNaN(categoryId)) {
+    if (isNaN(categoryIdNum)) {
       return NextResponse.json(
         { success: false, error: 'Invalid category ID' },
         { status: 400 }
       );
     }
 
+    // First, get all child category IDs for the given category
+    const childCategories = await prisma.tcategories.findMany({
+      where: { parent_id: categoryIdNum },
+      select: { id: true },
+    });
+
+    // Create array of category IDs: the selected category + all its children
+    const categoryIds = [categoryIdNum, ...childCategories.map(cat => cat.id)];
+
+    // Fetch services from all these categories
     const services = await prisma.tservices.findMany({
-      where: { tcategories_id: categoryId },
+      where: { 
+        tcategories_id: { 
+          in: categoryIds 
+        } 
+      },
       select: {
         id: true,
         name: true,
@@ -27,7 +42,15 @@ export async function GET(
       orderBy: { id: 'asc' },
     });
 
-    return NextResponse.json({ success: true, data: services });
+    return NextResponse.json({ 
+      success: true, 
+      data: services,
+      meta: {
+        categoryId: categoryIdNum,
+        childCategoryCount: childCategories.length,
+        totalCategoriesSearched: categoryIds.length
+      }
+    });
   } catch (error) {
     return NextResponse.json(
       { success: false, error: error instanceof Error ? error.message : 'Unknown error' },
