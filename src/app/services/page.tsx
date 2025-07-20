@@ -8,6 +8,7 @@ const services = [
   { name: 'Wine Tasting', price: '$60', rating: 4.6, description: 'Tour of local vineyards and wine tasting.' },
 ];
 
+// todo - mock design for `services` navbar button (remove later)
 export default function ServicesPage() {
   return (
     <div className="min-h-screen bg-white pb-24 sm:pb-0">
