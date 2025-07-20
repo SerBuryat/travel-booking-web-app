@@ -31,8 +31,6 @@ export default function CategoryServicesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState('');
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedService, setSelectedService] = useState<Service | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,15 +63,7 @@ export default function CategoryServicesPage() {
     fetchData();
   }, [categoryId]);
 
-  const handleServiceClick = (service: Service) => {
-    setSelectedService(service);
-    setModalOpen(true);
-  };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    setSelectedService(null);
-  };
 
   if (loading) {
     return (
@@ -129,7 +119,6 @@ export default function CategoryServicesPage() {
                 <ShortViewServiceComponent
                   key={service.id}
                   service={service}
-                  onClick={handleServiceClick}
                 />
               ))}
             </div>
@@ -139,46 +128,6 @@ export default function CategoryServicesPage() {
       
       {/* White blur effect near navbar */}
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
-      
-      {/* Service Modal */}
-      {modalOpen && selectedService && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative mx-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <button 
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 text-2xl"
-              onClick={closeModal}
-            >
-              &times;
-            </button>
-            
-            <div className="mb-4">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                {selectedService.name}
-              </h2>
-              <p className="text-gray-600 leading-relaxed">
-                {selectedService.description}
-              </p>
-            </div>
-            
-            <div className="border-t pt-4">
-              <div className="flex justify-between items-center mb-4">
-                <span className="text-2xl font-bold text-blue-600">
-                  ${selectedService.price}
-                </span>
-              </div>
-              
-              <div className="space-y-3">
-                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition">
-                  Book Now
-                </button>
-                <button className="w-full border border-gray-300 text-gray-700 py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition">
-                  Contact Provider
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 } 

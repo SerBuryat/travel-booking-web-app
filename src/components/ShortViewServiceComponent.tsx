@@ -1,4 +1,7 @@
+'use client';
+
 import React from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Service {
   id: number;
@@ -10,10 +13,14 @@ interface Service {
 
 interface ShortViewServiceComponentProps {
   service: Service;
-  onClick: (service: Service) => void;
+  onClick?: (service: Service) => void;
 }
 
-export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps> = ({ service, onClick }) => {
+export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps> = ({ 
+  service, 
+  onClick 
+}) => {
+  const router = useRouter();
   // Generate a random gradient for service photo
   const getRandomGradient = () => {
     const gradients = [
@@ -32,10 +39,19 @@ export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps>
     return text.substring(0, maxLength) + '...';
   };
 
+  const handleClick = () => {
+    if (onClick) {
+      onClick(service);
+    } else {
+      // Navigate to service page
+      router.push(`/services/${service.id}`);
+    }
+  };
+
   return (
     <div 
       className="bg-white rounded-[10px] overflow-hidden shadow-sm border cursor-pointer hover:shadow-md transition-shadow"
-      onClick={() => onClick(service)}
+      onClick={handleClick}
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
       {/* Service photo header */}

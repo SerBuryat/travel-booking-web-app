@@ -11,7 +11,6 @@
     "tunnel:win": "scripts\\tunnel.bat",
     "tunnel:wsl": "scripts\\tunnel-wsl.bat",
     "tunnel:unix": "chmod +x scripts/tunnel.sh && ./scripts/tunnel.sh",
-    "db:test": "node scripts/test-db.js",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
     "db:pull": "npx prisma db pull",

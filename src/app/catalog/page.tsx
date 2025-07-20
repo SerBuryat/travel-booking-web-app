@@ -13,22 +13,12 @@ interface Category {
   photo?: string | null;
 }
 
-interface Service {
-  id: number;
-  description: string;
-  tcategories_id: number;
-  price: string;
-}
+
 
 export default function CatalogPage() {
   const router = useRouter();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalCategory, setModalCategory] = useState<Category | null>(null);
-  const [services, setServices] = useState<Service[]>([]);
-  const [servicesLoading, setServicesLoading] = useState(false);
-  const [servicesError, setServicesError] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState('');
 
   useEffect(() => {
@@ -45,12 +35,7 @@ export default function CatalogPage() {
     router.push(`/catalog/${category.id}/services`);
   };
 
-  const closeModal = () => {
-    setModalOpen(false);
-    setModalCategory(null);
-    setServices([]);
-    setServicesError(null);
-  };
+
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -88,34 +73,6 @@ export default function CatalogPage() {
       
       {/* White blur effect near navbar */}
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
-      
-      {/* Modal (keeping for backward compatibility) */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
-          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600" onClick={closeModal}>&times;</button>
-            <h2 className="text-xl font-semibold mb-2">Services for: {modalCategory?.name}</h2>
-            {servicesLoading ? (
-              <div className="text-center py-4 text-gray-400">Loading services...</div>
-            ) : servicesError ? (
-              <div className="text-center py-4 text-red-500">{servicesError}</div>
-            ) : services.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">
-                no services found for category: {modalCategory?.id} - {modalCategory?.code} - {modalCategory?.name}
-              </div>
-            ) : (
-              <ul className="divide-y divide-gray-200">
-                {services.map((s) => (
-                  <li key={s.id} className="py-2">
-                    <div className="font-medium">{s.description}</div>
-                    <div className="text-sm text-gray-500">Price: {s.price}</div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 } 
