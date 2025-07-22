@@ -44,16 +44,20 @@ where tcategories_id in (select id from tcategories where parent_id = 2)
 
 ## Layout
 
+- In `CategoryServicesPage` between `CategoryHeaderComponent` and `SearchBar` add `ChildCategoryButton` list
+- `ChildCategoryButton` list has row layout, `scrollable`
 - 
 
 ## Design
 
-- 
+- active `ChildCategoryButton` has `#007AFF4D` color
+- nonactive `ChildCategoryButton` has `lightgray` color 
+- `ChildCategoryButton` font size `13px`, weight `600`
 
 ## Functionality
 
-- 
-
-## Recommendations
-
-- 
+- add api to get child `categories` by `parent_id`
+- use sql like: `tcategories where parent_id = parentId`
+- after clicking `child-category` button - load the `services` list by this `category_id`
+- there is can be the multiple selection(clicking) if so load the `services` list by this list `category_ids`
+- if no `child-category` button activated just load `services` by the `parent_id`

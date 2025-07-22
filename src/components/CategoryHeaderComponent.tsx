@@ -18,9 +18,10 @@ export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = (
     return gradients[Math.floor(Math.random() * gradients.length)];
   };
 
-  const backgroundStyle = photo 
-    ? { backgroundImage: `url(${photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-    : { background: getRandomGradient() };
+  const backgroundStyle = 
+    photo 
+      ? { backgroundImage: `url(${photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+      : { backgroundImage: getRandomGradient() };
 
   return (
     <div 
@@ -32,7 +33,7 @@ export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = (
       
       {/* Category name */}
       <h1 
-        className="relative z-10 text-white font-bold text-2xl text-center px-4"
+        className="relative z-10 text-white font-bold text-2xl text-center px-4 "
         style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}
       >
         {name}

@@ -22,47 +22,87 @@ interface Category {
   photo?: string | null;
 }
 
+// ChildCategoryButton component
+const ChildCategoryButton = ({ category, active, onClick }: { category: any, active: boolean, onClick: () => void }) => (
+  <button
+    className="px-4 py-2 rounded-[10px] mr-2 whitespace-nowrap"
+    style={{
+      background: active ? '#007AFF4D' : '#0000000A',
+      fontSize: '13px',
+      fontWeight: 600,
+      color: active ? '#007AFF' : '#333',
+      border: 'none',
+      outline: 'none',
+      transition: 'background 0.2s',
+    }}
+    onClick={onClick}
+    type="button"
+  >
+    {category.name}
+  </button>
+);
+
 export default function CategoryServicesPage() {
   const params = useParams();
   const categoryId = params.categoryId as string;
   
   const [services, setServices] = useState<Service[]>([]);
   const [category, setCategory] = useState<Category | null>(null);
+  const [childCategories, setChildCategories] = useState<Category[]>([]);
+  const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchValue, setSearchValue] = useState('');
 
+  // Fetch category and child categories
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch category details
         const categoryRes = await fetch(`/api/catalog/${categoryId}`);
         const categoryData = await categoryRes.json();
-        
         if (!categoryData.success) {
           setError('Category not found');
           return;
         }
-        
         setCategory(categoryData.data);
-        
-        // Fetch services for this category
-        const servicesRes = await fetch(`/api/catalog/${categoryId}/services`);
+        // Fetch child categories
+        const childRes = await fetch(`/api/catalog/${categoryId}/categories`);
+        const childData = await childRes.json();
+        if (childData.success) {
+          setChildCategories(childData.data);
+        }
+      } catch (err) {
+        setError('Failed to load data');
+      }
+    };
+    fetchData();
+  }, [categoryId]);
+
+  // Fetch services based on selected child categories or parent
+  useEffect(() => {
+    const fetchServices = async () => {
+      setLoading(true);
+      try {
+        let url = '';
+        if (selectedChildIds.length > 0) {
+          url = `/api/catalog/services?categoryIds=${selectedChildIds.join(',')}`;
+        } else {
+          url = `/api/catalog/${categoryId}/services`;
+        }
+        const servicesRes = await fetch(url);
         const servicesData = await servicesRes.json();
-        
         if (servicesData.success) {
           setServices(servicesData.data);
         }
       } catch (err) {
-        setError('Failed to load data');
+        setError('Failed to load services');
       } finally {
         setLoading(false);
       }
     };
-
-    fetchData();
-  }, [categoryId]);
-
+    fetchServices();
+  }, [categoryId, selectedChildIds]);
 
 
   if (loading) {
@@ -125,17 +165,39 @@ export default function CategoryServicesPage() {
       <div className="px-4 pt-8 pb-4">
         <CategoryHeaderComponent name={category.name} photo={category.photo} />
       </div>
-      
+      {/* Child Category Buttons */}
+      {childCategories.length > 0 && (
+        <div className="px-4 pb-2 overflow-x-auto">
+          <div className="flex flex-row w-full" style={{ overflowX: 'auto' }}>
+            {childCategories.map((cat) => {
+              const catIdStr = String(cat.id);
+              return (
+                <ChildCategoryButton
+                  key={catIdStr}
+                  category={cat}
+                  active={selectedChildIds.includes(catIdStr)}
+                  onClick={() => {
+                    setSelectedChildIds((prev) =>
+                      prev.includes(catIdStr)
+                        ? prev.filter((id) => id !== catIdStr)
+                        : [...prev, catIdStr]
+                    );
+                  }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
       {/* Search Bar */}
       <div className="px-4 pb-4">
         <SearchBar value={searchValue} onChange={setSearchValue} />
         {searchValue && (
           <div className="mt-2 text-sm text-gray-500 text-center">
-            You typed: &#34;{searchValue}&#34;
+            You typed: "{searchValue}"
           </div>
         )}
       </div>
-      
       {/* Services Grid */}
       <div className="px-4 pb-32">
         <div className="max-w-md mx-auto">
@@ -155,7 +217,6 @@ export default function CategoryServicesPage() {
           )}
         </div>
       </div>
-      
       {/* White blur effect near navbar */}
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
     </div>
