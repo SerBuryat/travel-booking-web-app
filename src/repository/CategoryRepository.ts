@@ -1,8 +1,7 @@
-import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET() {
-  const categories = await prisma.tcategories.findMany({
+export async function getAllParentCategories() {
+  return prisma.tcategories.findMany({
     where: { parent_id: null },
     select: {
       id: true,
@@ -12,5 +11,4 @@ export async function GET() {
     },
     orderBy: { id: 'asc' },
   });
-  return NextResponse.json(categories);
 } 
