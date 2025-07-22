@@ -39,3 +39,21 @@ where tcategories_id in (select id from tcategories where parent_id = 2)
 ## Recommendations
 
 - don't create `service` page for single `service` we create it later!
+
+# Services v2
+
+## Layout
+
+- 
+
+## Design
+
+- 
+
+## Functionality
+
+- 
+
+## Recommendations
+
+- 

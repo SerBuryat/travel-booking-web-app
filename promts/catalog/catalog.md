@@ -61,3 +61,17 @@ Page with list of `categories`(`tcategories`).
 - put placeholder (glass and word) in the middle of `searchbar`
 - categories list element must be less width than `navbar` (make `navbar` wider or `categories` list less via 
   `margin` for whole `categories` list element)
+
+# Catalog v4
+
+Shows only parent `categories`.
+
+## Functionality
+
+- show only parent `categories` and doesn't show children
+
+## Recommendations
+
+- `tcategories where parent_id is null` is parent `category`
+- doesn't load all `categories` from api, load only parent `categories`
+- create `categoryRepository` and function `findAllParentCategories` then use it
