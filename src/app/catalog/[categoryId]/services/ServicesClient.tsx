@@ -47,12 +47,14 @@ export default function ServicesClient({ category, childCategories, initialServi
   const [selectedChildIds, setSelectedChildIds] = useState<number[]>([]);
   const [searchValue, setSearchValue] = useState('');
 
-  // For demo: filter initialServices by search (in real app, fetch new services on selection)
+  // For demo: filter initialServices by search and selected child categories
   const filteredServices = useMemo(() => {
-    return initialServices.filter(service =>
-      service.name.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }, [initialServices, searchValue]);
+    return initialServices.filter(service => {
+      const matchesSearch = service.name.toLowerCase().includes(searchValue.toLowerCase());
+      const matchesCategory = selectedChildIds.length === 0 || selectedChildIds.includes(service.tcategories_id);
+      return matchesSearch && matchesCategory;
+    });
+  }, [initialServices, searchValue, selectedChildIds]);
 
   return (
     <>

@@ -1,7 +1,7 @@
 # Product Requirements Document (PRD)
 
 ## Project: Daily Task Manager Web App
-
+(just an example)
 ---
 
 ## 1. Project Purpose
