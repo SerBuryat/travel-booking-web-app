@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Loading() {
   return (
-    <>
+    <div className="bg-white">
       {/* Category Header Skeleton */}
       <div className="px-4 pt-8 pb-4">
         <div className="max-w-md mx-auto">
@@ -26,6 +26,6 @@ export default function Loading() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 } 

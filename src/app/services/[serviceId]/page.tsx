@@ -1,6 +1,6 @@
-import React, { Suspense } from 'react';
+import React from 'react';
 import { getServiceById } from '@/repository/ServiceRepository';
-import SingleServiceView, { SingleServiceViewLoadingSkeleton } from './SingleServiceView';
+import SingleServiceView from './SingleServiceView';
 
 export default async function ServicePage({ params }: { params: Promise<{ serviceId: string }> }) {
   const { serviceId } = await params;
@@ -26,9 +26,5 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
       </div>
     );
   }
-  return (
-    <Suspense fallback={<SingleServiceViewLoadingSkeleton />}> 
-      <SingleServiceView service={service} />
-    </Suspense>
-  );
+  return <SingleServiceView service={service} />;
 } 
