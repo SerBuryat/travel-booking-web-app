@@ -8,6 +8,7 @@ import { Suspense } from 'react';
 
 interface PageProps {
   params: { categoryId: string };
+  searchParams?: { childCategoryIds?: string };
 }
 
 function CategoryHeaderSkeleton() {
@@ -51,13 +52,24 @@ function ServicesSkeleton() {
   );
 }
 
-async function CategoryServicesContent({ categoryId }: { categoryId: number }) {
+async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { categoryId: number, childCategoryIdsParam?: string }) {
   const category = await getCategoryById(categoryId);
   if (!category) return notFound();
-  
   const childCategories = await getChildCategories(categoryId);
   const childCategoriesIds = childCategories.map((category) => category.id);
-  const services = await getServicesByCategoryIds([categoryId, ...childCategoriesIds]);
+
+  // Parse selected child category IDs from param
+  let selectedChildIds: number[] = [];
+  if (childCategoryIdsParam) {
+    selectedChildIds = childCategoryIdsParam.split(',').map(Number).filter(Boolean);
+  }
+
+  // If none selected, use parent + all children; else use parent + selected children
+  const serviceCategoryIds =
+      selectedChildIds.length > 0
+        ? [categoryId, ...selectedChildIds]
+        : [categoryId, ...childCategoriesIds];
+  const services = await getServicesByCategoryIds(serviceCategoryIds);
 
   return (
     <>
@@ -68,21 +80,23 @@ async function CategoryServicesContent({ categoryId }: { categoryId: number }) {
         category={category}
         childCategories={childCategories}
         initialServices={services}
+        selectedChildIds={selectedChildIds}
       />
     </>
   );
 }
 
-export default async function CategoryServicesPage({ params }: PageProps) {
+export default async function CategoryServicesPage({ params, searchParams }: PageProps) {
   const categoryId = Number(params.categoryId);
   if (isNaN(categoryId)) return notFound();
+  const childCategoryIdsParam = searchParams?.childCategoryIds;
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
       <Header><></></Header>
       <Suspense fallback={<CategoryHeaderSkeleton />}>
         <Suspense fallback={<ServicesSkeleton />}>
-          <CategoryServicesContent categoryId={categoryId} />
+          <CategoryServicesContent categoryId={categoryId} childCategoryIdsParam={childCategoryIdsParam} />
         </Suspense>
       </Suspense>
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>

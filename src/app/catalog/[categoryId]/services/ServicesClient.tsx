@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { SearchBar } from '@/components/SearchBar';
 import { ShortViewServiceComponent } from '@/components/ShortViewServiceComponent';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface Service {
   id: number;
@@ -22,6 +23,7 @@ interface ServicesClientProps {
   category: Category;
   childCategories: Category[];
   initialServices: Service[];
+  selectedChildIds?: number[];
 }
 
 const ChildCategoryButton = ({ category, active, onClick }: { category: Category, active: boolean, onClick: () => void }) => (
@@ -43,18 +45,38 @@ const ChildCategoryButton = ({ category, active, onClick }: { category: Category
   </button>
 );
 
-export default function ServicesClient({ category, childCategories, initialServices }: ServicesClientProps) {
-  const [selectedChildIds, setSelectedChildIds] = useState<number[]>([]);
+export default function ServicesClient({ category, childCategories, initialServices, selectedChildIds: initialSelectedChildIds = [] }: ServicesClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
 
-  // For demo: filter initialServices by search and selected child categories
+  // Use the selectedChildIds from props, not local state
+  const selectedChildIds = initialSelectedChildIds;
+
+  // Handle child category button click
+  const handleChildCategoryClick = (id: number) => {
+    let newSelected: number[];
+    if (selectedChildIds.includes(id)) {
+      newSelected = selectedChildIds.filter(cid => cid !== id);
+    } else {
+      newSelected = [...selectedChildIds, id];
+    }
+    const params = new URLSearchParams(searchParams.toString());
+    if (newSelected.length > 0) {
+      params.set('childCategoryIds', newSelected.join(','));
+    } else {
+      params.delete('childCategoryIds');
+    }
+    router.push(`?${params.toString()}`);
+    // Page will reload with new params
+  };
+
+  // For demo: filter initialServices by search only (category filtering is now server-side)
   const filteredServices = useMemo(() => {
-    return initialServices.filter(service => {
-      const matchesSearch = service.name.toLowerCase().includes(searchValue.toLowerCase());
-      const matchesCategory = selectedChildIds.length === 0 || selectedChildIds.includes(service.tcategories_id);
-      return matchesSearch && matchesCategory;
-    });
-  }, [initialServices, searchValue, selectedChildIds]);
+    return initialServices.filter(service =>
+      service.name.toLowerCase().includes(searchValue.toLowerCase())
+    );
+  }, [initialServices, searchValue]);
 
   return (
     <>
@@ -69,13 +91,7 @@ export default function ServicesClient({ category, childCategories, initialServi
                   key={cat.id}
                   category={cat}
                   active={active}
-                  onClick={() => {
-                    setSelectedChildIds((prev) =>
-                      prev.includes(cat.id)
-                        ? prev.filter((id) => id !== cat.id)
-                        : [...prev, cat.id]
-                    );
-                  }}
+                  onClick={() => handleChildCategoryClick(cat.id)}
                 />
               );
             })}
@@ -99,14 +115,9 @@ export default function ServicesClient({ category, childCategories, initialServi
               No services found in this category
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 overflow-y-auto">
-              {filteredServices.map((service) => (
-                <ShortViewServiceComponent
-                  key={service.id}
-                  service={service}
-                />
-              ))}
-            </div>
+            filteredServices.map((service) => (
+              <ShortViewServiceComponent key={service.id} service={service} />
+            ))
           )}
         </div>
       </div>
