@@ -86,17 +86,19 @@ async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { 
   );
 }
 
-export default async function CategoryServicesPage({ params, searchParams }: PageProps) {
-  const categoryId = Number(params.categoryId);
-  if (isNaN(categoryId)) return notFound();
-  const childCategoryIdsParam = searchParams?.childCategoryIds;
+export default async function CategoryServicesPage({ params, searchParams }: { params: Promise<{ categoryId: string }>, searchParams: Promise<{ childCategoryIds?: string }> }) {
+  const { categoryId } = await params;
+  const resolvedSearchParams = await searchParams;
+  const childCategoryIdsParam = resolvedSearchParams?.childCategoryIds;
+  const categoryIdNum = Number(categoryId);
+  if (isNaN(categoryIdNum)) return notFound();
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
       <Header><></></Header>
       <Suspense fallback={<CategoryHeaderSkeleton />}>
         <Suspense fallback={<ServicesSkeleton />}>
-          <CategoryServicesContent categoryId={categoryId} childCategoryIdsParam={childCategoryIdsParam} />
+          <CategoryServicesContent categoryId={categoryIdNum} childCategoryIdsParam={childCategoryIdsParam} />
         </Suspense>
       </Suspense>
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>

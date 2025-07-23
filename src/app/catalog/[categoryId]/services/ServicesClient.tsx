@@ -109,17 +109,17 @@ export default function ServicesClient({ category, childCategories, initialServi
       </div>
       {/* Services Grid */}
       <div className="px-4 pb-32">
-        <div className="max-w-md mx-auto">
           {filteredServices.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
               No services found in this category
             </div>
           ) : (
-            filteredServices.map((service) => (
-              <ShortViewServiceComponent key={service.id} service={service} />
-            ))
+            <div className="grid grid-cols-2 gap-3">
+              {filteredServices.map((service) => (
+                <ShortViewServiceComponent key={service.id} service={service} />
+              ))}
+            </div>
           )}
-        </div>
       </div>
     </>
   );
