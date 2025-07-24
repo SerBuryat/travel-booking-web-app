@@ -1,6 +1,6 @@
 import { getAllParentCategories } from '@/repository/CategoryRepository';
 import { Header } from '@/components/Header';
-import Catalog from './Catalog';
+import Catalog from "@/app/catalog/Catalog";
 
 export default async function CatalogPage() {
   const categories = await getAllParentCategories();

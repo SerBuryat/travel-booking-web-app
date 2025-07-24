@@ -36,4 +36,35 @@ export async function getChildCategories(parentId: number) {
     },
     orderBy: { id: 'asc' },
   });
+}
+
+export async function getCategoriesByIds(ids: number[]) {
+  if (!ids || ids.length === 0) return [];
+  return prisma.tcategories.findMany({
+    where: { id: { in: ids } },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      photo: true,
+    },
+    orderBy: { id: 'asc' },
+  });
+}
+
+export async function getCategoryParent(categoryId: number) {
+  const category = await prisma.tcategories.findUnique({
+    where: { id: categoryId },
+    select: { parent_id: true },
+  });
+  if (!category || category.parent_id == null) return null;
+  return prisma.tcategories.findUnique({
+    where: { id: category.parent_id },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      photo: true,
+    },
+  });
 } 

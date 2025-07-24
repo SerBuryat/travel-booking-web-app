@@ -43,4 +43,29 @@ export async function getServiceById(serviceId: number) {
     price: typeof service.price === 'object' && service.price !== null && 'toString' in service.price ? service.price.toString() : String(service.price),
     created_at: service.created_at instanceof Date ? service.created_at.toISOString() : String(service.created_at),
   };
+}
+
+export async function getAllServiceByLikeName(search: string) {
+  if (!search || search.length < 3) return [];
+  const services = await prisma.tservices.findMany({
+    where: {
+      name: {
+        contains: search,
+        mode: 'insensitive',
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      tcategories_id: true,
+    },
+    orderBy: { id: 'asc' },
+  });
+  return services.map(s => ({
+    ...s,
+    description: s.description ?? '',
+    price: typeof s.price === 'object' && s.price !== null && 'toString' in s.price ? s.price.toString() : String(s.price),
+  }));
 } 
