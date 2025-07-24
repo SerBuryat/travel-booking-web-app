@@ -1,14 +1,17 @@
 import { NavbarButtonConfig } from './Navbar';
 import HomeIcon from './HomeIcon';
 import CatalogIcon from './CatalogIcon';
-import ServicesIcon from './ServicesIcon';
 import ProfileIcon from './ProfileIcon';
+import MapIcon from './MapIcon';
+import RequestsIcon from './RequestsIcon';
 
 // Constants for each page
 export const HOME = '/home';
 export const CATALOG = '/catalog';
 export const SERVICES = '/services';
 export const PROFILE = '/profile';
+export const MAP = '/map';
+export const REQUESTS = '/requests';
 
 // Individual button configurations
 export const HOME_BUTTON: NavbarButtonConfig = {
@@ -23,12 +26,6 @@ export const CATALOG_BUTTON: NavbarButtonConfig = {
   title: 'Catalog',
 };
 
-export const SERVICES_BUTTON: NavbarButtonConfig = {
-  href: SERVICES,
-  icon: ServicesIcon,
-  title: 'Services',
-};
-
 export const PROFILE_BUTTON: NavbarButtonConfig = {
   href: PROFILE,
   icon: ProfileIcon,
@@ -36,10 +33,23 @@ export const PROFILE_BUTTON: NavbarButtonConfig = {
   badgeContent: 4,
 };
 
+export const MAP_BUTTON: NavbarButtonConfig = {
+  href: MAP,
+  icon: MapIcon,
+  title: 'Map',
+};
+
+export const REQUESTS_BUTTON: NavbarButtonConfig = {
+  href: REQUESTS,
+  icon: RequestsIcon,
+  title: 'Requests',
+};
+
 // Complete navbar configuration
 export const NAVBAR_BUTTONS: NavbarButtonConfig[] = [
   HOME_BUTTON,
   CATALOG_BUTTON,
-  SERVICES_BUTTON,
+  MAP_BUTTON,
+  REQUESTS_BUTTON,
   PROFILE_BUTTON,
 ];
