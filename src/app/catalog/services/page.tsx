@@ -2,7 +2,6 @@ import { getAllServiceByLikeName } from '@/repository/ServiceRepository';
 import { getCategoriesByIds, getAllParentCategories, getCategoryParent } from '@/repository/CategoryRepository';
 import SearchedServicesView from '@/components/SearchedServicesView';
 import React from 'react';
-import { notFound } from 'next/navigation';
 
 function parseIds(ids: string | undefined): number[] {
   if (!ids) return [];

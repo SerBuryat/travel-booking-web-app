@@ -49,6 +49,7 @@ export default function ServicesClient({ category, childCategories, initialServi
   const router = useRouter();
   const searchParams = useSearchParams();
   const [searchValue, setSearchValue] = useState('');
+  const [error, setError] = useState<string | undefined>(undefined);
 
   // Use the selectedChildIds from props, not local state
   const selectedChildIds = initialSelectedChildIds;
@@ -69,6 +70,20 @@ export default function ServicesClient({ category, childCategories, initialServi
     }
     router.push(`?${params.toString()}`);
     // Page will reload with new params
+  };
+
+  const handleSearch = (val: string) => {
+    if (val.length < 3) {
+      setError('Enter at least 3 characters to search');
+      return;
+    }
+    setError(undefined);
+    router.push(`/catalog/services?search=${encodeURIComponent(val)}`);
+  };
+
+  const handleClear = () => {
+    setSearchValue('');
+    setError(undefined);
   };
 
   // For demo: filter initialServices by search only (category filtering is now server-side)
@@ -100,7 +115,13 @@ export default function ServicesClient({ category, childCategories, initialServi
       )}
       {/* Search Bar */}
       <div className="px-4 pb-4">
-        <SearchBar value={searchValue} onChange={setSearchValue} />
+        <SearchBar
+            value={searchValue}
+            onChange={setSearchValue}
+            onSearch={handleSearch}
+            onClear={handleClear}
+            error={error}
+        />
         {searchValue && (
           <div className="mt-2 text-sm text-gray-500 text-center">
             You typed: &#34;{searchValue}&#34;

@@ -23,14 +23,21 @@ export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = (
       ? { backgroundImage: `url(${photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
       : { backgroundImage: getRandomGradient() };
 
+  // Generate a random gradient for overlay (used only if photo is present)
+  const overlayGradient = getRandomGradient();
+
   return (
     <div 
       className="relative h-32 rounded-[10px] flex items-center justify-center overflow-hidden"
       style={backgroundStyle}
     >
       {/* Overlay for better text readability */}
-      <div className="absolute inset-0 bg-black bg-opacity-30"></div>
-      
+      {photo && (
+        <div
+          className="absolute inset-0"
+          style={{ background: overlayGradient, opacity: 0.7 }}
+        ></div>
+      )}
       {/* Category name */}
       <h1 
         className="relative z-10 text-white font-bold text-2xl text-center px-4 "

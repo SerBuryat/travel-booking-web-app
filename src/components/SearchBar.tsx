@@ -43,7 +43,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch,
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onKeyDown={handleKeyDown}
-        placeholder="Search"
         className={`w-full px-10 py-3 rounded-[10px] text-[17px] font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border border-red-500' : ''}`}
         style={{
           backgroundColor: '#7676801F',
@@ -54,7 +53,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch,
       {(focused || value) && value && (
         <button
           type="button"
-          className="absolute left-0 ml-2 flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500"
+          className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500"
           onClick={() => {
             onChange('');
             onClear && onClear();
