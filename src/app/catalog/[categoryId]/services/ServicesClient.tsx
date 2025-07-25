@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React from 'react';
 import { SearchBar } from '@/components/SearchBar';
 import { ShortViewServiceComponent } from '@/components/ShortViewServiceComponent';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -45,16 +45,12 @@ const ChildCategoryButton = ({ category, active, onClick }: { category: Category
   </button>
 );
 
-export default function ServicesClient({ category, childCategories, initialServices, selectedChildIds: initialSelectedChildIds = [] }: ServicesClientProps) {
+export default function ServicesClient({childCategories, initialServices, selectedChildIds: initialSelectedChildIds = [] }: ServicesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [searchValue, setSearchValue] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
-
   // Use the selectedChildIds from props, not local state
   const selectedChildIds = initialSelectedChildIds;
 
-  // Handle child category button click
   const handleChildCategoryClick = (id: number) => {
     let newSelected: number[];
     if (selectedChildIds.includes(id)) {
@@ -71,27 +67,6 @@ export default function ServicesClient({ category, childCategories, initialServi
     router.push(`?${params.toString()}`);
     // Page will reload with new params
   };
-
-  const handleSearch = (val: string) => {
-    if (val.length < 3) {
-      setError('Enter at least 3 characters to search');
-      return;
-    }
-    setError(undefined);
-    router.push(`/catalog/services?search=${encodeURIComponent(val)}`);
-  };
-
-  const handleClear = () => {
-    setSearchValue('');
-    setError(undefined);
-  };
-
-  // For demo: filter initialServices by search only (category filtering is now server-side)
-  const filteredServices = useMemo(() => {
-    return initialServices.filter(service =>
-      service.name.toLowerCase().includes(searchValue.toLowerCase())
-    );
-  }, [initialServices, searchValue]);
 
   return (
     <>
@@ -115,32 +90,15 @@ export default function ServicesClient({ category, childCategories, initialServi
       )}
       {/* Search Bar */}
       <div className="px-4 pb-4">
-        <SearchBar
-            value={searchValue}
-            onChange={setSearchValue}
-            onSearch={handleSearch}
-            onClear={handleClear}
-            error={error}
-        />
-        {searchValue && (
-          <div className="mt-2 text-sm text-gray-500 text-center">
-            You typed: &#34;{searchValue}&#34;
-          </div>
-        )}
+        <SearchBar searchValue={""} />
       </div>
       {/* Services Grid */}
       <div className="px-4 pb-32">
-          {filteredServices.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              No services found in this category
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-3">
-              {filteredServices.map((service) => (
-                <ShortViewServiceComponent key={service.id} service={service} />
-              ))}
-            </div>
-          )}
+        <div className="grid grid-cols-2 gap-3">
+          {initialServices.map((service) => (
+              <ShortViewServiceComponent key={service.id} service={service} />
+          ))}
+        </div>
       </div>
     </>
   );

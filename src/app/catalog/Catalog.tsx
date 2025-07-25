@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
 import { CategoryItem } from '@/components/CategoryItem';
 import { SearchBar } from '@/components/SearchBar';
@@ -17,36 +17,14 @@ interface CatalogProps {
 
 export default function Catalog({ categories }: CatalogProps) {
   const router = useRouter();
-  const [searchValue, setSearchValue] = useState('');
-  const [error, setError] = useState<string | undefined>(undefined);
 
   const handleCategoryClick = (category: Category) => {
     router.push(`/catalog/${category.id}/services`);
   };
 
-  const handleSearch = (val: string) => {
-    if (val.length < 3) {
-      setError('Enter at least 3 characters to search');
-      return;
-    }
-    setError(undefined);
-    router.push(`/catalog/services?search=${encodeURIComponent(val)}`);
-  };
-
-  const handleClear = () => {
-    setSearchValue('');
-    setError(undefined);
-  };
-
   return (
     <>
-      <SearchBar
-        value={searchValue}
-        onChange={setSearchValue}
-        onSearch={handleSearch}
-        onClear={handleClear}
-        error={error}
-      />
+      <SearchBar searchValue={""} />
       <div className="pt-0 p-10">
         <div className="overflow-y-auto">
           {categories.length === 0 ? (

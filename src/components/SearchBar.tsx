@@ -1,21 +1,32 @@
 import React, { useState, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface SearchBarProps {
-  value: string;
-  onChange: (value: string) => void;
-  onSearch: (value: string) => void;
-  onClear?: () => void;
-  error?: string;
+  searchValue?: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch, onClear, error }) => {
+export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '' }) => {
+  const [value, setValue] = useState(searchValue);
+  const [error, setError] = useState<string | undefined>(undefined);
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && value.length >= 3) {
-      onSearch(value);
+    if (e.key === 'Enter') {
+      if (value.length < 3) {
+        setError('Enter at least 3 characters to search');
+        return;
+      }
+      setError(undefined);
+      router.push(`/catalog/services?search=${encodeURIComponent(value)}`);
     }
+  };
+
+  const handleClear = () => {
+    setValue('');
+    setError(undefined);
+    inputRef.current?.focus();
   };
 
   return (
@@ -39,7 +50,10 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch,
         ref={inputRef}
         type="text"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          setValue(e.target.value);
+          if (error) setError(undefined);
+        }}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         onKeyDown={handleKeyDown}
@@ -54,11 +68,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ value, onChange, onSearch,
         <button
           type="button"
           className="absolute right-2 flex items-center justify-center w-6 h-6 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500"
-          onClick={() => {
-            onChange('');
-            onClear && onClear();
-            inputRef.current?.focus();
-          }}
+          onClick={handleClear}
           tabIndex={-1}
         >
           <svg width="16" height="16" fill="none" viewBox="0 0 24 24">

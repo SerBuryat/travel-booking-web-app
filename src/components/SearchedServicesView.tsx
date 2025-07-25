@@ -66,25 +66,10 @@ function ChildCategoryButton({ category, active, onClick }: { category: Category
 }
 
 export default function SearchedServicesView({ search, services, categories, parentCategories }: SearchedServicesViewProps) {
-  const [searchValue, setSearchValue] = useState(search || '');
-  const [error, setError] = useState<string | undefined>(undefined);
-  const router = useRouter();
   const ids = services.map((s) => s.id);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
 
-  const handleSearch = (val: string) => {
-    if (val.length < 3) {
-      setError('Enter at least 3 characters to search');
-      return;
-    }
-    setError(undefined);
-    router.push(`/catalog/services?search=${encodeURIComponent(val)}`);
-  };
-
-  const handleClear = () => {
-    setSearchValue('');
-    setError(undefined);
-  };
+  const searchValue = search;
 
   // Filter by active category if selected
   const filteredServices = activeCategory
@@ -96,13 +81,7 @@ export default function SearchedServicesView({ search, services, categories, par
       {/* Header: SearchBar + CancelSearchButton */}
       <div className="flex items-center mb-4">
         <div className="flex-1">
-          <SearchBar
-            value={searchValue}
-            onChange={setSearchValue}
-            onSearch={handleSearch}
-            onClear={handleClear}
-            error={error}
-          />
+          <SearchBar searchValue={searchValue} />
         </div>
         <div className="w-1/4 flex justify-end">
           <CancelSearchButton />
