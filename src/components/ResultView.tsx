@@ -10,6 +10,7 @@ interface Service {
   description: string;
   price: string;
   tcategories_id: number;
+  priority?: string;
 }
 
 interface ResultViewProps {
@@ -17,14 +18,15 @@ interface ResultViewProps {
   services: Service[];
   categories: Category[];
   parentCategories: Category[];
+  showAll?: boolean;
 }
 
-function AllServicesButton({ ids }: { ids: number[] }) {
+function AllServicesButton({ ids, searchValue }: { ids: number[]; searchValue: string }) {
   const router = useRouter();
   return (
     <button
       className="px-4 py-2 text-blue-600 font-semibold rounded hover:underline"
-      onClick={() => router.push(`/result?ids=${ids.join(',')}`)}
+      onClick={() => router.push(`/result?search=${encodeURIComponent(searchValue)}&showAll=true`)}
     >
       All Services
     </button>
@@ -52,7 +54,7 @@ function ChildCategoryButton({ category, active, onClick }: { category: Category
   );
 }
 
-export default function ResultView({ searchValue, services, categories, parentCategories }: ResultViewProps) {
+export default function ResultView({ searchValue, services, categories, parentCategories, showAll = false }: ResultViewProps) {
   const ids = services.map((s) => s.id);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
 
@@ -78,8 +80,8 @@ export default function ResultView({ searchValue, services, categories, parentCa
       )}
       {/* Popular + AllServicesButton row */}
       <div className="flex items-center justify-between mb-2">
-        <span className="font-semibold text-lg text-black">Popular</span>
-        <AllServicesButton ids={ids} />
+        <span className="font-semibold text-lg text-black">{showAll ? 'All Services' : 'Popular'}</span>
+        {!showAll && <AllServicesButton ids={ids} searchValue={searchValue} />}
       </div>
       {/* Found services grid (2 columns) */}
       <div className="grid grid-cols-2 gap-4 mb-8">

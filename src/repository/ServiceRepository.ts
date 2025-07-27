@@ -60,12 +60,42 @@ export async function getAllServiceByLikeName(search: string) {
       description: true,
       price: true,
       tcategories_id: true,
+      priority: true,
     },
-    orderBy: { id: 'asc' },
+    orderBy: { priority: 'desc' },
   });
   return services.map(s => ({
     ...s,
     description: s.description ?? '',
     price: typeof s.price === 'object' && s.price !== null && 'toString' in s.price ? s.price.toString() : String(s.price),
+    priority: typeof s.priority === 'object' && s.priority !== null && 'toString' in s.priority ? s.priority.toString() : String(s.priority),
+  }));
+}
+
+export async function getPopularServiceByLikeName(search: string, popularCount: number = 10) {
+  if (!search || search.length < 3) return [];
+  const services = await prisma.tservices.findMany({
+    where: {
+      name: {
+        contains: search,
+        mode: 'insensitive',
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      description: true,
+      price: true,
+      tcategories_id: true,
+      priority: true,
+    },
+    orderBy: { priority: 'desc' },
+    take: popularCount,
+  });
+  return services.map(s => ({
+    ...s,
+    description: s.description ?? '',
+    price: typeof s.price === 'object' && s.price !== null && 'toString' in s.price ? s.price.toString() : String(s.price),
+    priority: typeof s.priority === 'object' && s.priority !== null && 'toString' in s.priority ? s.priority.toString() : String(s.priority),
   }));
 } 

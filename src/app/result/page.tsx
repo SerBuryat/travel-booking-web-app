@@ -1,4 +1,4 @@
-import { getAllServiceByLikeName } from '@/repository/ServiceRepository';
+import { getPopularServiceByLikeName, getAllServiceByLikeName } from '@/repository/ServiceRepository';
 import { getCategoriesByIds, getAllParentCategories, getCategoryParent } from '@/repository/CategoryRepository';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
@@ -10,13 +10,18 @@ function parseIds(ids: string | undefined): number[] {
   return ids.split(',').map((id) => parseInt(id, 10)).filter(Boolean);
 }
 
-export default async function ResultPage({ searchParams }: { searchParams: { search?: string; ids?: string } }) {
+export default async function ResultPage({ searchParams }: { searchParams: { search?: string; ids?: string; showAll?: string } }) {
   const searchValue = searchParams.search || '';
   const ids = parseIds(searchParams.ids);
+  const showAll = searchParams.showAll === 'true';
   let services: any[] = [];
   
   if (searchValue && searchValue.length >= 3) {
-    services = await getAllServiceByLikeName(searchValue);
+    if (showAll) {
+      services = await getAllServiceByLikeName(searchValue);
+    } else {
+      services = await getPopularServiceByLikeName(searchValue, 10);
+    }
   } else if (ids.length > 0) {
     // fallback: fetch by ids
     // You can implement getServicesByIds if needed
@@ -48,6 +53,7 @@ export default async function ResultPage({ searchParams }: { searchParams: { sea
           services={services}
           categories={[...categories, ...parentCategoriesFromServices]}
           parentCategories={parentCategories}
+          showAll={showAll}
         />
       </Header>
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
