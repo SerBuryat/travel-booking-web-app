@@ -12,8 +12,8 @@ interface Service {
   tcategories_id: number;
 }
 
-interface SearchedServicesViewProps {
-  search: string;
+interface ResultViewProps {
+  searchValue: string;
   services: Service[];
   categories: Category[];
   parentCategories: Category[];
@@ -24,7 +24,7 @@ function AllServicesButton({ ids }: { ids: number[] }) {
   return (
     <button
       className="px-4 py-2 text-blue-600 font-semibold rounded hover:underline"
-      onClick={() => router.push(`/catalog/services?ids=${ids.join(',')}`)}
+      onClick={() => router.push(`/result?ids=${ids.join(',')}`)}
     >
       All Services
     </button>
@@ -52,7 +52,7 @@ function ChildCategoryButton({ category, active, onClick }: { category: Category
   );
 }
 
-export default function SearchedServicesView({ search, services, categories, parentCategories }: SearchedServicesViewProps) {
+export default function ResultView({ searchValue, services, categories, parentCategories }: ResultViewProps) {
   const ids = services.map((s) => s.id);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
 

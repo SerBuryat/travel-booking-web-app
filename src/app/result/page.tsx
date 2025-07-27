@@ -2,29 +2,31 @@ import { getAllServiceByLikeName } from '@/repository/ServiceRepository';
 import { getCategoriesByIds, getAllParentCategories, getCategoryParent } from '@/repository/CategoryRepository';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
-import SearchedServicesView from '@/components/SearchedServicesView';
 import React from 'react';
+import ResultView from '@/components/ResultView';
 
 function parseIds(ids: string | undefined): number[] {
   if (!ids) return [];
   return ids.split(',').map((id) => parseInt(id, 10)).filter(Boolean);
 }
 
-export default async function CatalogServicesPage({ searchParams }: { searchParams: { search?: string; ids?: string } }) {
-  const search = searchParams.search || '';
+export default async function ResultPage({ searchParams }: { searchParams: { search?: string; ids?: string } }) {
+  const searchValue = searchParams.search || '';
   const ids = parseIds(searchParams.ids);
   let services: any[] = [];
-  if (search && search.length >= 3) {
-    services = await getAllServiceByLikeName(search);
+  
+  if (searchValue && searchValue.length >= 3) {
+    services = await getAllServiceByLikeName(searchValue);
   } else if (ids.length > 0) {
     // fallback: fetch by ids
     // You can implement getServicesByIds if needed
     services = [];
   }
+  
   const categoryIds = Array.from(new Set(services.map((s: any) => s.tcategories_id)));
   const categories = categoryIds.length > 0 ? await getCategoriesByIds(categoryIds) : [];
 
-  // Fetch parent categories for all found tservices
+  // Fetch parent categories for all found services
   const parentCategoryMap: Record<number, any> = {};
   for (const catId of categoryIds) {
     const parent = await getCategoryParent(catId);
@@ -40,9 +42,9 @@ export default async function CatalogServicesPage({ searchParams }: { searchPara
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
       <Header>
-        <SearchBar searchValue={search} showCancelButton={true} />
-        <SearchedServicesView
-          search={search}
+        <SearchBar searchValue={searchValue} showCancelButton={true} />
+        <ResultView
+          searchValue={searchValue}
           services={services}
           categories={[...categories, ...parentCategoriesFromServices]}
           parentCategories={parentCategories}

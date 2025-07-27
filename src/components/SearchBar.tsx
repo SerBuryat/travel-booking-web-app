@@ -21,7 +21,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
         return;
       }
       setError(undefined);
-      router.push(`/catalog/services?search=${encodeURIComponent(value)}`);
+      router.push(`/result?search=${encodeURIComponent(value)}`);
     }
   };
 
