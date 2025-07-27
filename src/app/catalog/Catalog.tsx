@@ -2,7 +2,6 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { CategoryItem } from '@/components/CategoryItem';
-import { SearchBar } from '@/components/SearchBar';
 
 export interface Category {
   id: number;
@@ -24,8 +23,7 @@ export default function Catalog({ categories }: CatalogProps) {
 
   return (
     <>
-      <SearchBar searchValue={""} />
-      <div className="pt-0 p-10">
+      <div className="p-4 pt-2">
         <div className="overflow-y-auto">
           {categories.length === 0 ? (
             <div className="text-center py-8 text-gray-400">No categories found.</div>

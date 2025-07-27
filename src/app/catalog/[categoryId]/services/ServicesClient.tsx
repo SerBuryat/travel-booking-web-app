@@ -1,8 +1,8 @@
 'use client';
 import React from 'react';
-import { SearchBar } from '@/components/SearchBar';
 import { ShortViewServiceComponent } from '@/components/ShortViewServiceComponent';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { SearchBar } from '@/components/SearchBar';
 
 interface Service {
   id: number;
@@ -88,9 +88,8 @@ export default function ServicesClient({childCategories, initialServices, select
           </div>
         </div>
       )}
-      {/* Search Bar */}
-      <div className="px-4 pb-4">
-        <SearchBar searchValue={""} />
+      <div className="px-4 pt-4 pb-6">
+        <SearchBar searchValue="" />
       </div>
       {/* Services Grid */}
       <div className="px-4 pb-32">

@@ -1,5 +1,7 @@
 import { getAllServiceByLikeName } from '@/repository/ServiceRepository';
 import { getCategoriesByIds, getAllParentCategories, getCategoryParent } from '@/repository/CategoryRepository';
+import { Header } from '@/components/Header';
+import { SearchBar } from '@/components/SearchBar';
 import SearchedServicesView from '@/components/SearchedServicesView';
 import React from 'react';
 
@@ -34,12 +36,19 @@ export default async function CatalogServicesPage({ searchParams }: { searchPara
 
   // Optionally fetch all parent categories for Catalog.tsx
   const parentCategories = await getAllParentCategories();
+  
   return (
-    <SearchedServicesView
-      search={search}
-      services={services}
-      categories={[...categories, ...parentCategoriesFromServices]}
-      parentCategories={parentCategories}
-    />
+    <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
+      <Header>
+        <SearchBar searchValue={search} showCancelButton={true} />
+        <SearchedServicesView
+          search={search}
+          services={services}
+          categories={[...categories, ...parentCategoriesFromServices]}
+          parentCategories={parentCategories}
+        />
+      </Header>
+      <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
+    </div>
   );
 } 

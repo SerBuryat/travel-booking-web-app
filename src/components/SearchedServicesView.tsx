@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { SearchBar } from './SearchBar';
 import { ShortViewServiceComponent } from './ShortViewServiceComponent';
 import Catalog, {Category} from "@/app/catalog/Catalog";
 
@@ -18,18 +17,6 @@ interface SearchedServicesViewProps {
   services: Service[];
   categories: Category[];
   parentCategories: Category[];
-}
-
-function CancelSearchButton() {
-  const router = useRouter();
-  return (
-    <button
-      className="ml-2 px-4 py-2 text-blue-600 font-semibold rounded hover:underline"
-      onClick={() => router.push('/catalog')}
-    >
-      Cancel
-    </button>
-  );
 }
 
 function AllServicesButton({ ids }: { ids: number[] }) {
@@ -69,8 +56,6 @@ export default function SearchedServicesView({ search, services, categories, par
   const ids = services.map((s) => s.id);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
 
-  const searchValue = search;
-
   // Filter by active category if selected
   const filteredServices = activeCategory
     ? services.filter((s) => s.tcategories_id === activeCategory)
@@ -78,15 +63,6 @@ export default function SearchedServicesView({ search, services, categories, par
 
   return (
     <div className="w-full max-w-3xl mx-auto pt-8 px-4 bg-white">
-      {/* Header: SearchBar + CancelSearchButton */}
-      <div className="flex items-center mb-4">
-        <div className="flex-1">
-          <SearchBar searchValue={searchValue} />
-        </div>
-        <div className="w-1/4 flex justify-end">
-          <CancelSearchButton />
-        </div>
-      </div>
       {/* ChildCategoryButton list */}
       {categories.length > 0 && (
         <div className="flex flex-wrap mb-4">

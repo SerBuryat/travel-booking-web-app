@@ -1,6 +1,7 @@
 import { getCategoryById, getChildCategories } from '@/repository/CategoryRepository';
 import { getServicesByCategoryIds } from '@/repository/ServiceRepository';
 import { Header } from '@/components/Header';
+import { SearchBar } from '@/components/SearchBar';
 import { CategoryHeaderComponent } from '@/components/CategoryHeaderComponent';
 import ServicesClient from './ServicesClient';
 import { notFound } from 'next/navigation';
@@ -53,7 +54,6 @@ export default async function CategoryServicesPage({ params, searchParams }: Pag
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
-      <Header><></></Header>
       <CategoryServicesContent categoryId={categoryIdNum} childCategoryIdsParam={childCategoryIdsParam} />
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
     </div>
