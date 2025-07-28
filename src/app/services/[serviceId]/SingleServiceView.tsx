@@ -33,14 +33,14 @@ export default function SingleServiceView({ service }: { service: Service }) {
       <div className="px-4 py-6">
         {/* Service Name */}
         <h1 
-          className="text-2xl font-bold text-black mb-3"
+          className="text-2xl font-bold text-black mb-3 text-center"
           style={{ fontSize: '24px', fontWeight: 700 }}
         >
           {service.name}
         </h1>
         {/* Address */}
         <p 
-          className="text-gray-500 mb-6"
+          className="text-gray-500 mb-6 text-center"
           style={{ fontSize: '15px', color: '#AAAAAA', fontWeight: 400 }}
         >
           123 Main Street, Downtown District, City Center, 12345

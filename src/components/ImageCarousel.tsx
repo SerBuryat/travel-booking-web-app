@@ -12,33 +12,34 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   autoPlayInterval = 5000 
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     if (images.length <= 1) return;
 
+    const startTime = Date.now();
     const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const progressPercent = (elapsed % autoPlayInterval) / autoPlayInterval;
+      setProgress(progressPercent);
+    }, 16); // Update progress every 16ms (~60fps) for smoother animation
+
+    const slideInterval = setInterval(() => {
       setCurrentIndex((prevIndex) => 
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
       );
+      setProgress(0);
     }, autoPlayInterval);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearInterval(slideInterval);
+    };
   }, [images.length, autoPlayInterval]);
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
-  };
-
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? images.length - 1 : prevIndex - 1
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === images.length - 1 ? 0 : prevIndex + 1
-    );
+    setProgress(0);
   };
 
   if (images.length === 0) {
@@ -65,45 +66,37 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
         ))}
       </div>
 
-      {/* Navigation Arrows */}
-      {images.length > 1 && (
-        <>
-          <button
-            onClick={goToPrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
-            aria-label="Previous image"
-          >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-              <path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-          <button
-            onClick={goToNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-75 transition-all"
-            aria-label="Next image"
-          >
-            <svg width="20" height="20" fill="none" viewBox="0 0 24 24">
-              <path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </button>
-        </>
-      )}
-
       {/* Dots Indicator */}
       {images.length > 1 && (
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {images.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentIndex 
-                  ? 'bg-white' 
-                  : 'bg-white bg-opacity-50 hover:bg-opacity-75'
-              }`}
-              aria-label={`Go to image ${index + 1}`}
-            />
-          ))}
+          {images.map((_, index) => {
+            const isActive = index === currentIndex;
+            
+            return (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                className={`relative rounded-full overflow-hidden transition-all duration-300 ease-in-out ${
+                  isActive ? 'w-6 h-3' : 'w-3 h-3'
+                }`}
+                aria-label={`Go to image ${index + 1}`}
+              >
+                {/* Background grey layer */}
+                <div className="absolute inset-0 bg-gray-400" />
+                
+                {/* Loading white layer - fills from left to right */}
+                {isActive && (
+                  <div 
+                    className="absolute inset-0 bg-white"
+                    style={{ 
+                      width: `${progress * 100}%`,
+                      transition: 'width 0.016s linear'
+                    }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
