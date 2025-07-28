@@ -2,7 +2,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ShortViewServiceComponent } from './ShortViewServiceComponent';
-import Catalog, {Category} from "@/app/catalog/Catalog";
+import { GeneralCategoriesListComponent } from './GeneralCategoriesListComponent';
+
+interface Category {
+  id: number;
+  name: string;
+  code: string;
+  photo?: string | null;
+}
 
 interface Service {
   id: number;
@@ -17,7 +24,7 @@ interface ResultViewProps {
   searchValue: string;
   services: Service[];
   categories: Category[];
-  parentCategories: Category[];
+  generalCategories: Category[];
   showAll?: boolean;
 }
 
@@ -54,7 +61,7 @@ function ChildCategoryButton({ category, active, onClick }: { category: Category
   );
 }
 
-export default function ResultView({ searchValue, services, categories, parentCategories, showAll = false }: ResultViewProps) {
+export default function ResultView({ searchValue, services, categories, generalCategories, showAll = false }: ResultViewProps) {
   const ids = services.map((s) => s.id);
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
 
@@ -89,8 +96,8 @@ export default function ResultView({ searchValue, services, categories, parentCa
           <ShortViewServiceComponent key={service.id} service={service} />
         ))}
       </div>
-      {/* Lower: Catalog (parent categories) */}
-      <Catalog categories={parentCategories} />
+      {/* Lower: General Categories */}
+      <GeneralCategoriesListComponent categories={generalCategories} />
     </div>
   );
 } 

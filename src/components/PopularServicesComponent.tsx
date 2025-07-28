@@ -13,15 +13,17 @@ interface Service {
   priority: string;
 }
 
-interface PopularServicesForHomeComponentProps {
+interface PopularServicesComponentProps {
   services: Service[];
 }
 
-export const PopularServicesForHomeComponent: React.FC<PopularServicesForHomeComponentProps> = ({ services }) => {
+export const PopularServicesComponent: React.FC<PopularServicesComponentProps> = ({ 
+  services 
+}) => {
   const router = useRouter();
 
   const handleAllServicesClick = () => {
-    router.push('/catalog');
+    router.push('/services/popular');
   };
 
   return (
@@ -29,11 +31,12 @@ export const PopularServicesForHomeComponent: React.FC<PopularServicesForHomeCom
       {/* Заголовок с кнопкой All */}
       <div className="flex justify-between items-center mb-4">
         <span 
-          className="text-gray-700"
+          className="text-[#707579]"
           style={{ 
             fontSize: '13px', 
             fontWeight: 400,
-            fontFamily: 'Inter, sans-serif'
+            fontFamily: 'Inter, sans-serif',
+            textTransform: 'uppercase'
           }}
         >
           Popular

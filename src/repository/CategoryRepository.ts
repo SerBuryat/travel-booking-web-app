@@ -79,4 +79,18 @@ export async function getCategoryParent(categoryId: number) {
       photo: true,
     },
   });
+}
+
+export async function getCategoriesByCodeIn(codes: string[]) {
+  if (!codes || codes.length === 0) return [];
+  return prisma.tcategories.findMany({
+    where: { code: { in: codes } },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      photo: true,
+    },
+    orderBy: { id: 'asc' },
+  });
 } 

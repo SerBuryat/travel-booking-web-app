@@ -75,3 +75,30 @@ Shows only parent `categories`.
 - `tcategories where parent_id is null` is parent `category`
 - doesn't load all `categories` from api, load only parent `categories`
 - create `categoryRepository` and function `findAllParentCategories` then use it
+
+# Catalog v4
+
+Change layout and design of `Catalog` page:
+- shows only general `categories`
+- shows few popular `services`
+
+## Layout
+
+- change list of all parent `categories` to several general `categories`
+- lower, add list of popular `services`: in the top on the left side `Popular` text, on the left button `All` and lower the list of popular `services`
+
+## Design 
+
+- for general `categories` list change icon with random gradient to svg icon
+- for popular services use design from `Home` page `PopularServicesForHomeComponent`
+
+## Functionality
+
+- how to get `general categories`: data -> `CategoryRepository`, create `getCategoriesByCodeIn(codes)`, sql -> `tcategories where tcategories.code in (<codes>)`; svg icons -> in `utils` create constants of interface GeneralCategory(code, icon): `ACCOMODATION(accomodation, <svg_icon>)`, `FOOD(food, <svg_icon>)`, `TRANSPORT(transport, <svg_icon>)`, `TOURS(tours, svg_icon)`, put in the map and create function `getGeneralCategoryByCode(code)` and with this function we will get `icon` to general category by code
+
+## Recommendations
+
+- for general categories consts create mock `<svg_icons>` based on category name
+- example icon component `CatalogIcon` as for `Navbar`
+- update `Catalog` component for `catalog` page
+- for incapsulation and simplicity `general categories logic` create `GeneralCategoriesListComponent`, put `generalCategories` list as props and use it in `Catalog` component (ALL `general categories logic` IN ONE PLACE CAUSE IT"S FOR MVP)

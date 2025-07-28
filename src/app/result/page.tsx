@@ -1,5 +1,6 @@
 import { getPopularServiceByLikeName, getAllServiceByLikeName } from '@/repository/ServiceRepository';
-import { getCategoriesByIds, getAllParentCategories, getCategoryParent } from '@/repository/CategoryRepository';
+import { getCategoriesByIds, getCategoriesByCodeIn, getCategoryParent } from '@/repository/CategoryRepository';
+import { getGeneralCategoryCodes } from '@/utils/generalCategories';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import React from 'react';
@@ -43,8 +44,9 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
   }
   const parentCategoriesFromServices = Object.values(parentCategoryMap);
 
-  // Optionally fetch all parent categories for Catalog.tsx
-  const parentCategories = await getAllParentCategories();
+  // Fetch general categories for GeneralCategoriesListComponent
+  const generalCategoryCodes = getGeneralCategoryCodes();
+  const generalCategories = await getCategoriesByCodeIn(generalCategoryCodes);
   
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -54,7 +56,7 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
           searchValue={searchValue}
           services={services}
           categories={[...categories, ...parentCategoriesFromServices]}
-          parentCategories={parentCategories}
+          generalCategories={generalCategories}
           showAll={showAll}
         />
       </Header>

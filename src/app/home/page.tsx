@@ -4,7 +4,7 @@ import { getPopularServices } from '@/repository/ServiceRepository';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { AllCategoriesForHomeComponent } from '@/components/AllCategoriesForHomeComponent';
-import { PopularServicesForHomeComponent } from '@/components/PopularServicesForHomeComponent';
+import { PopularServicesComponent } from '@/components/PopularServicesComponent';
 import { RegistryServiceButton } from '@/components/RegistryServiceButton';
 import { PrivatePolicyButton } from '@/components/PrivatePolicyButton';
 
@@ -27,7 +27,7 @@ export default async function HomePage() {
         </div>
 
         {/* Популярные сервисы */}
-        <PopularServicesForHomeComponent services={popularServices} />
+        <PopularServicesComponent services={popularServices} />
 
         {/* Кнопки Registry service и Private policy */}
         <div className="px-4 py-6 flex flex-col items-center space-y-3">
