@@ -1,5 +1,17 @@
 import { prisma } from '@/lib/prisma';
 
+export async function getAllCategories() {
+  return prisma.tcategories.findMany({
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      photo: true,
+    },
+    orderBy: { id: 'asc' },
+  });
+}
+
 export async function getAllParentCategories() {
   return prisma.tcategories.findMany({
     where: { parent_id: null },

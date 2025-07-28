@@ -10,17 +10,19 @@ function parseIds(ids: string | undefined): number[] {
   return ids.split(',').map((id) => parseInt(id, 10)).filter(Boolean);
 }
 
-export default async function ResultPage({ searchParams }: { searchParams: { search?: string; ids?: string; showAll?: string } }) {
-  const searchValue = searchParams.search || '';
-  const ids = parseIds(searchParams.ids);
-  const showAll = searchParams.showAll === 'true';
+export default async function ResultPage({ searchParams }: { searchParams: Promise<{ search?: string; ids?: string; showAll?: string }> }) {
+  const params = await searchParams;
+  const searchValue = params.search || '';
+  const ids = parseIds(params.ids);
+  const showAll = params.showAll === 'true';
   let services: any[] = [];
   
-  if (searchValue && searchValue.length >= 3) {
+  const popularServicesCount = 4;
+  if (searchValue) {
     if (showAll) {
       services = await getAllServiceByLikeName(searchValue);
     } else {
-      services = await getPopularServiceByLikeName(searchValue, 10);
+      services = await getPopularServiceByLikeName(searchValue, popularServicesCount);
     }
   } else if (ids.length > 0) {
     // fallback: fetch by ids

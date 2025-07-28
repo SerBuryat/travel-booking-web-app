@@ -21,8 +21,8 @@ export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps>
   onClick 
 }) => {
   const router = useRouter();
-  // Generate a random gradient for service photo
-  const getRandomGradient = () => {
+  // Generate a deterministic gradient for service photo based on service ID
+  const getGradientForId = (id: number) => {
     const gradients = [
       'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -30,7 +30,7 @@ export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps>
       'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
       'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
     ];
-    return gradients[Math.floor(Math.random() * gradients.length)];
+    return gradients[id % gradients.length];
   };
 
   // Truncate description if too long
@@ -50,14 +50,14 @@ export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps>
 
   return (
     <div 
-      className="bg-white rounded-[10px] overflow-hidden shadow-sm border cursor-pointer hover:shadow-md transition-shadow"
+      className="bg-white rounded-[24px] overflow-hidden shadow-sm border cursor-pointer hover:shadow-md transition-shadow w-40"
       onClick={handleClick}
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
       {/* Service photo header */}
       <div 
-        className="h-24 w-full"
-        style={{ background: getRandomGradient() }}
+        className="h-40 w-full"
+        style={{ background: getGradientForId(service.id) }}
       ></div>
       
       {/* Service content */}

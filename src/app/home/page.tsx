@@ -1,30 +1,39 @@
-'use client';
-
 import React from 'react';
+import { getAllParentCategories } from '@/repository/CategoryRepository';
+import { getPopularServices } from '@/repository/ServiceRepository';
+import { Header } from '@/components/Header';
+import { SearchBar } from '@/components/SearchBar';
+import { AllCategoriesForHomeComponent } from '@/components/AllCategoriesForHomeComponent';
+import { PopularServicesForHomeComponent } from '@/components/PopularServicesForHomeComponent';
+import { RegistryServiceButton } from '@/components/RegistryServiceButton';
+import { PrivatePolicyButton } from '@/components/PrivatePolicyButton';
 
-const homeData = [
-  { title: 'Welcome Back!', subtitle: 'Ready to explore today?', status: 'Active' },
-  { title: 'Recent Activity', subtitle: '3 new notifications', status: 'New' },
-  { title: 'Quick Actions', subtitle: 'Book your next adventure', status: 'Available' },
-];
+export default async function HomePage() {
+  // Загружаем данные
+  const categories = await getAllParentCategories();
+  const popularServices = await getPopularServices(6);
 
-export default function HomePage() {
   return (
-    <div className="min-h-screen bg-white pb-24 sm:pb-0">
-      <div className="max-w-md mx-auto pt-8 px-4">
-        <h1 className="text-2xl font-bold mb-4 text-black">Home</h1>
-        <ul className="space-y-4">
-          {homeData.map((item, i) => (
-            <li key={i} className="rounded-lg border p-4 bg-gray-100">
-              <div className="font-semibold text-lg text-black">{item.title}</div>
-              <div className="text-sm text-gray-500">{item.subtitle}</div>
-              <div className="flex justify-between mt-2 text-sm">
-                <span className="text-blue-600">Status: {item.status}</span>
-                <span className="text-blue-600">→</span>
-              </div>
-            </li>
-          ))}
-        </ul>
+    <div className="min-h-screen bg-white pb-24">
+      <div className="max-w-md mx-auto">
+        {/* Header с поисковой строкой */}
+        <Header>
+          <SearchBar />
+        </Header>
+
+        {/* Список всех категорий */}
+        <div className="overflow-y-auto">
+          <AllCategoriesForHomeComponent categories={categories} />
+        </div>
+
+        {/* Популярные сервисы */}
+        <PopularServicesForHomeComponent services={popularServices} />
+
+        {/* Кнопки Registry service и Private policy */}
+        <div className="px-4 py-6 flex flex-col items-center space-y-3">
+          <RegistryServiceButton />
+          <PrivatePolicyButton />
+        </div>
       </div>
     </div>
   );
