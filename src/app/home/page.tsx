@@ -22,12 +22,14 @@ export default async function HomePage() {
         </Header>
 
         {/* Список всех категорий */}
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto pt-4 pl-4 pr-4">
           <AllCategoriesForHomeComponent categories={categories} />
         </div>
 
         {/* Популярные сервисы */}
-        <PopularServicesComponent services={popularServices} />
+        <div className="pl-4 pr-4">
+          <PopularServicesComponent services={popularServices} />
+        </div>
 
         {/* Кнопки Registry service и Private policy */}
         <div className="px-4 py-6 flex flex-col items-center space-y-3">

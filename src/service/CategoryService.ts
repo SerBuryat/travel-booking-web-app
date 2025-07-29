@@ -1,6 +1,7 @@
 import {CategoryEntity} from '@/entity/CategoryEntity';
 import {CategoryType} from '@/model/CategoryType';
 import {CategoryRepository} from '@/repository/CategoryRepository';
+import { getGeneralCategoryCodes } from '@/utils/generalCategories';
 
 export class CategoryService {
   /**
@@ -48,5 +49,12 @@ export class CategoryService {
     }) => 
       this.mapToCategoryType(item.category, item.children, item.parent)
     );
+  }
+
+  /**
+   * Gets general categories (accommodation, food, transport, tours)
+   */
+  static async getGeneralCategories(): Promise<CategoryEntity[]> {
+    return CategoryRepository.findAllByCodeIn(getGeneralCategoryCodes());
   }
 }

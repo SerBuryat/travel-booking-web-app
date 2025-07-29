@@ -15,15 +15,21 @@ interface Service {
 
 interface PopularServicesComponentProps {
   services: Service[];
+  onAllClick?: () => void;
 }
 
 export const PopularServicesComponent: React.FC<PopularServicesComponentProps> = ({ 
-  services 
+  services,
+  onAllClick
 }) => {
   const router = useRouter();
 
   const handleAllServicesClick = () => {
-    router.push('/services/popular');
+    if (onAllClick) {
+      onAllClick();
+    } else {
+      router.push('/services/popular');
+    }
   };
 
   return (

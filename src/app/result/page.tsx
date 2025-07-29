@@ -1,6 +1,5 @@
 import { getPopularServiceByLikeName, getAllServiceByLikeName } from '@/repository/ServiceRepository';
 import { CategoryRepository } from '@/repository/CategoryRepository';
-import { getGeneralCategoryCodes } from '@/utils/generalCategories';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import React from 'react';
@@ -44,22 +43,17 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
   }
   const parentCategoriesFromServices = Object.values(parentCategoryMap);
 
-  // Fetch general categories for GeneralCategoriesListComponent
-  const generalCategoryCodes = getGeneralCategoryCodes();
-  const generalCategories = await CategoryRepository.findAllByCodeIn(generalCategoryCodes);
-  
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
       <Header>
         <SearchBar searchValue={searchValue} showCancelButton={true} />
-        <ResultView
+      </Header>
+      <ResultView
           searchValue={searchValue}
           services={services}
           categories={[...categories, ...parentCategoriesFromServices]}
-          generalCategories={generalCategories}
           showAll={showAll}
         />
-      </Header>
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
     </div>
   );

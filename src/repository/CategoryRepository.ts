@@ -179,15 +179,17 @@ export class CategoryRepository {
   /**
    * Find categories by array of codes
    */
-  static async findAllByCodeIn(codes: string[]) {
+  static async findAllByCodeIn(codes: string[]): Promise<CategoryEntity[]> {
     if (!codes || codes.length === 0) return [];
     return prisma.tcategories.findMany({
       where: { code: { in: codes } },
       select: {
         id: true,
-        name: true,
         code: true,
+        sysname: true,
+        name: true,
         photo: true,
+        parent_id: true,
       },
       orderBy: { id: 'asc' },
     });
