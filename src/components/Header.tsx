@@ -6,7 +6,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ children }) => {
   return (
-    <header className="bg-white pt-8 px-4 pb-4">
+    <header className="bg-white pt-4 px-4">
       <div className="max-w-md mx-auto flex flex-col">
         {children}
       </div>

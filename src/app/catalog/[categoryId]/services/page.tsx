@@ -1,4 +1,4 @@
-import { getCategoryById, getChildCategories } from '@/repository/CategoryRepository';
+import { CategoryRepository } from '@/repository/CategoryRepository';
 import { getServicesByCategoryIds } from '@/repository/ServiceRepository';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
@@ -12,9 +12,9 @@ interface PageProps {
 }
 
 async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { categoryId: number, childCategoryIdsParam?: string }) {
-  const category = await getCategoryById(categoryId);
+  const category = await CategoryRepository.getCategoryById(categoryId);
   if (!category) return notFound();
-  const childCategories = await getChildCategories(categoryId);
+  const childCategories = await CategoryRepository.findAllByParentId(categoryId);
   const childCategoriesIds = childCategories.map((category) => category.id);
 
   // Parse selected child category IDs from param

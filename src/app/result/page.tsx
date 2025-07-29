@@ -1,5 +1,5 @@
 import { getPopularServiceByLikeName, getAllServiceByLikeName } from '@/repository/ServiceRepository';
-import { getCategoriesByIds, getCategoriesByCodeIn, getCategoryParent } from '@/repository/CategoryRepository';
+import { CategoryRepository } from '@/repository/CategoryRepository';
 import { getGeneralCategoryCodes } from '@/utils/generalCategories';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
@@ -32,12 +32,12 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
   }
   
   const categoryIds = Array.from(new Set(services.map((s: any) => s.tcategories_id)));
-  const categories = categoryIds.length > 0 ? await getCategoriesByIds(categoryIds) : [];
+  const categories = categoryIds.length > 0 ? await CategoryRepository.getCategoriesByIds(categoryIds) : [];
 
   // Fetch parent categories for all found services
   const parentCategoryMap: Record<number, any> = {};
   for (const catId of categoryIds) {
-    const parent = await getCategoryParent(catId);
+    const parent = await CategoryRepository.getCategoryParent(catId);
     if (parent && !parentCategoryMap[parent.id]) {
       parentCategoryMap[parent.id] = parent;
     }
@@ -46,7 +46,7 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
 
   // Fetch general categories for GeneralCategoriesListComponent
   const generalCategoryCodes = getGeneralCategoryCodes();
-  const generalCategories = await getCategoriesByCodeIn(generalCategoryCodes);
+  const generalCategories = await CategoryRepository.findAllByCodeIn(generalCategoryCodes);
   
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>

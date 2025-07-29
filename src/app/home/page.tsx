@@ -1,5 +1,5 @@
 import React from 'react';
-import { getAllParentCategories } from '@/repository/CategoryRepository';
+import { CategoryRepository } from '@/repository/CategoryRepository';
 import { getPopularServices } from '@/repository/ServiceRepository';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
@@ -10,7 +10,7 @@ import { PrivatePolicyButton } from '@/components/PrivatePolicyButton';
 
 export default async function HomePage() {
   // Загружаем данные
-  const categories = await getAllParentCategories();
+  const categories = await CategoryRepository.getAllParentCategories();
   const popularServices = await getPopularServices(6);
 
   return (
