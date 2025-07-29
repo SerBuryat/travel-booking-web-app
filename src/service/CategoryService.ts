@@ -39,7 +39,7 @@ export class CategoryService {
    * Gets all categories as CategoryType with hierarchical structure
    */
   static async getAllCategories(): Promise<CategoryType[]> {
-    const categoriesWithRelations = await CategoryRepository.findAllWithRelations();
+    const categoriesWithRelations = await CategoryRepository.findAll();
     
     // Transform to CategoryType using the relations from Prisma
     return categoriesWithRelations.map((item: {
@@ -56,5 +56,29 @@ export class CategoryService {
    */
   static async getGeneralCategories(): Promise<CategoryEntity[]> {
     return CategoryRepository.findAllByCodeIn(getGeneralCategoryCodes());
+  }
+
+  /**
+   * Get all parent categories (categories with no parent)
+   */
+  static async getAllParentCategories(): Promise<CategoryEntity[]> {
+    return CategoryRepository.findAllByParentId(null);
+  }
+
+  /**
+   * Get category by ID as CategoryType with hierarchical structure
+   */
+  static async getById(categoryId: number): Promise<CategoryType | null> {
+    const categoryWithRelations = await CategoryRepository.findById(categoryId);
+    
+    if (!categoryWithRelations) {
+      return null;
+    }
+
+    return this.mapToCategoryType(
+      categoryWithRelations.category, 
+      categoryWithRelations.children, 
+      categoryWithRelations.parent
+    );
   }
 }

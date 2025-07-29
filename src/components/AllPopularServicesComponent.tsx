@@ -2,17 +2,10 @@
 
 import React from 'react';
 import { ShortViewServiceComponent } from './ShortViewServiceComponent';
-
-interface Service {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  tcategories_id: number;
-}
+import { ServiceType } from '@/model/ServiceType';
 
 interface AllPopularServicesComponentProps {
-  services: Service[];
+  services: ServiceType[];
 }
 
 export const AllPopularServicesComponent: React.FC<AllPopularServicesComponentProps> = ({ services }) => {

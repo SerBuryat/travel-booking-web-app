@@ -3,30 +3,17 @@ import React from 'react';
 import { ShortViewServiceComponent } from '@/components/ShortViewServiceComponent';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchBar } from '@/components/SearchBar';
-
-interface Service {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  tcategories_id: number;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  code: string;
-  photo?: string | null;
-}
+import { ServiceType } from '@/model/ServiceType';
+import { CategoryEntity } from '@/entity/CategoryEntity';
 
 interface ServicesClientProps {
-  category: Category;
-  childCategories: Category[];
-  initialServices: Service[];
+  category: CategoryEntity;
+  childCategories: CategoryEntity[];
+  initialServices: ServiceType[];
   selectedChildIds?: number[];
 }
 
-const ChildCategoryButton = ({ category, active, onClick }: { category: Category, active: boolean, onClick: () => void }) => (
+const ChildCategoryButton = ({ category, active, onClick }: { category: CategoryEntity, active: boolean, onClick: () => void }) => (
   <button
     className="px-4 py-2 rounded-[10px] mr-2 whitespace-nowrap"
     style={{

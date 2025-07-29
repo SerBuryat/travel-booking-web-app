@@ -2,18 +2,11 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-
-interface Service {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  tcategories_id: number;
-}
+import { ServiceType } from '@/model/ServiceType';
 
 interface ShortViewServiceComponentProps {
-  service: Service;
-  onClick?: (service: Service) => void;
+  service: ServiceType;
+  onClick?: (service: ServiceType) => void;
 }
 
 export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps> = ({ 

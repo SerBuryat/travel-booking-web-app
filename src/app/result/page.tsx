@@ -1,5 +1,5 @@
-import { getPopularServiceByLikeName, getAllServiceByLikeName } from '@/repository/ServiceRepository';
-import { CategoryRepository } from '@/repository/CategoryRepository';
+import { ServiceService } from '@/service/ServiceService';
+import { CategoryService } from '@/service/CategoryService';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import React from 'react';
@@ -20,9 +20,9 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
   const popularServicesCount = 4;
   if (searchValue) {
     if (showAll) {
-      services = await getAllServiceByLikeName(searchValue);
+      services = await ServiceService.searchServicesByName(searchValue);
     } else {
-      services = await getPopularServiceByLikeName(searchValue, popularServicesCount);
+      services = await ServiceService.getPopularServicesByName(searchValue, popularServicesCount);
     }
   } else if (ids.length > 0) {
     // fallback: fetch by ids
@@ -30,18 +30,16 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
     services = [];
   }
   
-  const categoryIds = Array.from(new Set(services.map((s: any) => s.tcategories_id)));
-  const categories = categoryIds.length > 0 ? await CategoryRepository.getCategoriesByIds(categoryIds) : [];
-
-  // Fetch parent categories for all found services
-  const parentCategoryMap: Record<number, any> = {};
-  for (const catId of categoryIds) {
-    const parent = await CategoryRepository.getCategoryParent(catId);
-    if (parent && !parentCategoryMap[parent.id]) {
-      parentCategoryMap[parent.id] = parent;
-    }
-  }
-  const parentCategoriesFromServices = Object.values(parentCategoryMap);
+  // Extract categories from services with relations
+  const categories = services
+    .map(service => service.category)
+    .filter(Boolean)
+    .reduce((unique: any[], category: any) => {
+      if (!unique.find(c => c.id === category.id)) {
+        unique.push(category);
+      }
+      return unique;
+    }, []);
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -51,7 +49,7 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
       <ResultView
           searchValue={searchValue}
           services={services}
-          categories={[...categories, ...parentCategoriesFromServices]}
+          categories={categories}
           showAll={showAll}
         />
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>

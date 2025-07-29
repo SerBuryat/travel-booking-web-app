@@ -1,10 +1,10 @@
-import { getPopularServices } from '@/repository/ServiceRepository';
+import { ServiceService } from '@/service/ServiceService';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { AllPopularServicesComponent } from '@/components/AllPopularServicesComponent';
 
 export default async function PopularServicesPage() {
-  const popularServices = await getPopularServices(10);
+  const popularServices = await ServiceService.getPopularServices(10);
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>

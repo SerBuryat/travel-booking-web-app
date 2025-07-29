@@ -1,7 +1,5 @@
-import { CategoryRepository } from '@/repository/CategoryRepository';
-import { getServicesByCategoryIds } from '@/repository/ServiceRepository';
-import { Header } from '@/components/Header';
-import { SearchBar } from '@/components/SearchBar';
+import { CategoryService } from '@/service/CategoryService';
+import { ServiceService } from '@/service/ServiceService';
 import { CategoryHeaderComponent } from '@/components/CategoryHeaderComponent';
 import ServicesClient from './ServicesClient';
 import { notFound } from 'next/navigation';
@@ -12,10 +10,10 @@ interface PageProps {
 }
 
 async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { categoryId: number, childCategoryIdsParam?: string }) {
-  const category = await CategoryRepository.getCategoryById(categoryId);
-  if (!category) return notFound();
-  const childCategories = await CategoryRepository.findAllByParentId(categoryId);
-  const childCategoriesIds = childCategories.map((category) => category.id);
+  const categoryWithRelations = await CategoryService.getById(categoryId);
+  if (!categoryWithRelations) return notFound();
+  
+  const childCategoriesIds = categoryWithRelations.children.map((child) => child.id);  
 
   // Parse selected child category IDs from param
   let selectedChildIds: number[] = [];
@@ -28,16 +26,16 @@ async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { 
       selectedChildIds.length > 0
         ? [categoryId, ...selectedChildIds]
         : [categoryId, ...childCategoriesIds];
-  const services = await getServicesByCategoryIds(serviceCategoryIds);
+  const services = await ServiceService.getServicesByCategoryIds(serviceCategoryIds);
 
   return (
     <>
       <div className="px-4 pt-8 pb-4">
-        <CategoryHeaderComponent name={category.name} photo={category.photo} />
+        <CategoryHeaderComponent name={categoryWithRelations.name} photo={categoryWithRelations.photo} />
       </div>
       <ServicesClient
-        category={category}
-        childCategories={childCategories}
+        category={categoryWithRelations}
+        childCategories={categoryWithRelations.children}
         initialServices={services}
         selectedChildIds={selectedChildIds}
       />

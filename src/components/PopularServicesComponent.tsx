@@ -3,18 +3,10 @@
 import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ShortViewServiceComponent } from './ShortViewServiceComponent';
-
-interface Service {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  tcategories_id: number;
-  priority: string;
-}
+import { ServiceType } from '@/model/ServiceType';
 
 interface PopularServicesComponentProps {
-  services: Service[];
+  services: ServiceType[];
   onAllClick?: () => void;
 }
 

@@ -1,27 +1,13 @@
 import React from 'react';
 import { PopularServicesComponent } from './PopularServicesComponent';
 import { GeneralCategoriesListComponent } from './GeneralCategoriesListComponent';
-
-interface Category {
-  id: number;
-  name: string;
-  code: string;
-  photo?: string | null;
-}
-
-interface Service {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  tcategories_id: number;
-  priority: string;
-}
+import { ServiceType } from '@/model/ServiceType';
+import { CategoryEntity } from '@/entity/CategoryEntity';
 
 interface ResultViewProps {
   searchValue: string;
-  services: Service[];
-  categories: Category[];
+  services: ServiceType[];
+  categories: CategoryEntity[];
   showAll?: boolean;
 }
 
@@ -31,7 +17,7 @@ export default function ResultView({ searchValue, services, categories, showAll 
       {/* Categories list */}
       {categories.length > 0 && (
         <div className="flex flex-wrap">
-          {categories.map((cat: Category) => (
+          {categories.map((cat: CategoryEntity) => (
             <span
               key={cat.id}
               className="px-4 py-2 rounded-[10px] mr-2 whitespace-nowrap bg-gray-100 text-gray-700"

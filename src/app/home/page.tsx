@@ -1,17 +1,17 @@
 import React from 'react';
-import { CategoryRepository } from '@/repository/CategoryRepository';
-import { getPopularServices } from '@/repository/ServiceRepository';
+import { ServiceService } from '@/service/ServiceService';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import { AllCategoriesForHomeComponent } from '@/components/AllCategoriesForHomeComponent';
 import { PopularServicesComponent } from '@/components/PopularServicesComponent';
 import { RegistryServiceButton } from '@/components/RegistryServiceButton';
 import { PrivatePolicyButton } from '@/components/PrivatePolicyButton';
+import { CategoryService } from '@/service/CategoryService';
 
 export default async function HomePage() {
   // Загружаем данные
-  const categories = await CategoryRepository.getAllParentCategories();
-  const popularServices = await getPopularServices(6);
+  const categories = await CategoryService.getAllParentCategories();
+  const popularServices = await ServiceService.getPopularServices(6);
 
   return (
     <div className="min-h-screen bg-white pb-24">

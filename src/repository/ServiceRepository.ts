@@ -1,122 +1,156 @@
 import { prisma } from '@/lib/prisma';
+import { ServiceEntity } from '@/entity/ServiceEntity';
 
-export async function getServicesByCategoryIds(categoryIds: number[]) {
-  const services = await prisma.tservices.findMany({
-    where: {
-      tcategories_id: { in: categoryIds },
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      tcategories_id: true,
-    },
-    orderBy: { id: 'asc' },
-  });
-  // Map description to string (never null) and price to string
-  return services.map(s => ({
-    ...s,
-    description: s.description ?? '',
-    price: s.price ? String(s.price) : '0',
-  }));
-}
-
-export async function getServiceById(serviceId: number) {
-  const service = await prisma.tservices.findUnique({
-    where: { id: serviceId },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      tcategories_id: true,
-      provider_id: true,
-      status: true,
-      created_at: true,
-    },
-  });
-  if (!service) return null;
-  return {
-    ...service,
-    description: service.description ?? '',
-    price: service.price ? String(service.price) : '0',
-    created_at: service.created_at instanceof Date ? service.created_at.toISOString() : String(service.created_at),
-  };
-}
-
-export async function getAllServiceByLikeName(search: string) {
-  if (!search || search.length < 3) return [];
-  const services = await prisma.tservices.findMany({
-    where: {
-      name: {
-        contains: search,
-        mode: 'insensitive',
+export class ServiceRepository {
+  /**
+   * Find all services by category IDs
+   */
+  static async findAllByCategoryIdIn(categoryIds: number[]): Promise<ServiceEntity[]> {
+    const services = await prisma.tservices.findMany({
+      where: {
+        tcategories_id: { in: categoryIds },
       },
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      tcategories_id: true,
-      priority: true,
-    },
-    orderBy: { priority: 'desc' },
-  });
-  return services.map(s => ({
-    ...s,
-    description: s.description ?? '',
-    price: s.price ? String(s.price) : '0',
-    priority: s.priority ? String(s.priority) : '0',
-  }));
-}
-
-export async function getPopularServiceByLikeName(search: string, popularCount: number = 6) {
-  if (!search || search.length < 3) return [];
-  const services = await prisma.tservices.findMany({
-    where: {
-      name: {
-        contains: search,
-        mode: 'insensitive',
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tcategories_id: true,
       },
-    },
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      tcategories_id: true,
-      priority: true,
-    },
-    orderBy: { priority: 'desc' },
-    take: popularCount,
-  });
-  return services.map(s => ({
-    ...s,
-    description: s.description ?? '',
-    price: s.price ? String(s.price) : '0',
-    priority: s.priority ? String(s.priority) : '0',
-  }));
-}
+      orderBy: { id: 'asc' },
+    });
+    
+    return services.map(s => ({
+      id: s.id,
+      name: s.name,
+      description: s.description ?? '',
+      price: s.price ? String(s.price) : '0',
+      tcategories_id: s.tcategories_id,
+    }));
+  }
 
-export async function getPopularServices(popularCount: number = 10) {
-  const services = await prisma.tservices.findMany({
-    select: {
-      id: true,
-      name: true,
-      description: true,
-      price: true,
-      tcategories_id: true,
-      priority: true,
-    },
-    orderBy: { priority: 'desc' },
-    take: popularCount,
-  });
-  return services.map(s => ({
-    ...s,
-    description: s.description ?? '',
-    price: s.price ? String(s.price) : '0',
-    priority: s.priority ? String(s.priority) : '0',
-  }));
+  /**
+   * Get service by ID
+   */
+  static async findById(serviceId: number): Promise<ServiceEntity | null> {
+    const service = await prisma.tservices.findUnique({
+      where: { id: serviceId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tcategories_id: true,
+        provider_id: true,
+        status: true,
+        created_at: true,
+      },
+    });
+    if (!service) return null;
+    
+    return {
+      id: service.id,
+      name: service.name,
+      description: service.description ?? '',
+      price: service.price ? String(service.price) : '0',
+      tcategories_id: service.tcategories_id,
+      provider_id: service.provider_id,
+      status: service.status,
+      created_at: service.created_at instanceof Date ? service.created_at.toISOString() : String(service.created_at),
+    };
+  }
+
+  /**
+   * Find all services by name search
+   */
+  static async findAllByNameLike(search: string): Promise<ServiceEntity[]> {
+    if (!search || search.length < 3) return [];
+    const services = await prisma.tservices.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tcategories_id: true,
+        priority: true,
+      },
+      orderBy: { priority: 'desc' },
+    });
+    
+    return services.map(s => ({
+      id: s.id,
+      name: s.name,
+      description: s.description ?? '',
+      price: s.price ? String(s.price) : '0',
+      tcategories_id: s.tcategories_id,
+      priority: s.priority ? String(s.priority) : '0',
+    }));
+  }
+
+  /**
+   * Get popular services by name search
+   */
+  static async findPopularByLikeName(search: string, popularCount: number = 6): Promise<ServiceEntity[]> {
+    if (!search || search.length < 3) return [];
+    const services = await prisma.tservices.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tcategories_id: true,
+        priority: true,
+      },
+      orderBy: { priority: 'desc' },
+      take: popularCount,
+    });
+    
+    return services.map(s => ({
+      id: s.id,
+      name: s.name,
+      description: s.description ?? '',
+      price: s.price ? String(s.price) : '0',
+      tcategories_id: s.tcategories_id,
+      priority: s.priority ? String(s.priority) : '0',
+    }));
+  }
+
+  /**
+   * Get popular services
+   */
+  static async findPopular(popularCount: number = 10): Promise<ServiceEntity[]> {
+    const services = await prisma.tservices.findMany({
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tcategories_id: true,
+        priority: true,
+      },
+      orderBy: { priority: 'desc' },
+      take: popularCount,
+    });
+    
+    return services.map(s => ({
+      id: s.id,
+      name: s.name,
+      description: s.description ?? '',
+      price: s.price ? String(s.price) : '0',
+      tcategories_id: s.tcategories_id,
+      priority: s.priority ? String(s.priority) : '0',
+    }));
+  }
 } 

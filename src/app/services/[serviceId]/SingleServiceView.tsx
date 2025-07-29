@@ -1,19 +1,9 @@
 'use client';
 import React from 'react';
 import { ImageCarousel } from '@/components/ImageCarousel';
+import { ServiceType } from '@/model/ServiceType';
 
-interface Service {
-  id: number;
-  name: string;
-  description: string;
-  price: string;
-  tcategories_id: number;
-  provider_id: number;
-  status: string;
-  created_at: string;
-}
-
-export default function SingleServiceView({ service }: { service: Service }) {
+export default function SingleServiceView({ service }: { service: ServiceType }) {
   // Mock images for carousel (gradient backgrounds)
   const mockImages = [
     'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',

@@ -1,10 +1,10 @@
 import React from 'react';
-import { getPopularServices } from '@/repository/ServiceRepository';
+import { ServiceService } from '@/service/ServiceService';
 import { GeneralCategoriesListComponent } from '@/components/GeneralCategoriesListComponent';
 import { PopularServicesComponent } from '@/components/PopularServicesComponent';
 
 export default async function Catalog() {
-  const popularServices = await getPopularServices(6);
+  const popularServices = await ServiceService.getPopularServices(6);
 
   return (
     <>
