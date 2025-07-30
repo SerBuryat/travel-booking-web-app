@@ -96,7 +96,7 @@ export class ServiceRepository {
   /**
    * Get popular services by name search
    */
-  static async findPopularByLikeName(search: string, popularCount: number = 6): Promise<ServiceEntity[]> {
+  static async findPopularByLikeName(search: string): Promise<ServiceEntity[]> {
     if (!search || search.length < 3) return [];
     const services = await prisma.tservices.findMany({
       where: {
@@ -114,7 +114,6 @@ export class ServiceRepository {
         priority: true,
       },
       orderBy: { priority: 'desc' },
-      take: popularCount,
     });
     
     return services.map(s => ({

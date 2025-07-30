@@ -10,9 +10,8 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
   const searchValue = params.search || '';
   let services: any[] = [];
   
-  const popularServicesCount = 4;
   if (searchValue) {
-    services = await ServiceService.getPopularServicesByName(searchValue, popularServicesCount);
+    services = await ServiceService.getPopularServicesByName(searchValue);
   }
   
   // Extract categories from services with relations
