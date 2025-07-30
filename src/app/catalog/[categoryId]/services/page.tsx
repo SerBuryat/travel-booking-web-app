@@ -30,7 +30,7 @@ async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { 
 
   return (
     <>
-      <div className="px-4 pt-8 pb-4">
+      <div className="pt-8 pb-4">
         <CategoryHeaderComponent name={categoryWithRelations.name} photo={categoryWithRelations.photo} />
       </div>
       <ServicesClient

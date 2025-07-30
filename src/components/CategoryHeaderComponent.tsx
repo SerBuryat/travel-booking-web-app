@@ -28,7 +28,7 @@ export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = (
 
   return (
     <div 
-      className="relative h-32 rounded-[10px] flex items-center justify-center overflow-hidden"
+      className="relative h-32 rounded-lg flex items-center justify-center overflow-hidden"
       style={backgroundStyle}
     >
       {/* Overlay for better text readability */}

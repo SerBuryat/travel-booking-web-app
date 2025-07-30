@@ -11,4 +11,5 @@ export interface ServiceType {
   created_at?: string;
   priority?: string;
   category?: CategoryEntity;
+  rating?: number;
 } 

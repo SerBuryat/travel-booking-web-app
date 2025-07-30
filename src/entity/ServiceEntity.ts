@@ -8,4 +8,5 @@ export interface ServiceEntity {
   status?: string;
   created_at?: string;
   priority?: string;
+  rating?: number;
 } 

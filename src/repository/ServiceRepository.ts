@@ -16,6 +16,7 @@ export class ServiceRepository {
         description: true,
         price: true,
         tcategories_id: true,
+        rating: true,
       },
       orderBy: { id: 'asc' },
     });
@@ -26,6 +27,7 @@ export class ServiceRepository {
       description: s.description ?? '',
       price: s.price ? String(s.price) : '0',
       tcategories_id: s.tcategories_id,
+      rating: s.rating ? Number(s.rating) : undefined,
     }));
   }
 
@@ -44,6 +46,7 @@ export class ServiceRepository {
         provider_id: true,
         status: true,
         created_at: true,
+        rating: true,
       },
     });
     if (!service) return null;
@@ -57,6 +60,7 @@ export class ServiceRepository {
       provider_id: service.provider_id,
       status: service.status,
       created_at: service.created_at instanceof Date ? service.created_at.toISOString() : String(service.created_at),
+      rating: service.rating ? Number(service.rating) : undefined,
     };
   }
 
@@ -79,6 +83,7 @@ export class ServiceRepository {
         price: true,
         tcategories_id: true,
         priority: true,
+        rating: true,
       },
       orderBy: { priority: 'desc' },
     });
@@ -90,6 +95,7 @@ export class ServiceRepository {
       price: s.price ? String(s.price) : '0',
       tcategories_id: s.tcategories_id,
       priority: s.priority ? String(s.priority) : '0',
+      rating: s.rating ? Number(s.rating) : undefined,
     }));
   }
 
@@ -112,6 +118,7 @@ export class ServiceRepository {
         price: true,
         tcategories_id: true,
         priority: true,
+        rating: true,
       },
       orderBy: { priority: 'desc' },
     });
@@ -123,6 +130,7 @@ export class ServiceRepository {
       price: s.price ? String(s.price) : '0',
       tcategories_id: s.tcategories_id,
       priority: s.priority ? String(s.priority) : '0',
+      rating: s.rating ? Number(s.rating) : undefined,
     }));
   }
 
@@ -148,6 +156,7 @@ export class ServiceRepository {
         price: true,
         tcategories_id: true,
         priority: true,
+        rating: true,
       },
       orderBy: { priority: 'desc' },
     });
@@ -159,6 +168,7 @@ export class ServiceRepository {
       price: s.price ? String(s.price) : '0',
       tcategories_id: s.tcategories_id,
       priority: s.priority ? String(s.priority) : '0',
+      rating: s.rating ? Number(s.rating) : undefined,
     }));
   }
 
@@ -174,6 +184,7 @@ export class ServiceRepository {
         price: true,
         tcategories_id: true,
         priority: true,
+        rating: true,
       },
       orderBy: { priority: 'desc' },
       take: popularCount,
@@ -186,6 +197,7 @@ export class ServiceRepository {
       price: s.price ? String(s.price) : '0',
       tcategories_id: s.tcategories_id,
       priority: s.priority ? String(s.priority) : '0',
+      rating: s.rating ? Number(s.rating) : undefined,
     }));
   }
 } 

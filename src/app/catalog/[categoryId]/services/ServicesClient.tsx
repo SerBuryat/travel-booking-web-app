@@ -1,6 +1,7 @@
 'use client';
 import React from 'react';
 import { ShortViewServiceComponent } from '@/components/ShortViewServiceComponent';
+import { HorizontalViewServiceComponent } from '@/components/HorizontalViewServiceComponent';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchBar } from '@/components/SearchBar';
 import { ServiceType } from '@/model/ServiceType';
@@ -37,6 +38,9 @@ export default function ServicesClient({childCategories, initialServices, select
     // Page will reload with new params
   };
 
+  // Check if any child categories are selected
+  const hasSelectedChildCategories = selectedChildIds.length > 0;
+
   return (
     <>
       {/* Child Category Buttons */}
@@ -60,13 +64,29 @@ export default function ServicesClient({childCategories, initialServices, select
       <div className="px-4 pt-4 pb-6">
         <SearchBar searchValue="" />
       </div>
-      {/* Services Grid */}
+      {/* Title - changes based on selection */}
+      <div className="px-4 pb-3 pl-6">
+        <h2 className="text-[13px] font-normal" style={{ fontFamily: 'Inter, sans-serif', color: '#707579' }}>
+          {hasSelectedChildCategories ? `Found: ${initialServices.length}` : 'For you'}
+        </h2>
+      </div>
+      {/* Services - different layout based on selection */}
       <div className="px-4 pb-32">
-        <div className="grid grid-cols-2 gap-3">
-          {initialServices.map((service) => (
+        {hasSelectedChildCategories ? (
+          // Horizontal layout when child categories are selected
+          <div className="space-y-3">
+            {initialServices.map((service) => (
+              <HorizontalViewServiceComponent key={service.id} service={service} />
+            ))}
+          </div>
+        ) : (
+          // Grid layout when no child categories are selected
+          <div className="grid grid-cols-2 gap-3">
+            {initialServices.map((service) => (
               <ShortViewServiceComponent key={service.id} service={service} />
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );

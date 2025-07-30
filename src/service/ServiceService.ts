@@ -19,6 +19,7 @@ export class ServiceService {
         ? rawService.created_at.toISOString() 
         : String(rawService.created_at),
       priority: rawService.priority ? String(rawService.priority) : '0',
+      rating: rawService.rating ? Number(rawService.rating) : undefined,
     };
   }
 
