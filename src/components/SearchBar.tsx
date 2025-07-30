@@ -33,7 +33,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
         params.set('categoryId', existingCategoryId);
       }
       
-      router.push(`/result?${params.toString()}`);
+      router.push(`/catalog/result?${params.toString()}`);
     }
   };
 

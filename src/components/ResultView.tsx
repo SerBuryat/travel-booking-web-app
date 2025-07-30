@@ -41,7 +41,7 @@ export default function ResultView({ searchValue, services, categories, selected
     
     // Navigate to new URL
     const queryString = params.toString();
-    router.push(`/result${queryString ? `?${queryString}` : ''}`);
+    router.push(`/catalog/result${queryString ? `?${queryString}` : ''}`);
   };
 
   return (

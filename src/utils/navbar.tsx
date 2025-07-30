@@ -51,7 +51,7 @@ export const Navbar: React.FC<NavbarProps> = ({ buttons }) => {
             href={btn.href}
             icon={btn.icon}
             title={btn.title}
-            active={pathname === btn.href}
+            active={pathname === btn.href || pathname.startsWith(btn.href + '/')}
             badgeContent={btn.badgeContent}
           />
         ))}
