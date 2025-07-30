@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 interface SearchBarProps {
   searchValue?: string;
@@ -13,6 +13,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -21,7 +22,18 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
         return;
       }
       setError(undefined);
-      router.push(`/result?search=${encodeURIComponent(value)}`);
+      
+      // Build query parameters preserving existing categoryId
+      const params = new URLSearchParams();
+      params.set('search', value);
+      
+      // Preserve existing categoryId if present
+      const existingCategoryId = searchParams.get('categoryId');
+      if (existingCategoryId) {
+        params.set('categoryId', existingCategoryId);
+      }
+      
+      router.push(`/result?${params.toString()}`);
     }
   };
 

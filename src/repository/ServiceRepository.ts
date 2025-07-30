@@ -127,6 +127,42 @@ export class ServiceRepository {
   }
 
   /**
+   * Get popular services by name search and filter by category IDs
+   */
+  static async findPopularByLikeNameAndCategoryIn(search: string, categoryIds: number[]): Promise<ServiceEntity[]> {
+    if (!search || search.length < 3) return [];
+    const services = await prisma.tservices.findMany({
+      where: {
+        name: {
+          contains: search,
+          mode: 'insensitive',
+        },
+        tcategories_id: {
+          in: categoryIds,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tcategories_id: true,
+        priority: true,
+      },
+      orderBy: { priority: 'desc' },
+    });
+    
+    return services.map(s => ({
+      id: s.id,
+      name: s.name,
+      description: s.description ?? '',
+      price: s.price ? String(s.price) : '0',
+      tcategories_id: s.tcategories_id,
+      priority: s.priority ? String(s.priority) : '0',
+    }));
+  }
+
+  /**
    * Get popular services
    */
   static async findPopular(popularCount: number = 10): Promise<ServiceEntity[]> {

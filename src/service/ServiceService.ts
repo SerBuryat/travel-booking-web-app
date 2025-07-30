@@ -86,6 +86,15 @@ export class ServiceService {
   }
 
   /**
+   * Get popular services by name and filter by category IDs
+   */
+  static async getPopularServicesByNameAndCategoryIn(search: string, categoryIds: number[]): Promise<ServiceType[]> {
+    const { ServiceRepository } = await import('@/repository/ServiceRepository');
+    const services = await ServiceRepository.findPopularByLikeNameAndCategoryIn(search, categoryIds);
+    return this.mapToServiceTypes(services);
+  }
+
+  /**
    * Get popular services with category relations
    */
   static async getPopularServices(popularCount: number = 10): Promise<ServiceType[]> {
