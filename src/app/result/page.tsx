@@ -5,29 +5,14 @@ import { SearchBar } from '@/components/SearchBar';
 import React from 'react';
 import ResultView from '@/components/ResultView';
 
-function parseIds(ids: string | undefined): number[] {
-  if (!ids) return [];
-  return ids.split(',').map((id) => parseInt(id, 10)).filter(Boolean);
-}
-
-export default async function ResultPage({ searchParams }: { searchParams: Promise<{ search?: string; ids?: string; showAll?: string }> }) {
+export default async function ResultPage({ searchParams }: { searchParams: Promise<{ search?: string }> }) {
   const params = await searchParams;
   const searchValue = params.search || '';
-  const ids = parseIds(params.ids);
-  const showAll = params.showAll === 'true';
   let services: any[] = [];
   
   const popularServicesCount = 4;
   if (searchValue) {
-    if (showAll) {
-      services = await ServiceService.searchServicesByName(searchValue);
-    } else {
-      services = await ServiceService.getPopularServicesByName(searchValue, popularServicesCount);
-    }
-  } else if (ids.length > 0) {
-    // fallback: fetch by ids
-    // You can implement getServicesByIds if needed
-    services = [];
+    services = await ServiceService.getPopularServicesByName(searchValue, popularServicesCount);
   }
   
   // Extract categories from services with relations
@@ -50,7 +35,6 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
           searchValue={searchValue}
           services={services}
           categories={categories}
-          showAll={showAll}
         />
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
     </div>

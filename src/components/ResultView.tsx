@@ -8,10 +8,9 @@ interface ResultViewProps {
   searchValue: string;
   services: ServiceType[];
   categories: CategoryEntity[];
-  showAll?: boolean;
 }
 
-export default function ResultView({ searchValue, services, categories, showAll = false }: ResultViewProps) {
+export default function ResultView({ searchValue, services, categories }: ResultViewProps) {
   return (
     <div className="w-full max-w-3xl mx-auto pt-4 px-4 bg-white">
       {/* Categories list */}

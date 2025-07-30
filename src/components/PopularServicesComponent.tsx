@@ -7,21 +7,15 @@ import { ServiceType } from '@/model/ServiceType';
 
 interface PopularServicesComponentProps {
   services: ServiceType[];
-  onAllClick?: () => void;
 }
 
 export const PopularServicesComponent: React.FC<PopularServicesComponentProps> = ({ 
-  services,
-  onAllClick
+  services
 }) => {
   const router = useRouter();
 
   const handleAllServicesClick = () => {
-    if (onAllClick) {
-      onAllClick();
-    } else {
-      router.push('/services/popular');
-    }
+    router.push('/services/popular');
   };
 
   return (
