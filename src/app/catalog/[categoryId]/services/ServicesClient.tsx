@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { SearchBar } from '@/components/SearchBar';
 import { ServiceType } from '@/model/ServiceType';
 import { CategoryEntity } from '@/entity/CategoryEntity';
+import { ChildCategoryButton } from '@/components/ChildCategoryButton';
 
 interface ServicesClientProps {
   category: CategoryEntity;
@@ -12,25 +13,6 @@ interface ServicesClientProps {
   initialServices: ServiceType[];
   selectedChildIds?: number[];
 }
-
-const ChildCategoryButton = ({ category, active, onClick }: { category: CategoryEntity, active: boolean, onClick: () => void }) => (
-  <button
-    className="px-4 py-2 rounded-[10px] mr-2 whitespace-nowrap"
-    style={{
-      background: active ? '#007AFF4D' : '#0000000A',
-      fontSize: '13px',
-      fontWeight: 600,
-      color: active ? '#007AFF' : '#333',
-      border: 'none',
-      outline: 'none',
-      transition: 'background 0.2s',
-    }}
-    onClick={onClick}
-    type="button"
-  >
-    {category.name}
-  </button>
-);
 
 export default function ServicesClient({childCategories, initialServices, selectedChildIds: initialSelectedChildIds = [] }: ServicesClientProps) {
   const router = useRouter();
