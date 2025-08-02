@@ -137,8 +137,11 @@ model tclients_settings {
 model tcontacts {
   id           Int       @id @default(autoincrement())
   tservices_id Int
-  phone        String    @db.VarChar(20)
   email        String    @db.VarChar(255)
+  phone        String?   @db.VarChar(14)
+  tg_username  String?   @db.VarChar(255)
+  website      String?   @db.VarChar(255)
+  whatsap      String?   @db.VarChar(255)
   tservices    tservices @relation(fields: [tservices_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
 
