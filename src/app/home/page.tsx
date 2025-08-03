@@ -27,7 +27,7 @@ export default async function HomePage() {
         </div>
 
         {/* Популярные сервисы */}
-        <div className="pl-4 pr-4">
+        <div>
           <PopularServicesComponent services={popularServices} />
         </div>
 

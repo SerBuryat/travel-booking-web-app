@@ -8,7 +8,7 @@ export default async function CatalogPage() {
       <Header>
         <SearchBar searchValue="" />
       </Header>
-      <div className="pr-4 pl-4 pb-20">
+      <div className="pb-20">
         <Catalog />
       </div>
       <div className="fixed bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
