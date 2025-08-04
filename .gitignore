@@ -42,5 +42,4 @@ prod.env
 next-env.d.ts
 
 # Prisma
-/prisma/migrations/
 /.idea/dataSources.xml

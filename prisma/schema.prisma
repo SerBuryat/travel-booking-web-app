@@ -112,13 +112,13 @@ model tclients {
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model tclients_auth {
-  id            Int       @id @default(autoincrement())
-  tclients_id   Int
-  auth_type     String?   @db.VarChar(20)
-  auth_id       String?   @db.VarChar(255)
-  password_hash String?   @db.VarChar(255)
-  last_login    DateTime? @db.Timestamp(6)
-  tclients      tclients  @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id           Int       @id @default(autoincrement())
+  tclients_id  Int
+  auth_type    String?   @db.VarChar(20)
+  auth_id      String?   @db.VarChar(255)
+  last_login   DateTime? @db.Timestamp(6)
+  auth_context Json?
+  tclients     tclients  @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([auth_type, auth_id])
 }
