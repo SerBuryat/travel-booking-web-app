@@ -12,12 +12,8 @@ services:
       - BOT_TOKEN=${BOT_TOKEN}
       - DATABASE_URL=${DATABASE_URL}
       - NODE_ENV=${NODE_ENV}
-      - SSH_HOST=${SSH_HOST}
-      - SSH_PORT=${SSH_PORT}
-      - SSH_USER=${SSH_USER}
-      - SSH_PASSWORD=${SSH_PASSWORD}
-      - SSH_DB_HOST=${SSH_DB_HOST}
-      - SSH_DB_PORT=${SSH_DB_PORT}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
