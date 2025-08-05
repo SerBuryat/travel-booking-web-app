@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { validateJWT, JWTPayload } from './jwt';
+import { verifyJWT } from './jwt';
 import { ClientService } from '../service/ClientService';
 import { AuthResult, ClientWithAuthType } from '../model/ClientType';
 
@@ -86,7 +86,7 @@ export async function checkAuth(): Promise<AuthResult> {
       return { isAuthenticated: false, error: 'No token provided' };
     }
 
-    const payload = validateJWT(token);
+    const payload = verifyJWT(token);
     if (!payload) {
       return { isAuthenticated: false, error: 'Invalid token' };
     }
@@ -105,7 +105,7 @@ export async function checkAuth(): Promise<AuthResult> {
  */
 export async function getUserFromToken(token: string): Promise<ClientWithAuthType | null> {
   try {
-    const payload = validateJWT(token);
+    const payload = verifyJWT(token);
     if (!payload) {
       return null;
     }

@@ -1,27 +1,35 @@
 import jwt, {Secret} from 'jsonwebtoken';
-import { randomBytes } from 'crypto';
 import {StringValue} from "ms";
 
 // Конфигурация JWT
-const JWT_SECRET: Secret = (process.env.JWT_SECRET || 'your-secret-key-change-in-production');
-const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN as StringValue; // 1 час
-const REFRESH_TOKEN_EXPIRES_IN = process.env.REFRESH_TOKEN_EXPIRES_IN as StringValue; // 7 дней
+const JWT_SECRET: Secret = process.env.JWT_SECRET || 'your-secret-key';
+const JWT_EXPIRES_IN: StringValue = '1h';
+const REFRESH_TOKEN_EXPIRES_IN: StringValue = '7d';
 
-// Типы для JWT payload
-export interface JWTPayload extends jwt.JwtPayload {
+// Интерфейсы для типизации
+interface JWTPayload {
   userId: number;
   role: string;
   authId: string;
 }
 
-export interface RefreshTokenPayload extends jwt.JwtPayload {
+interface RefreshTokenPayload {
   userId: number;
   authId: string;
   tokenId: string;
 }
 
 /**
- * Генерирует JWT токен для пользователя
+ * Генерирует случайные байты для токена (Web Crypto API)
+ */
+function generateRandomBytes(length: number): string {
+  const array = new Uint8Array(length);
+  crypto.getRandomValues(array);
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+/**
+ * Генерирует JWT токен
  */
 export function generateJWT(userId: number, role: string, authId: string): string {
   const payload: JWTPayload = {
@@ -36,10 +44,11 @@ export function generateJWT(userId: number, role: string, authId: string): strin
 }
 
 /**
- * Генерирует refresh токен
+ * Генерирует refresh токен с оптимизированным размером
  */
 export function generateRefreshToken(userId: number, authId: string): string {
-  const tokenId = randomBytes(32).toString('hex');
+  // Используем 16 байт вместо 32 для уменьшения размера
+  const tokenId = generateRandomBytes(16);
   const payload: RefreshTokenPayload = {
     userId,
     authId,
@@ -54,12 +63,12 @@ export function generateRefreshToken(userId: number, authId: string): string {
 /**
  * Валидирует JWT токен
  */
-export function validateJWT(token: string): JWTPayload | null {
+export function verifyJWT(token: string): JWTPayload | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as JWTPayload;
     return decoded;
   } catch (error) {
-    console.error('JWT validation error:', error);
+    console.error('JWT verification error:', error);
     return null;
   }
 }
@@ -67,12 +76,12 @@ export function validateJWT(token: string): JWTPayload | null {
 /**
  * Валидирует refresh токен
  */
-export function validateRefreshToken(token: string): RefreshTokenPayload | null {
+export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as RefreshTokenPayload;
     return decoded;
   } catch (error) {
-    console.error('Refresh token validation error:', error);
+    console.error('Refresh token verification error:', error);
     return null;
   }
 }
@@ -81,7 +90,7 @@ export function validateRefreshToken(token: string): RefreshTokenPayload | null 
  * Обновляет JWT токен используя refresh токен
  */
 export function refreshJWT(refreshToken: string, userRole?: string): { newJWT: string; newRefreshToken: string } | null {
-  const decoded = validateRefreshToken(refreshToken);
+  const decoded = verifyRefreshToken(refreshToken);
   if (!decoded) {
     return null;
   }
@@ -97,7 +106,7 @@ export function refreshJWT(refreshToken: string, userRole?: string): { newJWT: s
 }
 
 /**
- * Извлекает данные из JWT токена без валидации (для отладки)
+ * Декодирует JWT токен без валидации
  */
 export function decodeJWT(token: string): JWTPayload | null {
   try {
@@ -105,6 +114,19 @@ export function decodeJWT(token: string): JWTPayload | null {
     return decoded;
   } catch (error) {
     console.error('JWT decode error:', error);
+    return null;
+  }
+}
+
+/**
+ * Декодирует refresh токен без валидации
+ */
+export function decodeRefreshToken(token: string): RefreshTokenPayload | null {
+  try {
+    const decoded = jwt.decode(token) as RefreshTokenPayload;
+    return decoded;
+  } catch (error) {
+    console.error('Refresh token decode error:', error);
     return null;
   }
 }

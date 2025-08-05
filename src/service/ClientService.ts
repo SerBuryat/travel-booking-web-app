@@ -9,6 +9,7 @@ import {
   AuthResult
 } from '@/model/ClientType';
 import {TelegramUser} from "@/types/telegram";
+import { prisma } from '@/lib/prisma';
 
 export class ClientService {
   private clientRepository: ClientRepository;
@@ -202,78 +203,84 @@ export class ClientService {
     return requiredRoles.includes(userRole);
   }
 
+
   /**
-   * Создать или обновить клиента с Telegram аутентификацией
+   * Создать или обновить клиента с Telegram аутентификацией в транзакции
    */
-  async createOrUpdateWithTelegramAuth(
+  async createOrUpdateWithTelegramAuthInTransaction(
     telegramData: TelegramUser,
-    authId: string
+    authId: string,
+    refreshToken: string,
+    tokenExpiresAt: Date
   ): Promise<ClientWithAuthType | null> {
     try {
-      // Ищем существующего клиента по auth_id
-      const client = await this.clientRepository.findByAuthId(authId);
+      return await prisma.$transaction(async (tx) => {
+        // Ищем существующего клиента по auth_id используя транзакционную версию
+        const client = await this.clientRepository.findByAuthIdTx(tx, authId);
 
-      if (client) {
-        // Обновляем существующего клиента
-        const updateData: UpdateClientType = {
-          name: telegramData.first_name + (telegramData.last_name ? ` ${telegramData.last_name}` : ''),
-          additional_info: {
-            telegram_id: telegramData.id,
-            username: telegramData.username,
-            language_code: telegramData.language_code,
-            ...telegramData
+        if (client) {
+          // Обновляем существующего клиента
+          const updateData: UpdateClientType = {
+            name: telegramData.first_name + (telegramData.last_name ? ` ${telegramData.last_name}` : ''),
+            additional_info: {
+              telegram_id: telegramData.id,
+              username: telegramData.username,
+              language_code: telegramData.language_code,
+              ...telegramData
+            }
+          };
+
+          await this.clientRepository.updateTx(tx, client.id, updateData);
+
+          // Обновляем аутентификацию с refresh token
+          if (client.tclients_auth.length > 0) {
+            await this.clientRepository.updateAuthTx(tx, client.tclients_auth[0].id, {
+              last_login: new Date(),
+              refresh_token: refreshToken,
+              token_expires_at: tokenExpiresAt,
+            });
           }
-        };
 
-        const updatedClient = await this.clientRepository.update(client.id, updateData);
-        if (!updatedClient) {
-          return null;
-        }
+          return await this.clientRepository.findByIdWithAuthTx(tx, client.id);
+        } else {
+          // Создаем нового клиента
+          const createData: CreateClientType = {
+            name: telegramData.first_name + (telegramData.last_name ? ` ${telegramData.last_name}` : ''),
+            additional_info: {
+              telegram_id: telegramData.id,
+              username: telegramData.username,
+              language_code: telegramData.language_code,
+              ...telegramData
+            }
+          };
 
-        // Обновляем время последнего входа
-        if (client.tclients_auth.length > 0) {
-          await this.clientRepository.updateAuth(client.tclients_auth[0].id, {
-            last_login: new Date()
-          });
-        }
-
-        return await this.clientRepository.findByIdWithActiveAuth(client.id, authId);
-      } else {
-        // Создаем нового клиента
-        const createData: CreateClientType = {
-          name: telegramData.first_name + (telegramData.last_name ? ` ${telegramData.last_name}` : ''),
-          additional_info: {
-            telegram_id: telegramData.id,
-            username: telegramData.username,
-            language_code: telegramData.language_code,
-            ...telegramData
+          const newClient = await this.clientRepository.createTx(tx, createData);
+          if (!newClient) {
+            return null;
           }
-        };
 
-        const newClient = await this.clientRepository.create(createData);
-        if (!newClient) {
-          return null;
+          // Создаем аутентификацию с refresh token
+          const authData: CreateClientAuthType = {
+            tclients_id: newClient.id,
+            auth_type: 'telegram',
+            auth_id: authId,
+            auth_context: telegramData,
+            refresh_token: refreshToken,
+            token_expires_at: tokenExpiresAt,
+            role: 'user'
+          };
+
+          const auth = await this.clientRepository.createAuthTx(tx, authData);
+          if (!auth) {
+            return null;
+          }
+
+          return await this.clientRepository.findByIdWithAuthTx(tx, newClient.id);
         }
-
-        // Создаем аутентификацию
-        const authData: CreateClientAuthType = {
-          tclients_id: newClient.id,
-          auth_type: 'telegram',
-          auth_id: authId,
-          auth_context: telegramData,
-          role: 'user'
-        };
-
-        const auth = await this.clientRepository.createAuth(authData);
-        if (!auth) {
-          return null;
-        }
-
-        return await this.clientRepository.findByIdWithActiveAuth(newClient.id, authId);
-      }
+      });
     } catch (error) {
-      console.error('Error creating/updating client with Telegram auth:', error);
+      console.error('Error in transaction:', error);
       return null;
     }
   }
-} 
+}

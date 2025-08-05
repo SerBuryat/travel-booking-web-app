@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateJWT } from './lib/jwt';
+import { verifyJWT } from './lib/jwt';
 import { ClientService } from './service/ClientService';
 
 // Маршруты, которые не требуют аутентификации
@@ -46,7 +46,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     // Валидируем JWT токен
-    const payload = validateJWT(token);
+    const payload = verifyJWT(token);
     if (!payload) {
       // Неверный токен - перенаправляем на вход
       const loginUrl = new URL('/telegram-auth', request.url);

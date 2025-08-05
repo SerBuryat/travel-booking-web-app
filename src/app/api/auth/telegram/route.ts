@@ -39,12 +39,21 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Parse user data from URL-encoded JSON
-      const user = JSON.parse(decodeURIComponent(userData));
+      // Parse user data from URL-encoded JSON with proper typing
+      const parsedUserData = JSON.parse(decodeURIComponent(userData));
+      
+      // Create properly typed TelegramInitData object
+      const telegramInitData: TelegramInitData = {
+        user: parsedUserData,
+        auth_date: parseInt(urlParams.get('auth_date') || '0'),
+        query_id: urlParams.get('query_id') || undefined,
+        signature: urlParams.get('signature') || undefined,
+        hash: urlParams.get('hash') || undefined
+      };
       
       const response: TelegramAuthResponse = {
         success: true,
-        user: user
+        user: telegramInitData.user
       };
       
       return NextResponse.json(response);

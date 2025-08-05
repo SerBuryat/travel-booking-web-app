@@ -118,7 +118,7 @@ model tclients_auth {
   auth_id        String?   @db.VarChar(255)
   last_login     DateTime? @db.Timestamp(6)
   auth_context   Json?
-  refresh_token  String?   @db.VarChar(255)
+  refresh_token  String?   @db.VarChar(1000)
   token_expires_at DateTime? @db.Timestamp(6)
   is_active      Boolean   @default(true)
   role           String    @default("user") @db.VarChar(20)

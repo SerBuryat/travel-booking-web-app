@@ -45,12 +45,13 @@ const getInitData = (): { data: string | null; error: string | null } => {
   }
 };
 
-type AuthState = 'loading' | 'validating' | 'success' | 'error' | 'no-data' | 'invalid-access';
+type AuthState = 'loading' | 'validating' | 'success' | 'error' | 'no-data' | 'invalid-access' | 'logging-in';
 
 const ProgressSteps = ({ currentStep }: { currentStep: number }) => {
   const steps = [
     { title: 'Загрузка', icon: '📱' },
     { title: 'Проверка', icon: '🔐' },
+    { title: 'Вход', icon: '🚀' },
     { title: 'Готово', icon: '✅' }
   ];
 
@@ -136,11 +137,43 @@ const TelegramAuthPage = () => {
     }
   };
 
+  const handleLogin = async () => {
+    if (!userData) return;
+    
+    setAuthState('logging-in');
+    
+    try {
+      const response = await fetch('/api/auth/login-telegram', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ telegramUser: userData }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        // Успешная аутентификация, перенаправляем в приложение
+        window.location.href = '/home';
+      } else {
+        setAuthState('error');
+        setErrorMessage(result.error || 'Ошибка входа в приложение');
+        setErrorDetails('Не удалось создать сессию пользователя');
+      }
+    } catch (error) {
+      setAuthState('error');
+      setErrorMessage('Ошибка соединения с сервером');
+      setErrorDetails('Проверьте подключение к интернету и попробуйте снова');
+    }
+  };
+
   const getCurrentStep = () => {
     switch (authState) {
       case 'loading': return 0;
       case 'validating': return 1;
       case 'success': return 2;
+      case 'logging-in': return 2;
       case 'error': return 1;
       case 'no-data': return 0;
       case 'invalid-access': return 0;
@@ -160,13 +193,9 @@ const TelegramAuthPage = () => {
     </div>
   );
 
-  const SuccessCheckmark = () => (
+  const LoginSpinner = () => (
     <div className="flex items-center justify-center">
-      <div className="rounded-full h-10 w-10 sm:h-12 sm:w-12 bg-green-100 flex items-center justify-center">
-        <svg className="w-6 h-6 sm:w-8 sm:h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-        </svg>
-      </div>
+      <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-purple-600"></div>
     </div>
   );
 
@@ -216,20 +245,30 @@ const TelegramAuthPage = () => {
               <svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              <span className="text-green-800 font-medium text-sm sm:text-base">Авторизация успешна!</span>
+              <span className="text-green-800 font-medium text-sm sm:text-base">Данные проверены!</span>
             </div>
           </div>
 
           {/* Go to App Button */}
           <button 
-            onClick={() => window.location.href = '/home'}
-            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg text-sm sm:text-base"
+            onClick={handleLogin}
+            disabled={authState === 'logging-in'}
+            className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 transform hover:scale-105 shadow-lg text-sm sm:text-base disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <div className="flex items-center justify-center">
-              <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-              Перейти в приложение
+              {authState === 'logging-in' ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 sm:h-5 sm:w-5 border-b-2 border-white mr-2"></div>
+                  <span>Вход в приложение...</span>
+                </>
+              ) : (
+                <>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                  Перейти в приложение
+                </>
+              )}
             </div>
           </button>
         </div>
@@ -293,7 +332,7 @@ const TelegramAuthPage = () => {
               <p className="text-orange-800 font-medium text-xs sm:text-sm mb-1">Как правильно войти:</p>
               <ul className="text-orange-700 text-xs sm:text-sm space-y-1">
                 <li>• Откройте приложение в Telegram</li>
-                <li>• Используйте кнопку "Открыть приложение"</li>
+                <li>• Используйте кнопку &#34;Открыть приложение&#34;</li>
                 <li>• Не переходите по прямой ссылке</li>
               </ul>
             </div>
@@ -368,6 +407,13 @@ const TelegramAuthPage = () => {
             <div className="bg-white rounded-xl shadow-xl p-6 sm:p-8 text-center">
               <ValidationSpinner />
               <p className="text-gray-600 mt-4 text-sm sm:text-base">Проверка данных Telegram...</p>
+            </div>
+          )}
+
+          {authState === 'logging-in' && (
+            <div className="bg-white rounded-xl shadow-xl p-6 sm:p-8 text-center">
+              <LoginSpinner />
+              <p className="text-gray-600 mt-4 text-sm sm:text-base">Вход в приложение...</p>
             </div>
           )}
 

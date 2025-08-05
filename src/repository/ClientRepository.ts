@@ -1,3 +1,4 @@
+import { ITXClientDenyList } from '@prisma/client/runtime/library';
 import { prisma } from '../lib/prisma';
 import { 
   ClientType, 
@@ -8,6 +9,7 @@ import {
   UpdateClientAuthType,
   ClientAuthType
 } from '../model/ClientType';
+import { PrismaClient } from '@prisma/client';
 
 export class ClientRepository {
   /**
@@ -21,6 +23,24 @@ export class ClientRepository {
       return client as ClientType | null;
     } catch (error) {
       console.error('Error finding client by ID:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Найти клиента по ID с аутентификацией (транзакционная версия)
+   */
+  async findByIdWithAuthTx(tx: Omit<PrismaClient, ITXClientDenyList>, id: number): Promise<ClientWithAuthType | null> {
+    try {
+      const client = await tx.tclients.findUnique({
+        where: { id },
+        include: {
+          tclients_auth: true,
+        },
+      });
+      return client as ClientWithAuthType | null;
+    } catch (error) {
+      console.error('Error finding client by ID with auth:', error);
       return null;
     }
   }
@@ -82,6 +102,34 @@ export class ClientRepository {
   }
 
   /**
+   * Найти клиента по auth_id (транзакционная версия)
+   */
+  async findByAuthIdTx(tx: Omit<PrismaClient, ITXClientDenyList>, authId: string): Promise<ClientWithAuthType | null> {
+    try {
+      const client = await tx.tclients.findFirst({
+        where: {
+          tclients_auth: {
+            some: {
+              auth_id: authId,
+            },
+          },
+        },
+        include: {
+          tclients_auth: {
+            where: {
+              auth_id: authId,
+            },
+          },
+        },
+      });
+      return client as ClientWithAuthType | null;
+    } catch (error) {
+      console.error('Error finding client by auth_id:', error);
+      return null;
+    }
+  }
+
+  /**
    * Найти клиента по auth_id
    */
   async findByAuthId(authId: string): Promise<ClientWithAuthType | null> {
@@ -110,6 +158,26 @@ export class ClientRepository {
   }
 
   /**
+   * Создать нового клиента (транзакционная версия)
+   */
+  async createTx(tx: Omit<PrismaClient, ITXClientDenyList>, data: CreateClientType): Promise<ClientType | null> {
+    try {
+      const client = await tx.tclients.create({
+        data: {
+          name: data.name,
+          email: data.email,
+          additional_info: data.additional_info,
+          tarea_id: data.tarea_id,
+        },
+      });
+      return client as ClientType;
+    } catch (error) {
+      console.error('Error creating client:', error);
+      return null;
+    }
+  }
+
+  /**
    * Создать нового клиента
    */
   async create(data: CreateClientType): Promise<ClientType | null> {
@@ -125,6 +193,27 @@ export class ClientRepository {
       return client as ClientType;
     } catch (error) {
       console.error('Error creating client:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Обновить клиента (транзакционная версия)
+   */
+  async updateTx(tx: Omit<PrismaClient, ITXClientDenyList>, id: number, data: UpdateClientType): Promise<ClientType | null> {
+    try {
+      const client = await tx.tclients.update({
+        where: { id },
+        data: {
+          name: data.name,
+          email: data.email,
+          additional_info: data.additional_info,
+          tarea_id: data.tarea_id,
+        },
+      });
+      return client as ClientType;
+    } catch (error) {
+      console.error('Error updating client:', error);
       return null;
     }
   }
@@ -151,6 +240,29 @@ export class ClientRepository {
   }
 
   /**
+   * Создать аутентификацию клиента (транзакционная версия)
+   */
+  async createAuthTx(tx: Omit<PrismaClient, ITXClientDenyList>, data: CreateClientAuthType): Promise<ClientAuthType | null> {
+    try {
+      const auth = await tx.tclients_auth.create({
+        data: {
+          tclients_id: data.tclients_id,
+          auth_type: data.auth_type,
+          auth_id: data.auth_id,
+          auth_context: data.auth_context,
+          refresh_token: data.refresh_token,
+          token_expires_at: data.token_expires_at,
+          role: data.role || 'user',
+        },
+      });
+      return auth as ClientAuthType;
+    } catch (error) {
+      console.error('Error creating client auth:', error);
+      return null;
+    }
+  }
+
+  /**
    * Создать аутентификацию клиента
    */
   async createAuth(data: CreateClientAuthType): Promise<ClientAuthType | null> {
@@ -169,6 +281,31 @@ export class ClientRepository {
       return auth as ClientAuthType;
     } catch (error) {
       console.error('Error creating client auth:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Обновить аутентификацию клиента (транзакционная версия)
+   */
+  async updateAuthTx(tx: Omit<PrismaClient, ITXClientDenyList>, id: number, data: UpdateClientAuthType): Promise<ClientAuthType | null> {
+    try {
+      const auth = await tx.tclients_auth.update({
+        where: { id },
+        data: {
+          auth_type: data.auth_type,
+          auth_id: data.auth_id,
+          last_login: data.last_login,
+          auth_context: data.auth_context,
+          refresh_token: data.refresh_token,
+          token_expires_at: data.token_expires_at,
+          is_active: data.is_active,
+          role: data.role,
+        },
+      });
+      return auth as ClientAuthType;
+    } catch (error) {
+      console.error('Error updating client auth:', error);
       return null;
     }
   }
