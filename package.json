@@ -19,7 +19,8 @@
     "dev:full": "npm run tunnel & npm run dev",
     "dev:win": "start npm run tunnel:win && npm run dev",
     "dev:full:win": "npm run tunnel:win && npm run db:sync && npm run dev",
-    "dev:full:linux": "npm run tunnel && npm run db:sync && npm run dev"
+    "dev:full:linux": "npm run tunnel && npm run db:sync && npm run dev",
+    "generate:jwt-secret": "node scripts/generate-jwt-secret.js"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -29,7 +30,9 @@
     "@telegram-apps/init-data-node": "^2.0.10",
     "@telegram-apps/sdk-react": "^3.3.6",
     "@telegram-apps/types": "^2.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
     "dotenv": "^17.2.0",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.3.5",
     "prisma": "^6.12.0",
     "react": "^19.0.0",
