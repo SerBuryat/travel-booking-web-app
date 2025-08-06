@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateRefreshToken, generateJWT, generateRefreshToken } from '@/lib/jwt';
+import { verifyRefreshToken, generateJWT, generateRefreshToken } from '@/lib/jwt';
 import { 
   getRefreshTokenFromRequest, 
   setJWTCookie, 
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate refresh token
-    const decoded = validateRefreshToken(refreshToken);
+    const decoded = verifyRefreshToken(refreshToken);
     if (!decoded) {
       return NextResponse.json(
         { error: 'Invalid refresh token' },

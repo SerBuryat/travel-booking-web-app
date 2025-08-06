@@ -1,49 +1,8 @@
 "use client";
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { TelegramUser } from '@/types/telegram';
-
-// При переходе в наш сервис из telegram mini app, 
-// передается telegram данные пользователя в виде url-encoded строки
-// Эта функция получает эту строку и извлекает tgWebAppData
-const getInitData = (): { data: string | null; error: string | null } => {
-  try {
-    const hash = window.location.hash;
-    
-    // Проверяем, есть ли хэш в URL
-    if (!hash || !hash.startsWith('#')) {
-      return {
-        data: null,
-        error: 'Отсутствуют данные авторизации в URL. Убедитесь, что вы перешли из Telegram Mini App.'
-      };
-    }
-
-    const rawUserDataFromTgHash = hash.substring(1);
-    if (!rawUserDataFromTgHash) {
-      return {
-        data: null,
-        error: 'URL содержит пустые данные авторизации. Попробуйте перейти из Telegram Mini App снова.'
-      };
-    }
-    
-    const params = new URLSearchParams(rawUserDataFromTgHash);
-    const tgWebAppData = params.get('tgWebAppData');
-    
-    if (!tgWebAppData) {
-      return {
-        data: null,
-        error: 'Не найдены данные Telegram Web App. Убедитесь, что вы используете правильную ссылку из Telegram.'
-      };
-    }
-
-    return { data: tgWebAppData, error: null };
-  } catch (error) {
-    console.error('Error getting tgWebAppData from hash:', error);
-    return {
-      data: null,
-      error: 'Произошла ошибка при обработке данных авторизации. Попробуйте обновить страницу.'
-    };
-  }
-};
+import { getInitData } from '@/utils/telegramUtils';
 
 type AuthState = 'loading' | 'validating' | 'success' | 'error' | 'no-data' | 'invalid-access' | 'logging-in';
 
@@ -87,6 +46,7 @@ const ProgressSteps = ({ currentStep }: { currentStep: number }) => {
 };
 
 const TelegramAuthPage = () => {
+  const router = useRouter();
   const [authState, setAuthState] = useState<AuthState>('loading');
   const [userData, setUserData] = useState<TelegramUser | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -155,7 +115,7 @@ const TelegramAuthPage = () => {
 
       if (response.ok && result.success) {
         // Успешная аутентификация, перенаправляем в приложение
-        window.location.href = '/home';
+        router.push('/home');
       } else {
         setAuthState('error');
         setErrorMessage(result.error || 'Ошибка входа в приложение');
@@ -297,7 +257,7 @@ const TelegramAuthPage = () => {
           </button>
           
           <button 
-            onClick={() => window.location.href = '/'}
+            onClick={() => router.push('/')}
             className="w-full bg-gray-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-600 transition-colors text-sm sm:text-base"
           >
             Вернуться на главную
@@ -340,7 +300,7 @@ const TelegramAuthPage = () => {
         </div>
         
         <button 
-          onClick={() => window.location.href = '/'}
+          onClick={() => router.push('/')}
           className="w-full bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm sm:text-base"
         >
           Вернуться на главную
@@ -366,7 +326,7 @@ const TelegramAuthPage = () => {
         )}
         
         <button 
-          onClick={() => window.location.href = '/'}
+          onClick={() => router.push('/')}
           className="w-full bg-blue-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-600 transition-colors text-sm sm:text-base"
         >
           Вернуться на главную

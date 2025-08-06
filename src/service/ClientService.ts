@@ -5,7 +5,6 @@ import {
   CreateClientType, 
   UpdateClientType,
   CreateClientAuthType,
-  UpdateClientAuthType,
   AuthResult
 } from '@/model/ClientType';
 import { TelegramUser } from "@/types/telegram";
@@ -20,38 +19,10 @@ export class ClientService {
   }
 
   /**
-   * Найти клиента по ID
-   */
-  async findById(id: number): Promise<ClientType | null> {
-    return await this.clientRepository.findById(id);
-  }
-
-  /**
-   * Найти клиента по ID с аутентификацией
-   */
-  async findByIdWithAuth(id: number): Promise<ClientWithAuthType | null> {
-    return await this.clientRepository.findByIdWithAuth(id);
-  }
-
-  /**
    * Найти клиента по ID с активной аутентификацией
    */
   async findByIdWithActiveAuth(id: number, authId: string): Promise<ClientWithAuthType | null> {
     return await this.clientRepository.findByIdWithActiveAuth(id, authId);
-  }
-
-  /**
-   * Найти клиента по email
-   */
-  async findByEmail(email: string): Promise<ClientType | null> {
-    return await this.clientRepository.findByEmail(email);
-  }
-
-  /**
-   * Найти клиента по auth_id
-   */
-  async findByAuthId(authId: string): Promise<ClientWithAuthType | null> {
-    return await this.clientRepository.findByAuthId(authId);
   }
 
   /**
@@ -71,59 +42,6 @@ export class ClientService {
   }
 
   /**
-   * Обновить клиента
-   */
-  async update(id: number, data: UpdateClientType): Promise<ClientType | null> {
-    // Проверяем, существует ли клиент
-    const existingClient = await this.clientRepository.findById(id);
-    if (!existingClient) {
-      console.error('Client not found');
-      return null;
-    }
-
-    // Если обновляется email, проверяем уникальность
-    if (data.email && data.email !== existingClient.email) {
-      const clientWithEmail = await this.clientRepository.findByEmail(data.email);
-      if (clientWithEmail) {
-        console.error('Client with this email already exists');
-        return null;
-      }
-    }
-
-    return await this.clientRepository.update(id, data);
-  }
-
-  /**
-   * Создать аутентификацию клиента
-   */
-  async createAuth(data: CreateClientAuthType): Promise<boolean> {
-    // Проверяем, существует ли клиент
-    const client = await this.clientRepository.findById(data.tclients_id);
-    if (!client) {
-      console.error('Client not found');
-      return false;
-    }
-
-    // Проверяем, существует ли уже аутентификация с таким auth_id
-    const existingAuth = await this.clientRepository.findByAuthId(data.auth_id);
-    if (existingAuth) {
-      console.error('Auth with this auth_id already exists');
-      return false;
-    }
-
-    const auth = await this.clientRepository.createAuth(data);
-    return auth !== null;
-  }
-
-  /**
-   * Обновить аутентификацию клиента
-   */
-  async updateAuth(id: number, data: UpdateClientAuthType): Promise<boolean> {
-    const auth = await this.clientRepository.updateAuth(id, data);
-    return auth !== null;
-  }
-
-  /**
    * Обновить refresh token
    */
   async updateRefreshToken(authId: string, refreshToken: string, expiresAt: Date): Promise<boolean> {
@@ -135,20 +53,6 @@ export class ClientService {
    */
   async deactivateAuth(authId: string): Promise<boolean> {
     return await this.clientRepository.deactivateAuth(authId);
-  }
-
-  /**
-   * Удалить клиента
-   */
-  async delete(id: number): Promise<boolean> {
-    // Проверяем, существует ли клиент
-    const client = await this.clientRepository.findById(id);
-    if (!client) {
-      console.error('Client not found');
-      return false;
-    }
-
-    return await this.clientRepository.delete(id);
   }
 
   /**
@@ -191,19 +95,6 @@ export class ClientService {
     return user.tclients_auth[0].role || 'user';
   }
 
-  /**
-   * Проверить, имеет ли пользователь требуемую роль
-   */
-  async hasRole(userId: number, authId: string, requiredRoles: string[]): Promise<boolean> {
-    const userRole = await this.getUserRole(userId, authId);
-    
-    if (!userRole) {
-      return false;
-    }
-
-    return requiredRoles.includes(userRole);
-  }
-
 
   /**
    * Создать или обновить клиента с Telegram аутентификацией
@@ -218,7 +109,7 @@ export class ClientService {
         const client = await this.clientRepository.findByAuthIdTx(tx, authId);
         
         if (client) {
-          return await this.updateExistingClient(tx, client, telegramData, tokenExpiresAt);
+          return await this.updateExistingClient(tx, client, telegramData);
         } else {
           return await this.createNewClient(tx, telegramData, authId, tokenExpiresAt);
         }
@@ -235,8 +126,7 @@ export class ClientService {
   private async updateExistingClient(
     tx: any,
     client: ClientWithAuthType,
-    telegramData: TelegramUser,
-    tokenExpiresAt: Date
+    telegramData: TelegramUser
   ): Promise<ClientWithAuthType | null> {
     const updateData = this.buildClientUpdateData(telegramData);
     await this.clientRepository.updateTx(tx, client.id, updateData);
