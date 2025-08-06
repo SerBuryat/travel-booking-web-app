@@ -26,22 +26,6 @@ export class ClientService {
   }
 
   /**
-   * Создать нового клиента
-   */
-  async create(data: CreateClientType): Promise<ClientType | null> {
-    // Проверяем, существует ли клиент с таким email
-    if (data.email) {
-      const existingClient = await this.clientRepository.findByEmail(data.email);
-      if (existingClient) {
-        console.error('Client with this email already exists');
-        return null;
-      }
-    }
-
-    return await this.clientRepository.create(data);
-  }
-
-  /**
    * Обновить refresh token
    */
   async updateRefreshToken(authId: string, refreshToken: string, expiresAt: Date): Promise<boolean> {

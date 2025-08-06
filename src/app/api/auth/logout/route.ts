@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validateRefreshToken } from '@/lib/jwt';
+import { verifyRefreshToken } from '@/lib/jwt';
 import { 
   getRefreshTokenFromRequest, 
   clearAuthCookies, 
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate refresh token to get user info for logging
-    const decoded = validateRefreshToken(refreshToken);
+    const decoded = verifyRefreshToken(refreshToken);
     
     if (decoded) {
       // Deactivate auth in database

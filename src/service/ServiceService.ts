@@ -69,15 +69,6 @@ export class ServiceService {
   }
 
   /**
-   * Search all services by name with category relations
-   */
-  static async searchServicesByName(search: string): Promise<ServiceType[]> {
-    const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const services = await ServiceRepository.findAllByNameLike(search);
-    return this.mapToServiceTypes(services);
-  }
-
-  /**
    * Get popular services by name with category relations
    */
   static async getPopularServicesByName(search: string): Promise<ServiceType[]> {

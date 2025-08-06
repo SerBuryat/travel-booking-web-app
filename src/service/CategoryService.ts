@@ -36,22 +36,6 @@ export class CategoryService {
   }
 
   /**
-   * Gets all categories as CategoryType with hierarchical structure
-   */
-  static async getAllCategories(): Promise<CategoryType[]> {
-    const categoriesWithRelations = await CategoryRepository.findAll();
-    
-    // Transform to CategoryType using the relations from Prisma
-    return categoriesWithRelations.map((item: {
-      category: CategoryEntity;
-      parent: CategoryEntity | null;
-      children: CategoryEntity[];
-    }) => 
-      this.mapToCategoryType(item.category, item.children, item.parent)
-    );
-  }
-
-  /**
    * Gets general categories (accommodation, food, transport, tours)
    */
   static async getGeneralCategories(): Promise<CategoryEntity[]> {

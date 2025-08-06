@@ -1,33 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setJWTCookie, setRefreshTokenCookie, getClientIP, logLoginAttempt } from '@/lib/auth';
 import { AuthService } from '@/service/AuthService';
-import { validateAuthRequest, validateTelegramUser } from '@/utils/validation';
+import { TelegramUser } from '@/types/telegram';
+
+// Тип для тела запроса
+interface LoginTelegramRequest {
+  telegramUser: TelegramUser;
+}
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    
-    // Валидация запроса
-    const validatedRequest = validateAuthRequest(body);
-    if (!validatedRequest) {
-      return NextResponse.json(
-        { error: 'Invalid request format' },
-        { status: 400 }
-      );
-    }
+    const body: LoginTelegramRequest = await request.json();
 
-    // Валидация Telegram пользователя
-    const user = validateTelegramUser(validatedRequest.telegramUser);
-    if (!user) {
+    // Валидация тела запроса
+    if (!body.telegramUser) {
       return NextResponse.json(
-        { error: 'Invalid Telegram user data' },
+        { error: 'Missing telegramUser in request body' },
         { status: 400 }
       );
     }
 
     // Аутентификация
     const authService = new AuthService();
-    const result = await authService.authenticateWithTelegram(user);
+    const result = await authService.authenticateWithTelegram(body.telegramUser);
 
     if (!result) {
       return NextResponse.json(

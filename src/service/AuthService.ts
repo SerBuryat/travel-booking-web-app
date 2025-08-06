@@ -1,7 +1,6 @@
 import { ClientService } from './ClientService';
 import { generateJWT, generateRefreshToken } from '@/lib/jwt';
 import { TelegramUser } from '@/types/telegram';
-import { AuthResult } from '@/model/ClientType';
 
 export interface AuthTokens {
   jwtToken: string;
@@ -65,20 +64,6 @@ export class AuthService {
       console.error('Authentication error:', error);
       return null;
     }
-  }
-
-  /**
-   * Проверка аутентификации пользователя
-   */
-  async validateAuth(userId: number, authId: string): Promise<AuthResult> {
-    return await this.clientService.checkAuth(userId, authId);
-  }
-
-  /**
-   * Получение роли пользователя
-   */
-  async getUserRole(userId: number, authId: string): Promise<string | null> {
-    return await this.clientService.getUserRole(userId, authId);
   }
 
   /**

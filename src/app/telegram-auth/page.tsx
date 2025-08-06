@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { TelegramUser } from '@/types/telegram';
 import { getInitData } from '@/utils/telegramUtils';
+import { useAuth } from '@/contexts/AuthContext';
 
 type AuthState = 'loading' | 'validating' | 'success' | 'error' | 'no-data' | 'invalid-access' | 'logging-in';
 
@@ -47,6 +48,7 @@ const ProgressSteps = ({ currentStep }: { currentStep: number }) => {
 
 const TelegramAuthPage = () => {
   const router = useRouter();
+  const { loginTelegram } = useAuth();
   const [authState, setAuthState] = useState<AuthState>('loading');
   const [userData, setUserData] = useState<TelegramUser | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -103,28 +105,13 @@ const TelegramAuthPage = () => {
     setAuthState('logging-in');
     
     try {
-      const response = await fetch('/api/auth/login-telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ telegramUser: userData }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok && result.success) {
-        // Успешная аутентификация, перенаправляем в приложение
-        router.push('/home');
-      } else {
-        setAuthState('error');
-        setErrorMessage(result.error || 'Ошибка входа в приложение');
-        setErrorDetails('Не удалось создать сессию пользователя');
-      }
+      await loginTelegram(userData);
+      // Успешная аутентификация, перенаправляем в профиль
+      router.push('/profile');
     } catch (error) {
       setAuthState('error');
-      setErrorMessage('Ошибка соединения с сервером');
-      setErrorDetails('Проверьте подключение к интернету и попробуйте снова');
+      setErrorMessage('Ошибка входа в приложение');
+      setErrorDetails('Не удалось создать сессию пользователя');
     }
   };
 
