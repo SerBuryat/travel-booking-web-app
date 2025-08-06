@@ -1,79 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateJWT, generateRefreshToken } from '@/lib/jwt';
 import { setJWTCookie, setRefreshTokenCookie, getClientIP, logLoginAttempt } from '@/lib/auth';
-import { ClientService } from '@/service/ClientService';
-import { TelegramUser } from '@/types/telegram';
+import { AuthService } from '@/service/AuthService';
+import { validateAuthRequest, validateTelegramUser } from '@/utils/validation';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { telegramUser } = body;
-
-    if (!telegramUser || !telegramUser.id) {
+    
+    // Валидация запроса
+    const validatedRequest = validateAuthRequest(body);
+    if (!validatedRequest) {
       return NextResponse.json(
-        { error: 'Missing or invalid Telegram user data' },
+        { error: 'Invalid request format' },
         { status: 400 }
       );
     }
 
-    // Validate that telegramUser has the correct structure
-    const user: TelegramUser = {
-      id: telegramUser.id,
-      first_name: telegramUser.first_name,
-      last_name: telegramUser.last_name,
-      username: telegramUser.username,
-      language_code: telegramUser.language_code,
-      allows_write_to_pm: telegramUser.allows_write_to_pm,
-      photo_url: telegramUser.photo_url
-    };
-
-    // Generate JWT tokens first
-    const authId = `telegram_${user.id}`;
-    const jwtToken = generateJWT(user.id, 'user', authId); // Default role
-    const refreshToken = generateRefreshToken(user.id, authId);
-    
-    // Calculate token expiration
-    const tokenExpiresAt = new Date();
-    tokenExpiresAt.setHours(tokenExpiresAt.getHours() + 1); // 1 hour
-
-    // Create or update user in database with transaction
-    const clientService = new ClientService();
-    const clientWithAuth = await clientService.createOrUpdateWithTelegramAuthInTransaction(
-      user, 
-      authId, 
-      refreshToken, 
-      tokenExpiresAt
-    );
-    
-    if (!clientWithAuth || !clientWithAuth.tclients_auth.length) {
-      console.error('Failed to create or update client with Telegram auth in transaction');
+    // Валидация Telegram пользователя
+    const user = validateTelegramUser(validatedRequest.telegramUser);
+    if (!user) {
       return NextResponse.json(
-        { error: 'Failed to authenticate user' },
+        { error: 'Invalid Telegram user data' },
+        { status: 400 }
+      );
+    }
+
+    // Аутентификация
+    const authService = new AuthService();
+    const result = await authService.authenticateWithTelegram(user);
+
+    if (!result) {
+      return NextResponse.json(
+        { error: 'Authentication failed' },
         { status: 500 }
       );
     }
 
-    const auth = clientWithAuth.tclients_auth[0];
-    
-    // Log successful login
-    const clientIP = getClientIP(request);
-    logLoginAttempt(clientWithAuth.id, true, clientIP);
+    const { user: authUser, tokens } = result;
 
-    // Create response with tokens in cookies
+    // Логирование
+    const clientIP = getClientIP(request);
+    logLoginAttempt(authUser.id, true, clientIP);
+
+    // Создание ответа
     const response = NextResponse.json({
       success: true,
-      user: {
-        id: clientWithAuth.id,
-        name: clientWithAuth.name,
-        role: auth.role,
-        telegram_id: user.id,
-        username: user.username
-      }
+      user: authUser
     });
 
-    // Set tokens in httpOnly cookies
-    setJWTCookie(jwtToken, response);
-    setRefreshTokenCookie(refreshToken, response);
+    // Установка cookies
+    setJWTCookie(tokens.jwtToken, response);
+    setRefreshTokenCookie(tokens.refreshToken, response);
     
     return response;
 
