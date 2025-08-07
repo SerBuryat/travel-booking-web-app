@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { TelegramUser } from '@/types/telegram';
+import { useRouter } from 'next/navigation';
 import { UserAuth } from '@/app/api/auth/me/route';
 
 // Интерфейс контекста аутентификации
@@ -39,7 +40,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserAuth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const router = useRouter();
   // Функция проверки аутентификации
   const checkAuth = async () => {
     try {
@@ -106,6 +107,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setUser(null);
       setIsAuthenticated(false);
+      router.push('/telegram-auth');
     }
   };
   
