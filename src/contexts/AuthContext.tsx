@@ -14,7 +14,7 @@ interface AuthContextType {
   
   // Функции
   checkAuth: () => Promise<void>;
-  loginTelegram: (telegramData: TelegramUser) => Promise<void>;
+  loginWithTelegram: (telegramData: TelegramUser) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -41,6 +41,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<UserAuth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
   // Функция проверки аутентификации
   const checkAuth = async () => {
     try {
@@ -65,7 +66,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
   
   // Функция входа через Telegram
-  const loginTelegram = async (telegramData: TelegramUser) => {
+  const loginWithTelegram = async (telegramData: TelegramUser) => {
     try {
       setIsLoading(true);
       const response = await fetch('/api/auth/login-telegram', {
@@ -121,7 +122,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     user,
     isLoading,
     checkAuth,
-    loginTelegram,
+    loginWithTelegram,
     logout,
   };
   
