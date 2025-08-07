@@ -2,19 +2,13 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { TelegramUser } from '@/types/telegram';
-
-// Типы для пользователя
-interface User {
-  id: number;        // tclients.id
-  name: string;      // Имя из Telegram
-  role: string;      // user/provider/admin
-}
+import { UserAuth } from '@/app/api/auth/me/route';
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
   // Состояние
   isAuthenticated: boolean;
-  user: User | null;
+  user: UserAuth | null;
   isLoading: boolean;
   
   // Функции
@@ -43,7 +37,7 @@ interface AuthProviderProps {
 export function AuthProvider({ children }: AuthProviderProps) {
   // Состояние
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserAuth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   
   // Функция проверки аутентификации
@@ -53,8 +47,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const response = await fetch('/api/auth/me');
       
       if (response.ok) {
-        const userData = await response.json();
-        setUser(userData.user);
+        const userAuth = await response.json() as UserAuth;
+        setUser(userAuth);
         setIsAuthenticated(true);
       } else {
         setUser(null);

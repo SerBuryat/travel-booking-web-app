@@ -7,6 +7,12 @@ import {
 } from '@/lib/auth';
 import { ClientService } from '@/service/ClientService';
 
+export interface UserAuth {
+  userId: number;
+  authId: string;
+  role: string;
+}
+
 export async function GET(request: NextRequest) {
   try {
     // Get JWT token from cookies
@@ -39,27 +45,27 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const auth = user.tclients_auth[0];
+    const auth = user.tclients_auth.find(auth => auth.auth_id === payload.authId);
+    if (!auth) {
+      return NextResponse.json(
+        { error: 'User auth not found' },
+        { status: 401 }
+      );
+    }
     
     // Log successful authentication check
     const clientIP = getClientIP(request);
     logLoginAttempt(user.id, true, clientIP);
 
-    console.log('user', user);
-
+    
     // Return user profile
     return NextResponse.json({
       success: true,
       user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: auth.role,
-        created_at: user.created_at,
-        additional_info: user.additional_info,
-        last_login: auth.last_login,
-        is_active: auth.is_active
-      }
+        userId: user.id,
+        authId: auth.auth_id,
+        role: auth.role
+      } as UserAuth
     });
 
   } catch (error) {
