@@ -1,6 +1,5 @@
 import { ClientRepository } from '@/repository/ClientRepository';
-import { 
-  ClientType, 
+import {  
   ClientWithAuthType, 
   CreateClientType, 
   UpdateClientType,
@@ -77,6 +76,13 @@ export class ClientService {
     }
 
     return user.tclients_auth[0].role || 'user';
+  }
+
+  /**
+   * Получить клиента по ID с аутентификацией
+   */
+  async getByIdWithAuth(id: number): Promise<ClientWithAuthType | null> {
+    return await this.clientRepository.findByIdWithAuth(id);
   }
 
 

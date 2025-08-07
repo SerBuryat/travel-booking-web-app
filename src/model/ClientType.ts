@@ -4,7 +4,7 @@ export interface ClientType {
   tarea_id: number | null;
   name: string;
   email: string | null;
-  additional_info: never | null;
+  additional_info: any | null;
   created_at: Date;
 }
 

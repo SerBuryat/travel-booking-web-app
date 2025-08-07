@@ -16,7 +16,7 @@ export interface ServerUser {
  */
 export async function getServerUser(): Promise<ServerUser | null> {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const token = cookieStore.get('auth_token')?.value;
     
     if (!token) {
@@ -42,12 +42,17 @@ export async function getServerUser(): Promise<ServerUser | null> {
       return null;
     }
 
+    // Извлекаем telegram_id и username из auth_context
+    const authContext = auth.auth_context as any;
+    const telegram_id = authContext?.id;
+    const username = authContext?.username;
+
     return {
       id: user.id,
       name: user.name,
       role: auth.role,
-      telegram_id: user.telegram_id,
-      username: user.username
+      telegram_id: telegram_id,
+      username: username
     };
   } catch (error) {
     console.error('Server auth error:', error);
