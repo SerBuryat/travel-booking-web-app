@@ -45,6 +45,8 @@ export async function GET(request: NextRequest) {
     const clientIP = getClientIP(request);
     logLoginAttempt(user.id, true, clientIP);
 
+    console.log('user', user);
+
     // Return user profile
     return NextResponse.json({
       success: true,

@@ -299,7 +299,8 @@ export class ClientRepository {
           auth_context: data.auth_context,
           refresh_token: data.refresh_token,
           token_expires_at: data.token_expires_at,
-          is_active: data.is_active,
+          // пока сделаю так, чтобы при обновлении аутентификации она всегда активна
+          is_active: true,
           role: data.role,
         },
       });
