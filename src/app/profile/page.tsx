@@ -1,8 +1,9 @@
 import React from 'react';
 import { getServerUser } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
-import ProfileClient from '@/app/profile/ProfileClient';
 import { ClientService } from '@/service/ClientService';
+import ProfileHeader from "@/app/profile/_components/ProfileHeader";
+import ProfileMenu from "@/app/profile/_components/ProfileMenu";
 
 export default async function ProfilePage() {
   // Получаем данные пользователя на сервере
@@ -17,10 +18,18 @@ export default async function ProfilePage() {
   const clientService = new ClientService();
   const fullUserData = await clientService.getByIdWithAuth(user.id);
 
+  // Если пользователь не найден, перенаправляем
   if (!fullUserData) {
     redirect('/telegram-auth');
   }
 
   // Передаем полные данные в клиентский компонент
-  return <ProfileClient user={fullUserData} />;
+  return (
+      <div className="min-h-screen bg-gray-50">
+        <ProfileHeader user={fullUserData} />
+        <div className="max-w-md mx-auto pt-6 px-4">
+          <ProfileMenu/>
+        </div>
+      </div>
+  );
 } 
