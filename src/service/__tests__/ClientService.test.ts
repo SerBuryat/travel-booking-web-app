@@ -36,7 +36,8 @@ describe('ClientService', () => {
     first_name: 'John',
     last_name: 'Doe',
     username: 'johndoe',
-    language_code: 'en'
+    language_code: 'en',
+    photo_url: 'https://t.me/i/userpic/320/johndoe.jpg'
   };
 
   const mockAuthId = 'auth_123456789';
@@ -47,6 +48,7 @@ describe('ClientService', () => {
     tarea_id: null,
     name: 'John Doe',
     email: null,
+    photo: 'https://t.me/i/userpic/320/johndoe.jpg',
     additional_info: { telegram_id: 123456789 },
     created_at: new Date(),
     tclients_auth: [
@@ -70,6 +72,7 @@ describe('ClientService', () => {
     tarea_id: null,
     name: 'John Doe',
     email: null,
+    photo: 'https://t.me/i/userpic/320/johndoe.jpg',
     additional_info: { telegram_id: 123456789 },
     created_at: new Date(),
     tclients_auth: [
@@ -110,6 +113,7 @@ describe('ClientService', () => {
         
         mockTelegramDataBuilder.buildClientUpdateData = jest.fn().mockReturnValue({
           name: 'John Doe Updated',
+          photo: 'https://t.me/i/userpic/320/johndoe.jpg',
           additional_info: { telegram_id: 123456789, updated: true }
         });
       });
@@ -137,11 +141,12 @@ describe('ClientService', () => {
           mockExistingClient.id,
           {
             name: 'John Doe Updated',
+            photo: 'https://t.me/i/userpic/320/johndoe.jpg',
             additional_info: { telegram_id: 123456789, updated: true },
             tclients_auth: {
               update: {
                 where: { id: mockExistingClient.tclients_auth[0].id },
-                data: { last_login: expect.any(Date) }
+                data: { last_login: expect.any(Date), is_active: true }
               }
             }
           }
@@ -183,6 +188,7 @@ describe('ClientService', () => {
           clientWithoutAuth.id,
           {
             name: 'John Doe Updated',
+            photo: 'https://t.me/i/userpic/320/johndoe.jpg',
             additional_info: { telegram_id: 123456789, updated: true }
           }
         );
@@ -197,6 +203,7 @@ describe('ClientService', () => {
         
         mockTelegramDataBuilder.buildClientCreateData = jest.fn().mockReturnValue({
           name: 'John Doe',
+          photo: 'https://t.me/i/userpic/320/johndoe.jpg',
           additional_info: { telegram_id: 123456789 }
         });
         
@@ -238,6 +245,7 @@ describe('ClientService', () => {
         expect(mockClientRepository.createWithAuth).toHaveBeenCalledTimes(1);
         expect(mockClientRepository.createWithAuth).toHaveBeenCalledWith({
           name: 'John Doe',
+          photo: 'https://t.me/i/userpic/320/johndoe.jpg',
           additional_info: { telegram_id: 123456789 },
           tclients_auth: {
             create: {
@@ -317,6 +325,7 @@ describe('ClientService', () => {
         
         mockTelegramDataBuilder.buildClientCreateData = jest.fn().mockReturnValue({
           name: 'John Doe',
+          photo: 'https://t.me/i/userpic/320/johndoe.jpg',
           additional_info: { telegram_id: 123456789 }
         });
         
@@ -331,6 +340,7 @@ describe('ClientService', () => {
         
         mockTelegramDataBuilder.buildClientUpdateData = jest.fn().mockReturnValue({
           name: 'John Doe Updated',
+          photo: 'https://t.me/i/userpic/320/johndoe.jpg',
           additional_info: { telegram_id: 123456789, updated: true }
         });
 

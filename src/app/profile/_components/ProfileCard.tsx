@@ -30,6 +30,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
       id: user.id,
       name: user.name,
       role: activeAuth?.role || 'user',
+      photo: user.photo ?? authContext?.photo_url,
       telegram_id: authContext?.id,
       username: authContext?.username
     };
@@ -44,9 +45,17 @@ export default function ProfileCard({ user }: ProfileCardProps) {
         onClick={() => setIsModalOpen(true)}
       >
         {/* Аватарка */}
-        <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
-          {getInitials(userInfo.name)}
-        </div>
+        {userInfo.photo ? (
+          <img
+            src={userInfo.photo}
+            alt={userInfo.name}
+            className="w-16 h-16 rounded-full object-cover"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
+            {getInitials(userInfo.name)}
+          </div>
+        )}
         
         {/* Имя и ID */}
         <div className="flex-1">

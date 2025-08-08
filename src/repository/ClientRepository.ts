@@ -87,6 +87,7 @@ export class ClientRepository {
         data: {
           name: data.name,
           email: data.email,
+          photo: data.photo,
           additional_info: data.additional_info,
           tarea_id: data.tarea_id,
           tclients_auth: data.tclients_auth,
@@ -115,6 +116,7 @@ export class ClientRepository {
         data: {
           name: data.name,
           email: data.email,
+          photo: data.photo,
           additional_info: data.additional_info,
           tarea_id: data.tarea_id,
           ...(data.tclients_auth && { tclients_auth: data.tclients_auth }),

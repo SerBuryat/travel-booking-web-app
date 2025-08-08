@@ -27,6 +27,7 @@ export class TelegramDataBuilder {
   static buildClientCreateData(telegramData: TelegramUser): CreateClientType {
     return {
       name: this.buildFullName(telegramData),
+      photo: telegramData.photo_url,
       additional_info: this.buildAdditionalInfo(telegramData)
     };
   }
@@ -37,6 +38,7 @@ export class TelegramDataBuilder {
   static buildClientUpdateData(telegramData: TelegramUser): UpdateClientType {
     return {
       name: this.buildFullName(telegramData),
+      photo: telegramData.photo_url,
       additional_info: this.buildAdditionalInfo(telegramData)
     };
   }

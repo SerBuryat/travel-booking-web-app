@@ -4,6 +4,7 @@ export interface ClientType {
   tarea_id: number | null;
   name: string;
   email: string | null;
+  photo: string | null;
   additional_info: any | null;
   created_at: Date;
 }
@@ -38,6 +39,7 @@ export interface AuthResult {
 export interface CreateClientType {
   name: string;
   email?: string;
+  photo?: string;
   additional_info?: any;
   tarea_id?: number;
 }
@@ -46,6 +48,7 @@ export interface CreateClientType {
 export interface UpdateClientType {
   name?: string;
   email?: string;
+  photo?: string;
   additional_info?: any;
   tarea_id?: number;
 }
