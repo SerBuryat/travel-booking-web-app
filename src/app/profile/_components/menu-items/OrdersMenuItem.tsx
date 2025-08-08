@@ -28,7 +28,7 @@ export default function OrdersMenuItem() {
       <BaseMenuItem
           title="Мои заказы"
           icon={icon}
-          onClick={() => router.push('/profile')}
+          onClick={() => router.push('/profile/orders')}
       />
   );
 }
