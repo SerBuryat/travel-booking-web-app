@@ -46,7 +46,7 @@ export const PrivatePolicyButton: React.FC = () => {
             
             <div className="text-sm text-gray-700 space-y-4">
               <p>
-                This Privacy Policy describes how Daily Task Manager ("we", "our", or "us") collects, uses, and shares your personal information when you use our service marketplace application.
+                This Privacy Policy describes how Daily Task Manager (&#34;we&#34;, &#34;our&#34;, or &#34;us&#34;) collects, uses, and shares your personal information when you use our service marketplace application.
               </p>
               
               <div>

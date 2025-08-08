@@ -52,7 +52,7 @@ export interface UpdateClientType {
 
 // Тип для создания аутентификации клиента
 export interface CreateClientAuthType {
-  tclients_id: number;
+  tclients_id?: number; // optional: set automatically in nested writes
   auth_type: string;
   auth_id: string;
   auth_context?: any;

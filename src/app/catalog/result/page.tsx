@@ -1,5 +1,4 @@
 import { ServiceService } from '@/service/ServiceService';
-import { CategoryService } from '@/service/CategoryService';
 import { Header } from '@/components/Header';
 import { SearchBar } from '@/components/SearchBar';
 import React from 'react';

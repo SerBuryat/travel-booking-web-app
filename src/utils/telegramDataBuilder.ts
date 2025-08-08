@@ -45,13 +45,11 @@ export class TelegramDataBuilder {
    * Построить данные для создания аутентификации
    */
   static buildAuthCreateData(
-    clientId: number,
     authId: string,
     telegramData: TelegramUser,
     tokenExpiresAt: Date
   ): CreateClientAuthType {
     return {
-      tclients_id: clientId,
       auth_type: 'telegram',
       auth_id: authId,
       auth_context: telegramData,

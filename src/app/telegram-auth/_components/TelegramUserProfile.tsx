@@ -10,7 +10,7 @@ export function TelegramUserProfile({ userData }: TelegramUserProfileProps) {
       {/* User Avatar */}
       <div className="mb-4 sm:mb-6">
         {userData.photo_url ? (
-          <img 
+          <img
             src={userData.photo_url} 
             alt="Profile" 
             className="w-20 h-20 sm:w-24 sm:h-24 rounded-full mx-auto border-4 border-blue-100 shadow-lg"

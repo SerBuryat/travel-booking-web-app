@@ -20,7 +20,7 @@ export default function TelegramAuthPage() {
         <TelegramAuthProgress currentStep={getCurrentStep(authState)} />
         <TelegramAuthContent 
           state={authState}
-          userData={userData}
+          userData={userData!}
           error={error}
           onLogin={handleLoginWithTelegram}
         />
