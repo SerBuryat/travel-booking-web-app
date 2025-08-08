@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import ProfileHeader from '@/app/profile/_components/ProfileHeader';
-import OrdersList from '@/app/profile/orders/OrdersList';
+import OrdersList from '@/app/profile/orders/_components/OrdersList';
 import {getServerUser} from "@/lib/server-auth";
 
 export default async function ProfileOrdersPage() {
