@@ -65,41 +65,6 @@ export class ServiceRepository {
   }
 
   /**
-   * Find all services by name search
-   */
-  static async findAllByNameLike(search: string): Promise<ServiceEntity[]> {
-    if (!search || search.length < 3) return [];
-    const services = await prisma.tservices.findMany({
-      where: {
-        name: {
-          contains: search,
-          mode: 'insensitive',
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        price: true,
-        tcategories_id: true,
-        priority: true,
-        rating: true,
-      },
-      orderBy: { priority: 'desc' },
-    });
-    
-    return services.map(s => ({
-      id: s.id,
-      name: s.name,
-      description: s.description ?? '',
-      price: s.price ? String(s.price) : '0',
-      tcategories_id: s.tcategories_id,
-      priority: s.priority ? String(s.priority) : '0',
-      rating: s.rating ? Number(s.rating) : undefined,
-    }));
-  }
-
-  /**
    * Get popular services by name search
    */
   static async findPopularByLikeName(search: string): Promise<ServiceEntity[]> {

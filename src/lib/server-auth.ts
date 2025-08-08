@@ -59,11 +59,3 @@ export async function getServerUser(): Promise<ServerUser | null> {
     return null;
   }
 }
-
-/**
- * Проверяет, авторизован ли пользователь на сервере
- */
-export async function isServerAuthenticated(): Promise<boolean> {
-  const user = await getServerUser();
-  return user !== null;
-}
