@@ -10,8 +10,10 @@ import { CategoryService } from '@/service/CategoryService';
 
 export default async function HomePage() {
   // Загружаем данные
-  const categories = await CategoryService.getAllParentCategories();
-  const popularServices = await ServiceService.getPopularServices(6);
+  const categoryService = new CategoryService();
+  const categories = await categoryService.getAllParentCategories();
+  const serviceService = new ServiceService();
+  const popularServices = await serviceService.getPopularServices(6);
 
   return (
     <div className="min-h-screen bg-white pb-24">

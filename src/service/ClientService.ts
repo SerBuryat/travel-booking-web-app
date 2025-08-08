@@ -1,10 +1,9 @@
 import { ClientRepository } from '@/repository/ClientRepository';
-import {  
-  ClientWithAuthType, 
-  CreateClientType, 
+import {
+  ClientWithAuthType,
+  CreateClientType,
   UpdateClientType,
-  CreateClientAuthType,
-  AuthResult
+  CreateClientAuthType
 } from '@/model/ClientType';
 import { TelegramUser } from "@/types/telegram";
 import { prisma } from '@/lib/prisma';
@@ -39,52 +38,11 @@ export class ClientService {
   }
 
   /**
-   * Проверить аутентификацию пользователя
-   */
-  async checkAuth(userId: number, authId: string): Promise<AuthResult> {
-    try {
-      const user = await this.clientRepository.findByIdWithActiveAuth(userId, authId);
-      
-      if (!user || user.tclients_auth.length === 0) {
-        return { 
-          isAuthenticated: false, 
-          error: 'User not found or inactive' 
-        };
-      }
-
-      return { 
-        isAuthenticated: true, 
-        user 
-      };
-    } catch (error) {
-      console.error('Auth check error:', error);
-      return { 
-        isAuthenticated: false, 
-        error: 'Authentication error' 
-      };
-    }
-  }
-
-  /**
-   * Получить роль пользователя
-   */
-  async getUserRole(userId: number, authId: string): Promise<string | null> {
-    const user = await this.clientRepository.findByIdWithActiveAuth(userId, authId);
-    
-    if (!user || user.tclients_auth.length === 0) {
-      return null;
-    }
-
-    return user.tclients_auth[0].role || 'user';
-  }
-
-  /**
    * Получить клиента по ID с аутентификацией
    */
   async getByIdWithAuth(id: number): Promise<ClientWithAuthType | null> {
     return await this.clientRepository.findByIdWithAuth(id);
   }
-
 
   /**
    * Создать или обновить клиента с Telegram аутентификацией

@@ -15,7 +15,8 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
       </div>
     );
   }
-  const service = await ServiceService.getServiceById(id);
+  const serviceService = new ServiceService();
+  const service = await serviceService.getServiceById(id);
   if (!service) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">

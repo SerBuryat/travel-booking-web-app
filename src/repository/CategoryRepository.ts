@@ -4,9 +4,35 @@ import { CategoryEntity } from '@/entity/CategoryEntity';
 export class CategoryRepository {
 
   /**
+   * Common field selector for category entities
+   */
+  private readonly CATEGORY_SELECT = {
+    id: true,
+    code: true,
+    sysname: true,
+    name: true,
+    photo: true,
+    parent_id: true,
+  } as const;
+
+  /**
+   * Converts raw Prisma category data to CategoryEntity
+   */
+  private toCategoryEntity(data: any): CategoryEntity {
+    return {
+      id: data.id,
+      code: data.code,
+      sysname: data.sysname,
+      name: data.name,
+      photo: data.photo,
+      parent_id: data.parent_id,
+    };
+  }
+
+  /**
    * Find category by ID with parent and children relations
    */
-  static async findById(categoryId: number): Promise<{
+  async findById(categoryId: number): Promise<{
     category: CategoryEntity;
     parent: CategoryEntity | null;
     children: CategoryEntity[];
@@ -14,33 +40,14 @@ export class CategoryRepository {
     const categoryWithRelations = await prisma.tcategories.findUnique({
       where: { id: categoryId },
       select: {
-        id: true,
-        code: true,
-        sysname: true,
-        name: true,
-        photo: true,
-        parent_id: true,
+        ...this.CATEGORY_SELECT,
         // Parent relation
         tcategories: {
-          select: {
-            id: true,
-            code: true,
-            sysname: true,
-            name: true,
-            photo: true,
-            parent_id: true,
-          }
+          select: this.CATEGORY_SELECT
         },
         // Children relations
         other_tcategories: {
-          select: {
-            id: true,
-            code: true,
-            sysname: true,
-            name: true,
-            photo: true,
-            parent_id: true,
-          },
+          select: this.CATEGORY_SELECT,
           orderBy: { id: 'asc' },
         }
       },
@@ -51,67 +58,41 @@ export class CategoryRepository {
     }
 
     return {
-      category: {
-        id: categoryWithRelations.id,
-        code: categoryWithRelations.code,
-        sysname: categoryWithRelations.sysname,
-        name: categoryWithRelations.name,
-        photo: categoryWithRelations.photo,
-        parent_id: categoryWithRelations.parent_id,
-      },
-      parent: categoryWithRelations.tcategories ? {
-        id: categoryWithRelations.tcategories.id,
-        code: categoryWithRelations.tcategories.code,
-        sysname: categoryWithRelations.tcategories.sysname,
-        name: categoryWithRelations.tcategories.name,
-        photo: categoryWithRelations.tcategories.photo,
-        parent_id: categoryWithRelations.tcategories.parent_id,
-      } : null,
-      children: categoryWithRelations.other_tcategories.map(child => ({
-        id: child.id,
-        code: child.code,
-        sysname: child.sysname,
-        name: child.name,
-        photo: child.photo,
-        parent_id: child.parent_id,
-      }))
+      category: this.toCategoryEntity(categoryWithRelations),
+      parent: categoryWithRelations.tcategories 
+        ? this.toCategoryEntity(categoryWithRelations.tcategories) 
+        : null,
+      children: categoryWithRelations.other_tcategories.map(child => 
+        this.toCategoryEntity(child)
+      )
     };
   }
 
   /**
    * Find all categories by parent ID
    */
-  static async findAllByParentId(parentId: number | null): Promise<CategoryEntity[]> {
-    return prisma.tcategories.findMany({
+  async findAllByParentId(parentId: number | null): Promise<CategoryEntity[]> {
+    const categories = await prisma.tcategories.findMany({
       where: { parent_id: parentId },
-      select: {
-        id: true,
-        code: true,
-        sysname: true,
-        name: true,
-        photo: true,
-        parent_id: true,
-      },
+      select: this.CATEGORY_SELECT,
       orderBy: { id: 'asc' },
     });
+
+    return categories.map(category => this.toCategoryEntity(category));
   }
 
   /**
    * Find categories by array of codes
    */
-  static async findAllByCodeIn(codes: string[]): Promise<CategoryEntity[]> {
+  async findAllByCodeIn(codes: string[]): Promise<CategoryEntity[]> {
     if (!codes || codes.length === 0) return [];
-    return prisma.tcategories.findMany({
+    
+    const categories = await prisma.tcategories.findMany({
       where: { code: { in: codes } },
-      select: {
-        id: true,
-        code: true,
-        sysname: true,
-        name: true,
-        photo: true,
-        parent_id: true,
-      },
+      select: this.CATEGORY_SELECT,
       orderBy: { id: 'asc' },
     });
+
+    return categories.map(category => this.toCategoryEntity(category));
   }
 } 

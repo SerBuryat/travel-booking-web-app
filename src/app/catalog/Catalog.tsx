@@ -4,7 +4,8 @@ import { GeneralCategoriesListComponent } from '@/components/GeneralCategoriesLi
 import { PopularServicesComponent } from '@/components/PopularServicesComponent';
 
 export default async function Catalog() {
-  const popularServices = await ServiceService.getPopularServices(6);
+  const serviceService = new ServiceService();
+  const popularServices = await serviceService.getPopularServices(6);
 
   return (
     <>

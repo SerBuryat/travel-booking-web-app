@@ -3,6 +3,12 @@ import { ServiceType } from '@/model/ServiceType';
 import { CategoryService } from './CategoryService';
 
 export class ServiceService {
+  private categoryService: CategoryService;
+
+  constructor() {
+    this.categoryService = new CategoryService();
+  }
+
   /**
    * Maps raw service data to ServiceEntity
    */
@@ -26,8 +32,8 @@ export class ServiceService {
   /**
    * Maps ServiceEntity to ServiceType with category relation
    */
-  static async mapToServiceType(entity: ServiceEntity): Promise<ServiceType> {
-    const category = await CategoryService.getById(entity.tcategories_id);
+  async mapToServiceType(entity: ServiceEntity): Promise<ServiceType> {
+    const category = await this.categoryService.getById(entity.tcategories_id);
     
     return {
       ...entity,
@@ -45,25 +51,27 @@ export class ServiceService {
   /**
    * Maps array of ServiceEntity to ServiceType with categories
    */
-  static async mapToServiceTypes(entities: ServiceEntity[]): Promise<ServiceType[]> {
+  async mapToServiceTypes(entities: ServiceEntity[]): Promise<ServiceType[]> {
     return Promise.all(entities.map(entity => this.mapToServiceType(entity)));
   }
 
   /**
    * Get services by category IDs with category relations
    */
-  static async getServicesByCategoryIds(categoryIds: number[]): Promise<ServiceType[]> {
+  async getServicesByCategoryIds(categoryIds: number[]): Promise<ServiceType[]> {
     const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const services = await ServiceRepository.findAllByCategoryIdIn(categoryIds);
+    const serviceRepository = new ServiceRepository();
+    const services = await serviceRepository.findAllByCategoryIdIn(categoryIds);
     return this.mapToServiceTypes(services);
   }
 
   /**
    * Get service by ID with category relation
    */
-  static async getServiceById(serviceId: number): Promise<ServiceType | null> {
+  async getServiceById(serviceId: number): Promise<ServiceType | null> {
     const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const service = await ServiceRepository.findById(serviceId);
+    const serviceRepository = new ServiceRepository();
+    const service = await serviceRepository.findById(serviceId);
     if (!service) return null;
     return this.mapToServiceType(service);
   }
@@ -71,27 +79,30 @@ export class ServiceService {
   /**
    * Get popular services by name with category relations
    */
-  static async getPopularServicesByName(search: string): Promise<ServiceType[]> {
+  async getPopularServicesByName(search: string): Promise<ServiceType[]> {
     const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const services = await ServiceRepository.findPopularByLikeName(search);
+    const serviceRepository = new ServiceRepository();
+    const services = await serviceRepository.findPopularByLikeName(search);
     return this.mapToServiceTypes(services);
   }
 
   /**
    * Get popular services by name and filter by category IDs
    */
-  static async getPopularServicesByNameAndCategoryIn(search: string, categoryIds: number[]): Promise<ServiceType[]> {
+  async getPopularServicesByNameAndCategoryIn(search: string, categoryIds: number[]): Promise<ServiceType[]> {
     const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const services = await ServiceRepository.findPopularByLikeNameAndCategoryIn(search, categoryIds);
+    const serviceRepository = new ServiceRepository();
+    const services = await serviceRepository.findPopularByLikeNameAndCategoryIn(search, categoryIds);
     return this.mapToServiceTypes(services);
   }
 
   /**
    * Get popular services with category relations
    */
-  static async getPopularServices(popularCount: number = 10): Promise<ServiceType[]> {
+  async getPopularServices(popularCount: number = 10): Promise<ServiceType[]> {
     const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const services = await ServiceRepository.findPopular(popularCount);
+    const serviceRepository = new ServiceRepository();
+    const services = await serviceRepository.findPopular(popularCount);
     return this.mapToServiceTypes(services);
   }
 } 

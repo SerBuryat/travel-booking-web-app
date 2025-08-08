@@ -5,7 +5,7 @@ export class ServiceRepository {
   /**
    * Find all services by category IDs
    */
-  static async findAllByCategoryIdIn(categoryIds: number[]): Promise<ServiceEntity[]> {
+  async findAllByCategoryIdIn(categoryIds: number[]): Promise<ServiceEntity[]> {
     const services = await prisma.tservices.findMany({
       where: {
         tcategories_id: { in: categoryIds },
@@ -34,7 +34,7 @@ export class ServiceRepository {
   /**
    * Get service by ID
    */
-  static async findById(serviceId: number): Promise<ServiceEntity | null> {
+  async findById(serviceId: number): Promise<ServiceEntity | null> {
     const service = await prisma.tservices.findUnique({
       where: { id: serviceId },
       select: {
@@ -67,7 +67,7 @@ export class ServiceRepository {
   /**
    * Get popular services by name search
    */
-  static async findPopularByLikeName(search: string): Promise<ServiceEntity[]> {
+  async findPopularByLikeName(search: string): Promise<ServiceEntity[]> {
     if (!search || search.length < 3) return [];
     const services = await prisma.tservices.findMany({
       where: {
@@ -102,7 +102,7 @@ export class ServiceRepository {
   /**
    * Get popular services by name search and filter by category IDs
    */
-  static async findPopularByLikeNameAndCategoryIn(search: string, categoryIds: number[]): Promise<ServiceEntity[]> {
+  async findPopularByLikeNameAndCategoryIn(search: string, categoryIds: number[]): Promise<ServiceEntity[]> {
     if (!search || search.length < 3) return [];
     const services = await prisma.tservices.findMany({
       where: {
@@ -140,7 +140,7 @@ export class ServiceRepository {
   /**
    * Get popular services
    */
-  static async findPopular(popularCount: number = 10): Promise<ServiceEntity[]> {
+  async findPopular(popularCount: number = 10): Promise<ServiceEntity[]> {
     const services = await prisma.tservices.findMany({
       select: {
         id: true,

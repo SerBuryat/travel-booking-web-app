@@ -11,7 +11,8 @@ export interface Category {
 }
 
 export const GeneralCategoriesListComponent: React.FC = async () => {
-  const generalCategories = await CategoryService.getGeneralCategories();
+  const categoryService = new CategoryService();
+  const generalCategories = await categoryService.getGeneralCategories();
 
   return (
     <div className="p-4 pt-2">

@@ -10,7 +10,8 @@ interface PageProps {
 }
 
 async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { categoryId: number, childCategoryIdsParam?: string }) {
-  const categoryWithRelations = await CategoryService.getById(categoryId);
+  const categoryService = new CategoryService();
+  const categoryWithRelations = await categoryService.getById(categoryId);
   if (!categoryWithRelations) return notFound();
   
   const childCategoriesIds = categoryWithRelations.children.map((child) => child.id);  
@@ -26,7 +27,8 @@ async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { 
       selectedChildIds.length > 0
         ? [categoryId, ...selectedChildIds]
         : [categoryId, ...childCategoriesIds];
-  const services = await ServiceService.getServicesByCategoryIds(serviceCategoryIds);
+  const serviceService = new ServiceService();
+  const services = await serviceService.getServicesByCategoryIds(serviceCategoryIds);
 
   return (
     <>

@@ -121,26 +121,6 @@ export class ClientRepository {
   }
 
   /**
-   * Создать нового клиента
-   */
-  async create(data: CreateClientType): Promise<ClientType | null> {
-    try {
-      const client = await prisma.tclients.create({
-        data: {
-          name: data.name,
-          email: data.email,
-          additional_info: data.additional_info,
-          tarea_id: data.tarea_id,
-        },
-      });
-      return client as ClientType;
-    } catch (error) {
-      console.error('Error creating client:', error);
-      return null;
-    }
-  }
-
-  /**
    * Обновить клиента (транзакционная версия)
    */
   async updateTx(tx: Omit<PrismaClient, ITXClientDenyList>, id: number, data: UpdateClientType): Promise<ClientType | null> {

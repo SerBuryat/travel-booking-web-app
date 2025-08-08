@@ -13,16 +13,17 @@ export default async function ResultPage({ searchParams }: { searchParams: Promi
   let services: any[] = [];
   
   if (searchValue) {
+    const serviceService = new ServiceService();
     if (categoryIdParam) {
       // Parse category IDs from comma-separated string
       const categoryIds = categoryIdParam.split(',').map(id => parseInt(id.trim())).filter(id => !isNaN(id));
       if (categoryIds.length > 0) {
-        services = await ServiceService.getPopularServicesByNameAndCategoryIn(searchValue, categoryIds);
+        services = await serviceService.getPopularServicesByNameAndCategoryIn(searchValue, categoryIds);
       } else {
-        services = await ServiceService.getPopularServicesByName(searchValue);
+        services = await serviceService.getPopularServicesByName(searchValue);
       }
     } else {
-      services = await ServiceService.getPopularServicesByName(searchValue);
+      services = await serviceService.getPopularServicesByName(searchValue);
     }
   }
   

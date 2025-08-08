@@ -4,6 +4,12 @@ import {CategoryRepository} from '@/repository/CategoryRepository';
 import { getGeneralCategoryCodes } from '@/utils/generalCategories';
 
 export class CategoryService {
+  private categoryRepository: CategoryRepository;
+
+  constructor() {
+    this.categoryRepository = new CategoryRepository();
+  }
+
   /**
    * Maps CategoryEntity to CategoryType
    */
@@ -38,28 +44,28 @@ export class CategoryService {
   /**
    * Gets general categories (accommodation, food, transport, tours)
    */
-  static async getGeneralCategories(): Promise<CategoryEntity[]> {
-    return CategoryRepository.findAllByCodeIn(getGeneralCategoryCodes());
+  async getGeneralCategories(): Promise<CategoryEntity[]> {
+    return this.categoryRepository.findAllByCodeIn(getGeneralCategoryCodes());
   }
 
   /**
    * Get all parent categories (categories with no parent)
    */
-  static async getAllParentCategories(): Promise<CategoryEntity[]> {
-    return CategoryRepository.findAllByParentId(null);
+  async getAllParentCategories(): Promise<CategoryEntity[]> {
+    return this.categoryRepository.findAllByParentId(null);
   }
 
   /**
    * Get category by ID as CategoryType with hierarchical structure
    */
-  static async getById(categoryId: number): Promise<CategoryType | null> {
-    const categoryWithRelations = await CategoryRepository.findById(categoryId);
+  async getById(categoryId: number): Promise<CategoryType | null> {
+    const categoryWithRelations = await this.categoryRepository.findById(categoryId);
     
     if (!categoryWithRelations) {
       return null;
     }
 
-    return this.mapToCategoryType(
+    return CategoryService.mapToCategoryType(
       categoryWithRelations.category, 
       categoryWithRelations.children, 
       categoryWithRelations.parent
