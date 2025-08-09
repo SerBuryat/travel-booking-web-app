@@ -1,57 +1,59 @@
-import { prisma } from '@/lib/prisma';
+import {prisma} from '@/lib/prisma';
 
-export interface ServiceClickEntity {
+export interface ServiceClickModel {
   id: number;
   tclients_id: number;
-  tservices_id: number;
-  timestamp: string;
+  tservices: ClickedService;
+  timestamp: Date;
+}
+
+export interface ClickedService {
+  id: number;
+  name: string;
 }
 
 export class ServicesClicksRepository {
 
-  async findByClientId(clientId: number): Promise<ServiceClickEntity[]> {
-    const items = await prisma.tservices_clicks.findMany({
-      where: { tclients_id: clientId },
-      orderBy: { timestamp: 'desc' },
+  async findAllByClientId(clientId: number): Promise<ServiceClickModel[]> {
+    return await prisma.tservices_clicks.findMany({
+      where: {tclients_id: clientId},
+      orderBy: {timestamp: 'desc'},
+      include: {
+        tservices: true,
+      },
     });
-    return items.map((i) => ({
-      id: i.id,
-      tclients_id: i.tclients_id,
-      tservices_id: i.tservices_id,
-      timestamp: i.timestamp instanceof Date ? i.timestamp.toISOString() : String(i.timestamp),
-    }));
   }
 
-  async createUnique(clientId: number, serviceId: number): Promise<ServiceClickEntity> {
-    // If exists, return existing; else create
-    try {
-      const created = await prisma.tservices_clicks.create({
-        data: { tclients_id: clientId, tservices_id: serviceId },
+  async createUnique(clientId: number, serviceId: number): Promise<{
+    id: number;
+    timestamp: Date;
+  }> {
+    // ищем по clientId и serviceId существующий клик
+    const existing = await prisma.tservices_clicks.findUnique({
+      where: { tclients_id_tservices_id: { tclients_id: clientId, tservices_id: serviceId } },
+    });
+
+    // если находим, то обновляем timestamp
+    if (existing) {
+      const updated = await prisma.tservices_clicks.update({
+        where: { id: existing.id },
+        data: { timestamp: new Date().toISOString() },
       });
       return {
-        id: created.id,
-        tclients_id: created.tclients_id,
-        tservices_id: created.tservices_id,
-        timestamp: created.timestamp instanceof Date ? created.timestamp.toISOString() : String(created.timestamp),
-      };
-    } catch (e: any) {
-      // Unique violation -> return existing
-      const existing = await prisma.tservices_clicks.findUnique({
-        where: {
-          tclients_id_tservices_id: {
-            tclients_id: clientId,
-            tservices_id: serviceId,
-          },
-        },
-      });
-      if (!existing) throw e;
-      return {
-        id: existing.id,
-        tclients_id: existing.tclients_id,
-        tservices_id: existing.tservices_id,
-        timestamp: existing.timestamp instanceof Date ? existing.timestamp.toISOString() : String(existing.timestamp),
+        id: updated.id,
+        timestamp: updated.timestamp,
       };
     }
+
+    // если не находим, то создаем
+    const created = await prisma.tservices_clicks.create({
+      data: { tclients_id: clientId, tservices_id: serviceId },
+    });
+
+    return {
+      id: created.id,
+      timestamp: created.timestamp,
+    };
   }
 }
 

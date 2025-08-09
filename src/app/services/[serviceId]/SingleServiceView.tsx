@@ -2,7 +2,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { ImageCarousel } from '@/components/ImageCarousel';
 import { ServiceTypeFull } from '@/model/ServiceType';
-
+import { useRouter } from 'next/navigation';
 export default function SingleServiceView({ service }: { service: ServiceTypeFull }) {
   // Mock images for carousel (gradient backgrounds)
   const mockImages = [
@@ -13,17 +13,16 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
     'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
   ];
 
+  const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
-
-  const primaryContact = useMemo(() => service.contacts?.[0], [service.contacts]);
 
   async function handleContactClick() {
     try {
       const res = await fetch(`/api/services/${service.id}/click`, { method: 'POST' });
       if (res.status === 401) {
-        window.location.href = '/telegram-auth';
+        router.push('/telegram-auth');
         return;
       }
     } catch (e) {
@@ -94,11 +93,11 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
       </div>
 
       {/* Sticky Contact Button */}
-      <div className="fixed bottom-20 left-0 right-0 px-4" style={{ zIndex: 60 }}>
+      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
         <button
           onClick={handleContactClick}
-          className="w-full text-black py-4 px-6 font-semibold"
-          style={{ backgroundColor: '#95E59D', borderRadius: 30 }}
+          className="max-w-sm text-black pt-2 pb-2 pr-4 pl-4"
+          style={{ backgroundColor: '#95E59D', borderRadius: 30, fontSize: 17, fontWeight: 400 }}
         >
           Связаться
         </button>

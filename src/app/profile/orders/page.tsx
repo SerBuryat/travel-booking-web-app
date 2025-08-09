@@ -9,11 +9,12 @@ export default async function ProfileOrdersPage() {
   // Получаем данные пользователя на сервере
   const user = await getServerUser();
   const clicksService = new ServicesClicksService();
-  const ordersRaw = await clicksService.getByClientsId(user.id);
-  const orders = ordersRaw.map((o) => ({
-    serviceId: o.serviceId,
-    name: o.serviceName,
-    respondedAt: new Date(o.timestamp),
+  const clicks = await clicksService.getByClientId(user.id);
+  const orders = clicks.map((c) => ({
+    id: c.id,
+    serviceId: c.tservices.id,
+    name: c.tservices.name,
+    respondedAt: c.timestamp,
   }));
 
   return (

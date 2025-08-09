@@ -3,8 +3,8 @@ import {StringValue} from "ms";
 
 // Конфигурация JWT
 const JWT_SECRET: Secret = process.env.JWT_SECRET || 'your-secret-key';
-const JWT_EXPIRES_IN: StringValue = '1h';
-const REFRESH_TOKEN_EXPIRES_IN: StringValue = '7d';
+const JWT_EXPIRES_IN: StringValue = '1d';
+const REFRESH_TOKEN_EXPIRES_IN: StringValue = '14d';
 
 // Интерфейсы для типизации
 interface JWTPayload {

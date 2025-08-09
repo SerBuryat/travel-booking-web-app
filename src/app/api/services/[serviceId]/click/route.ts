@@ -17,7 +17,7 @@ export async function POST(_req: NextRequest, { params }: { params: { serviceId:
 
   const clicksService = new ServicesClicksService();
   try {
-    const created = await clicksService.createUniqueClick(user.id, id);
+    const created = await clicksService.create(user.id, id);
     return NextResponse.json({ id: created.id, timestamp: created.timestamp }, { status: 201 });
   } catch {
     // If unique violation path reached, createUniqueClick already returns existing
