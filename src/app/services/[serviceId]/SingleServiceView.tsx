@@ -1,9 +1,9 @@
 'use client';
-import React from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ImageCarousel } from '@/components/ImageCarousel';
-import { ServiceType } from '@/model/ServiceType';
+import { ServiceTypeFull } from '@/model/ServiceType';
 
-export default function SingleServiceView({ service }: { service: ServiceType }) {
+export default function SingleServiceView({ service }: { service: ServiceTypeFull }) {
   // Mock images for carousel (gradient backgrounds)
   const mockImages = [
     'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -12,6 +12,26 @@ export default function SingleServiceView({ service }: { service: ServiceType })
     'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
     'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
   ];
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const openModal = useCallback(() => setIsModalOpen(true), []);
+  const closeModal = useCallback(() => setIsModalOpen(false), []);
+
+  const primaryContact = useMemo(() => service.contacts?.[0], [service.contacts]);
+
+  async function handleContactClick() {
+    try {
+      const res = await fetch(`/api/services/${service.id}/click`, { method: 'POST' });
+      if (res.status === 401) {
+        window.location.href = '/telegram-auth';
+        return;
+      }
+    } catch (e) {
+      // ignore for MVP
+    } finally {
+      openModal();
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
@@ -70,15 +90,50 @@ export default function SingleServiceView({ service }: { service: ServiceType })
           </div>
         </div>
         {/* Action Buttons */}
-        <div className="mt-8 space-y-3">
-          <button className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg font-medium hover:bg-blue-700 transition-colors">
-            Book Now
-          </button>
-          <button className="w-full border border-gray-300 text-gray-700 py-4 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors">
-            Contact Provider
-          </button>
-        </div>
+        <div className="h-28" />
       </div>
+
+      {/* Sticky Contact Button */}
+      <div className="fixed bottom-20 left-0 right-0 px-4" style={{ zIndex: 60 }}>
+        <button
+          onClick={handleContactClick}
+          className="w-full text-black py-4 px-6 font-semibold"
+          style={{ backgroundColor: '#95E59D', borderRadius: 30 }}
+        >
+          Связаться
+        </button>
+      </div>
+
+      {/* Contacts Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 flex items-end sm:items-center justify-center" style={{ zIndex: 60 }}>
+          <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
+          <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-6 m-0 sm:m-4">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Контакты</h3>
+              <button onClick={closeModal} className="text-gray-500">✕</button>
+            </div>
+            {service.contacts && service.contacts.length > 0 ? (
+              <div className="space-y-3">
+                {service.contacts.map((c) => (
+                  <div key={c.id} className="rounded-lg border border-gray-100 p-4">
+                    {c.phone && <div className="text-sm text-gray-700"><span className="font-medium">Телефон:</span> {c.phone}</div>}
+                    {c.email && <div className="text-sm text-gray-700"><span className="font-medium">Email:</span> {c.email}</div>}
+                    {c.tg_username && <div className="text-sm text-gray-700"><span className="font-medium">Telegram:</span> @{c.tg_username}</div>}
+                    {c.whatsap && <div className="text-sm text-gray-700"><span className="font-medium">WhatsApp:</span> {c.whatsap}</div>}
+                    {c.website && <div className="text-sm text-blue-600"><a href={c.website} target="_blank" rel="noreferrer">Сайт</a></div>}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-sm text-gray-500">Контактная информация недоступна</div>
+            )}
+            <div className="mt-6">
+              <button onClick={closeModal} className="w-full py-3 rounded-xl bg-gray-100 text-gray-700">Закрыть</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 

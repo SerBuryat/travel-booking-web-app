@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React from 'react';
 import OrderListItem from './OrderListItem';
 
 type OrderItem = {
@@ -9,23 +9,7 @@ type OrderItem = {
   respondedAt: Date;
 };
 
-export default function OrdersList() {
-  const orders: OrderItem[] = useMemo(
-    () => [
-      {
-        serviceId: 14,
-        name: 'Сервис №14',
-        respondedAt: new Date('2025-02-10'),
-      },
-      {
-        serviceId: 18,
-        name: 'Сервис №18',
-        respondedAt: new Date('2024-07-05'),
-      },
-    ],
-    []
-  );
-
+export default function OrdersList({ orders }: { orders: OrderItem[] }) {
   return (
     <div className="bg-white rounded-xl shadow-sm divide-y divide-gray-100">
       {orders.map((order, index) => (

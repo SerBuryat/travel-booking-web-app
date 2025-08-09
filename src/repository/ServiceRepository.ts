@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma';
 import { ServiceEntity } from '@/entity/ServiceEntity';
+import { ContactsType } from '@/model/ContactsType';
 
 export class ServiceRepository {
   /**
@@ -62,6 +63,59 @@ export class ServiceRepository {
       created_at: service.created_at instanceof Date ? service.created_at.toISOString() : String(service.created_at),
       rating: service.rating ? Number(service.rating) : undefined,
     };
+  }
+
+  /**
+   * Get service by ID including contacts
+   */
+  async findFullById(serviceId: number): Promise<(ServiceEntity & { contacts: ContactsType[] }) | null> {
+    const service = await prisma.tservices.findUnique({
+      where: { id: serviceId },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        tcategories_id: true,
+        provider_id: true,
+        status: true,
+        created_at: true,
+        rating: true,
+        tcontacts: {
+          select: {
+            id: true,
+            tservices_id: true,
+            email: true,
+            phone: true,
+            tg_username: true,
+            website: true,
+            whatsap: true,
+          },
+        },
+      },
+    });
+    if (!service) return null;
+    const base: ServiceEntity = {
+      id: service.id,
+      name: service.name,
+      description: service.description ?? '',
+      price: service.price ? String(service.price) : '0',
+      tcategories_id: service.tcategories_id,
+      provider_id: service.provider_id,
+      status: service.status,
+      created_at: service.created_at instanceof Date ? service.created_at.toISOString() : String(service.created_at),
+      rating: service.rating ? Number(service.rating) : undefined,
+    };
+    const contacts: ContactsType[] = service.tcontacts.map(c => ({
+      id: c.id,
+      tservices_id: c.tservices_id,
+      email: c.email,
+      phone: c.phone,
+      tg_username: c.tg_username,
+      website: c.website,
+      whatsap: c.whatsap,
+    }));
+    return { ...base, contacts };
   }
 
   /**

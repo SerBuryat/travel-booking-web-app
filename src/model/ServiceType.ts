@@ -1,4 +1,5 @@
 import { CategoryEntity } from '@/entity/CategoryEntity';
+import { ContactsType } from '@/model/ContactsType';
 
 export interface ServiceType {
   id: number;
@@ -13,3 +14,7 @@ export interface ServiceType {
   category?: CategoryEntity;
   rating?: number;
 } 
+
+export interface ServiceTypeFull extends ServiceType {
+  contacts: ContactsType[];
+}

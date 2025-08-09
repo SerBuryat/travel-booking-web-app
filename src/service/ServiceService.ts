@@ -1,5 +1,5 @@
 import { ServiceEntity } from '@/entity/ServiceEntity';
-import { ServiceType } from '@/model/ServiceType';
+import { ServiceType, ServiceTypeFull } from '@/model/ServiceType';
 import { CategoryService } from './CategoryService';
 
 export class ServiceService {
@@ -48,6 +48,14 @@ export class ServiceService {
     };
   }
 
+  async mapToServiceTypeFull(entity: ServiceEntity & { contacts: any[] }): Promise<ServiceTypeFull> {
+    const base = await this.mapToServiceType(entity);
+    return {
+      ...base,
+      contacts: entity.contacts ?? [],
+    };
+  }
+
   /**
    * Maps array of ServiceEntity to ServiceType with categories
    */
@@ -68,12 +76,12 @@ export class ServiceService {
   /**
    * Get service by ID with category relation
    */
-  async getServiceById(serviceId: number): Promise<ServiceType | null> {
+  async getServiceById(serviceId: number): Promise<ServiceTypeFull | null> {
     const { ServiceRepository } = await import('@/repository/ServiceRepository');
     const serviceRepository = new ServiceRepository();
-    const service = await serviceRepository.findById(serviceId);
+    const service = await serviceRepository.findFullById(serviceId);
     if (!service) return null;
-    return this.mapToServiceType(service);
+    return this.mapToServiceTypeFull(service);
   }
 
   /**
