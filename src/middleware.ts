@@ -2,18 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { verifyJWT } from './lib/jwt';
 import { ClientService } from './service/ClientService';
 
+// todo - пока не работает, т.к. middleware умеет запускать, только edge functions, чтобы это ни значило
+//  Middleware нам нужен для быстрой и дешевой защиты маршрутов без загрузки страниц и без хитов в БД
+//  в middleware оставляем только легковесные проверки по JWT и роуты/роли
 // Маршруты, которые не требуют аутентификации
 const publicRoutes = [
-  '/',
-  '/home',
-  '/catalog',
-  '/services',
-  '/map',
-  '/telegram-auth',
-  '/api/auth/telegram',
-  '/api/auth/refresh',
-  '/api/auth/logout',
-  '/api/auth/validate',
+  '/'
 ];
 
 // Маршруты, которые требуют определенных ролей
