@@ -90,8 +90,20 @@ model tcategories {
   tcategories       tcategories?          @relation("tcategoriesTotcategories", fields: [parent_id], references: [id], onUpdate: NoAction)
   other_tcategories tcategories[]         @relation("tcategoriesTotcategories")
   tservices         tservices[]
+  tcategories_options tcategories_options[]
 
   @@index([path], map: "idx_categories_path", type: Gist)
+}
+
+/// Options for service categories (e.g., "WiFi", "Parking" for "Hotel" category)
+model tcategories_options {
+  id          Int         @id @default(autoincrement())
+  category_id Int
+  name        String      @db.VarChar(255)
+  description String?
+  tcategories tcategories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([category_id], map: "idx_tcategories_options_category")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -275,6 +287,7 @@ model tservices {
   rating         Decimal?     @default(0.0) @db.Decimal(3, 2)
   rating_count   Int?         @default(0)
   view_count     Int?         @default(0)
+  service_options Json?        // Массив опций сервиса
   tcontacts      tcontacts[]
   tlocations     tlocations[]
   tpayments      tpayments[]

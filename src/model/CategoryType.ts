@@ -11,3 +11,12 @@ export interface CategoryType {
   parent: CategoryEntity | null;
   isParent: boolean;
 }
+
+export interface ParentCategoryWithChildren {
+  id: number;
+  code: string;
+  sysname: string;
+  name: string;
+  photo: string | null;
+  children: CategoryEntity[];
+}
