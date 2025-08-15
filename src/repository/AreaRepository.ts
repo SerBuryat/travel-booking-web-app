@@ -43,47 +43,4 @@ export class AreaRepository {
     return areas.map(area => this.toAreaEntity(area));
   }
 
-  /**
-   * Find all parent areas (areas with no parent)
-   */
-  async findAllParent(): Promise<AreaEntity[]> {
-    const areas = await prisma.tarea.findMany({
-      where: { parent_id: null },
-      select: this.AREA_SELECT,
-      orderBy: [
-        { tier: 'asc' },
-        { name: 'asc' }
-      ],
-    });
-
-    return areas.map(area => this.toAreaEntity(area));
-  }
-
-  /**
-   * Find areas by parent ID
-   */
-  async findByParentId(parentId: number): Promise<AreaEntity[]> {
-    const areas = await prisma.tarea.findMany({
-      where: { parent_id: parentId },
-      select: this.AREA_SELECT,
-      orderBy: [
-        { tier: 'asc' },
-        { name: 'asc' }
-      ],
-    });
-
-    return areas.map(area => this.toAreaEntity(area));
-  }
-
-  /**
-   * Find area by ID
-   */
-  async findById(areaId: number): Promise<AreaEntity | null> {
-    const area = await prisma.tarea.findUnique({
-      where: { id: areaId },
-      select: this.AREA_SELECT,
-    });
-
-    return area ? this.toAreaEntity(area) : null;
-  }
 }

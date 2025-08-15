@@ -9,6 +9,9 @@ export interface ClientType {
   created_at: Date;
 }
 
+export type AuthRole =
+    'user' | 'provider' | 'admin';
+
 // Тип для аутентификации клиента
 export interface ClientAuthType {
   id: number;
@@ -20,19 +23,12 @@ export interface ClientAuthType {
   refresh_token: string | null;
   token_expires_at: Date | null;
   is_active: boolean;
-  role: string;
+  role: AuthRole;
 }
 
 // Тип для клиента с аутентификацией
 export interface ClientWithAuthType extends ClientType {
   tclients_auth: ClientAuthType[];
-}
-
-// Тип для результата аутентификации
-export interface AuthResult {
-  isAuthenticated: boolean;
-  user?: ClientWithAuthType;
-  error?: string;
 }
 
 // Тип для создания клиента

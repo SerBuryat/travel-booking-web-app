@@ -72,7 +72,7 @@ export class ClientService {
     client: ClientWithAuthType,
     telegramData: TelegramUser
   ): Promise<ClientWithAuthType | null> {
-    const updateData = this.buildClientUpdateData(telegramData);
+    const updateData = TelegramDataBuilder.buildClientUpdateData(telegramData);
     
     if (client.tclients_auth.length > 0) {
       return await this.clientRepository.updateWithAuth(client.id, {
@@ -80,7 +80,7 @@ export class ClientService {
         tclients_auth: {
           update: {
             where: { id: client.tclients_auth[0].id },
-            data: { last_login: new Date() , is_active: true}
+            data: { last_login: new Date() , is_active: true, role: 'user'}
           }
         }
       });
@@ -97,8 +97,8 @@ export class ClientService {
     authId: string,
     tokenExpiresAt: Date
   ): Promise<ClientWithAuthType | null> {
-    const createData = this.buildClientCreateData(telegramData);
-    const authData = this.buildAuthCreateData(authId, telegramData, tokenExpiresAt);
+    const createData = TelegramDataBuilder.buildClientCreateData(telegramData);
+    const authData = TelegramDataBuilder.buildAuthCreateData(authId, telegramData, tokenExpiresAt);
     
     return await this.clientRepository.createWithAuth({
       ...createData,
@@ -109,27 +109,21 @@ export class ClientService {
   }
 
   /**
-   * Построить данные для обновления клиента
+   * Обновить роль аутентификации клиента
    */
-  private buildClientUpdateData(telegramData: TelegramUser): UpdateClientType {
-    return TelegramDataBuilder.buildClientUpdateData(telegramData);
-  }
-
-  /**
-   * Построить данные для создания клиента
-   */
-  private buildClientCreateData(telegramData: TelegramUser): CreateClientType {
-    return TelegramDataBuilder.buildClientCreateData(telegramData);
-  }
-
-  /**
-   * Построить данные для создания аутентификации
-   */
-  private buildAuthCreateData(
-    authId: string,
-    telegramData: TelegramUser,
-    tokenExpiresAt: Date
-  ): CreateClientAuthType {
-    return TelegramDataBuilder.buildAuthCreateData(authId, telegramData, tokenExpiresAt);
+  async updateAuthRole(clientId: number, authId: number, newRole: string): Promise<ClientWithAuthType | null> {
+    try {
+      return await this.clientRepository.updateWithAuth(clientId, {
+        tclients_auth: {
+          update: {
+            where: { id: authId },
+            data: { role: newRole }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error updating auth role:', error);
+      return null;
+    }
   }
 }

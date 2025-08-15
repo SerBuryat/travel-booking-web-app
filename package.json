@@ -11,20 +11,11 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
-    "tunnel": "bash scripts/tunnel.sh",
-    "tunnel:win": "scripts\\tunnel.bat",
-    "tunnel:wsl": "scripts\\tunnel-wsl.bat",
-    "tunnel:unix": "chmod +x scripts/tunnel.sh && ./scripts/tunnel.sh",
     "db:studio": "npx prisma studio",
     "db:generate": "npx prisma generate",
     "db:pull": "npx prisma db pull",
     "db:push": "npx prisma db push",
-    "db:sync": "npx prisma db pull && npx prisma generate",
-    "dev:full": "npm run tunnel & npm run dev",
-    "dev:win": "start npm run tunnel:win && npm run dev",
-    "dev:full:win": "npm run tunnel:win && npm run db:sync && npm run dev",
-    "dev:full:linux": "npm run tunnel && npm run db:sync && npm run dev",
-    "generate:jwt-secret": "node scripts/generate-jwt-secret.js"
+    "db:sync": "npx prisma db pull && npx prisma generate"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
