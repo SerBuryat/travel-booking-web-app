@@ -13,7 +13,8 @@ export interface ServiceType {
   priority?: string;
   category?: CategoryEntity;
   rating?: number;
-} 
+  view_count?: number;
+}
 
 export interface ServiceTypeFull extends ServiceType {
   contacts: ContactsType[];

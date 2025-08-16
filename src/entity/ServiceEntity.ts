@@ -9,4 +9,5 @@ export interface ServiceEntity {
   created_at?: string;
   priority?: string;
   rating?: number;
+  view_count?: number;
 } 

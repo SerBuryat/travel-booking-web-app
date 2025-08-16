@@ -26,6 +26,7 @@ export class ServiceService {
         : String(rawService.created_at),
       priority: rawService.priority ? String(rawService.priority) : '0',
       rating: rawService.rating ? Number(rawService.rating) : undefined,
+      view_count: rawService.view_count || 0,
     };
   }
 
@@ -111,6 +112,16 @@ export class ServiceService {
     const { ServiceRepository } = await import('@/repository/ServiceRepository');
     const serviceRepository = new ServiceRepository();
     const services = await serviceRepository.findPopular(popularCount);
+    return this.mapToServiceTypes(services);
+  }
+
+  /**
+   * Get all services by provider ID with category relations
+   */
+  async getAllServicesByProviderId(providerId: number): Promise<ServiceType[]> {
+    const { ServiceRepository } = await import('@/repository/ServiceRepository');
+    const serviceRepository = new ServiceRepository();
+    const services = await serviceRepository.getAllByProviderId(providerId);
     return this.mapToServiceTypes(services);
   }
 } 

@@ -49,6 +49,7 @@ export class ClientService {
     tokenExpiresAt: Date
   ): Promise<ClientWithAuthType | null> {
     try {
+      console.log(telegramData);
       const client = await this.clientRepository.findByAuthId(authId);
       
       if (client) {
