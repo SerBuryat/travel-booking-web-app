@@ -1,9 +1,6 @@
 import { ClientRepository } from '@/repository/ClientRepository';
 import {
-  ClientWithAuthType,
-  CreateClientType,
-  UpdateClientType,
-  CreateClientAuthType
+  ClientWithAuthType
 } from '@/model/ClientType';
 import { TelegramUser } from "@/types/telegram";
 import { TelegramDataBuilder } from '@/utils/telegramDataBuilder';

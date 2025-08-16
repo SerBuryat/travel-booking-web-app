@@ -8,6 +8,7 @@ import {
   logLoginAttempt 
 } from '@/lib/auth';
 import { ClientService } from '@/service/ClientService';
+import { ProviderService } from '@/service/ProviderService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,8 +44,18 @@ export async function POST(request: NextRequest) {
 
     const auth = user.tclients_auth[0];
     
+    // Если роль 'provider', получаем providerId для JWT
+    let providerId: number | undefined;
+    if (auth.role === 'provider') {
+      const providerService = new ProviderService();
+      const provider = await providerService.getProviderForClient(user.id);
+      if (provider) {
+        providerId = provider.id;
+      }
+    }
+    
     // Generate new tokens
-    const newJWT = generateJWT(user.id, auth.role, decoded.authId);
+    const newJWT = generateJWT(user.id, auth.role, decoded.authId, providerId);
     const newRefreshToken = generateRefreshToken(user.id, decoded.authId);
     
     // Calculate new token expiration

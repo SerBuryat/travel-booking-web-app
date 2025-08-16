@@ -72,12 +72,12 @@ export class AuthService {
   /**
    * Генерация JWT токенов
    */
-  private generateTokens(userId: number, role: string, authId: string): AuthTokens {
+  private generateTokens(userId: number, role: string, authId: string, providerId?: number): AuthTokens {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + 1);
 
     return {
-      jwtToken: generateJWT(userId, role, authId),
+      jwtToken: generateJWT(userId, role, authId, providerId),
       refreshToken: generateRefreshToken(userId, authId),
       expiresAt
     };
@@ -115,8 +115,8 @@ export class AuthService {
         throw new Error('Не удалось обновить роль клиента');
       }
 
-      // Генерируем новые токены с ролью 'provider'
-      const tokens = this.generateTokens(userId, 'provider', authId);
+      // Генерируем новые токены с ролью 'provider' и providerId
+      const tokens = this.generateTokens(userId, 'provider', authId, provider.id);
       
       // Обновляем refresh token в БД
       await this.clientService.updateRefreshToken(authId, tokens.refreshToken, tokens.expiresAt);

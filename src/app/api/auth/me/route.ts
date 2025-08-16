@@ -11,6 +11,7 @@ export interface UserAuth {
   userId: number;
   authId: string;
   role: string;
+  providerId?: number
 }
 
 export async function GET(request: NextRequest) {
@@ -64,7 +65,8 @@ export async function GET(request: NextRequest) {
       user: {
         userId: user.id,
         authId: auth.auth_id,
-        role: auth.role
+        role: auth.role,
+        providerId: user.providerId
       } as UserAuth
     });
 

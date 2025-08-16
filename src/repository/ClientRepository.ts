@@ -41,9 +41,23 @@ export class ClientRepository {
               is_active: true,
             },
           },
+          tproviders: {
+            select: {
+              id: true
+            }
+          }
         },
       });
-      return client as ClientWithAuthType | null;
+
+      if (!client) return null;
+
+      // Добавляем providerId если клиент является провайдером
+      const providerId = client.tproviders.length > 0 ? client.tproviders[0].id : undefined;
+      
+      return {
+        ...client,
+        providerId
+      } as ClientWithAuthType;
     } catch (error) {
       console.error('Error finding client by ID with active auth:', error);
       return null;

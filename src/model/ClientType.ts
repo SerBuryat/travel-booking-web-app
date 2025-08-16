@@ -29,6 +29,7 @@ export interface ClientAuthType {
 // Тип для клиента с аутентификацией
 export interface ClientWithAuthType extends ClientType {
   tclients_auth: ClientAuthType[];
+  providerId?: number | null;
 }
 
 // Тип для создания клиента

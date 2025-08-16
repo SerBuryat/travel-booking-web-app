@@ -1,23 +1,11 @@
 import jwt, {Secret} from 'jsonwebtoken';
 import {StringValue} from "ms";
+import { JWTPayload, RefreshTokenPayload } from '@/types/jwt';
 
 // Конфигурация JWT
 const JWT_SECRET: Secret = process.env.JWT_SECRET || 'your-secret-key';
 const JWT_EXPIRES_IN: StringValue = '1d';
 const REFRESH_TOKEN_EXPIRES_IN: StringValue = '14d';
-
-// Интерфейсы для типизации
-interface JWTPayload {
-  userId: number;
-  role: string;
-  authId: string;
-}
-
-interface RefreshTokenPayload {
-  userId: number;
-  authId: string;
-  tokenId: string;
-}
 
 /**
  * Генерирует случайные байты для токена (Web Crypto API)
@@ -31,11 +19,12 @@ function generateRandomBytes(length: number): string {
 /**
  * Генерирует JWT токен
  */
-export function generateJWT(userId: number, role: string, authId: string): string {
+export function generateJWT(userId: number, role: string, authId: string, providerId?: number): string {
   const payload: JWTPayload = {
     userId,
     role,
     authId,
+    ...(providerId && { providerId }), // Добавляем providerId только если он передан
   };
 
   return jwt.sign(payload, JWT_SECRET, {
