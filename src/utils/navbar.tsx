@@ -114,12 +114,22 @@ const RequestsIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
+const MyServicesIcon = (props: SvgIconProps) => (
+  <SvgIcon {...props} sx={{width:"24", height:"24", viewBox:"0 0 24 24", fill:"none", xmlns:"http://www.w3.org/2000/svg"}}>
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" 
+      stroke="currentColor" strokeOpacity="0.65" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  </SvgIcon>
+);
+
 // Constants for each page
 export const HOME = '/home';
 export const CATALOG = '/catalog';
 export const PROFILE = '/profile';
 export const MAP = '/map';
 export const REQUESTS = '/requests';
+export const MY_SERVICES = '/provider/services';
 
 // Individual button configurations
 export const HOME_BUTTON: NavbarButtonConfig = {
@@ -132,6 +142,12 @@ export const CATALOG_BUTTON: NavbarButtonConfig = {
   href: CATALOG,
   icon: CatalogIcon,
   title: 'Catalog',
+};
+
+export const MY_SERVICES_BUTTON: NavbarButtonConfig = {
+  href: MY_SERVICES,
+  icon: MyServicesIcon,
+  title: 'Мои объекты',
 };
 
 export const PROFILE_BUTTON: NavbarButtonConfig = {
@@ -153,8 +169,8 @@ export const REQUESTS_BUTTON: NavbarButtonConfig = {
   title: 'Requests',
 };
 
-// Complete navbar configuration
-export const NAVBAR_BUTTONS: NavbarButtonConfig[] = [
+// Navbar configurations for different roles
+export const USER_NAVBAR: NavbarButtonConfig[] = [
   HOME_BUTTON,
   CATALOG_BUTTON,
   MAP_BUTTON,
@@ -162,12 +178,31 @@ export const NAVBAR_BUTTONS: NavbarButtonConfig[] = [
   PROFILE_BUTTON,
 ];
 
+export const PROVIDER_NAVBAR: NavbarButtonConfig[] = [
+  HOME_BUTTON,
+  MY_SERVICES_BUTTON,
+  MAP_BUTTON,
+  REQUESTS_BUTTON,
+  PROFILE_BUTTON,
+];
+
+// Legacy navbar configuration (deprecated)
+export const NAVBAR_BUTTONS: NavbarButtonConfig[] = USER_NAVBAR;
+
+// Function to get navbar buttons by role
+export function getNavbarButtonsByRole(role?: string): NavbarButtonConfig[] {
+  if (role === 'provider') {
+    return PROVIDER_NAVBAR;
+  }
+  return USER_NAVBAR;
+}
+
 // Function to get navbar button by href
 export function getNavbarButtonByHref(href: string): NavbarButtonConfig | undefined {
-  return NAVBAR_BUTTONS.find(button => button.href === href);
+  return [...USER_NAVBAR, ...PROVIDER_NAVBAR].find(button => button.href === href);
 }
 
 // Function to get all navbar button hrefs
 export function getNavbarButtonHrefs(): string[] {
-  return NAVBAR_BUTTONS.map(button => button.href);
+  return [...USER_NAVBAR, ...PROVIDER_NAVBAR].map(button => button.href);
 } 
