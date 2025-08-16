@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const serviceRegistrationSchema = z.object({
+  // Основная информация о сервисе
   name: z.string()
     .min(3, 'Название должно содержать минимум 3 символа')
     .max(100, 'Название не должно превышать 100 символов'),
@@ -32,7 +33,21 @@ export const serviceRegistrationSchema = z.object({
     .optional(),
   
   serviceOptions: z.array(z.string())
-    .optional()
+    .optional(),
+  
+  // Данные провайдера (новые поля)
+  providerCompanyName: z.string()
+    .min(2, 'Название компании должно содержать минимум 2 символа')
+    .max(255, 'Название компании не должно превышать 255 символов'),
+  
+  providerContactPerson: z.string()
+    .min(2, 'Имя контактного лица должно содержать минимум 2 символа')
+    .max(100, 'Имя контактного лица не должно превышать 100 символов'),
+  
+  providerPhone: z.string()
+    .regex(/^\+?[\d\s\-\(\)]+$/, 'Неверный формат телефона компании')
+    .min(10, 'Телефон должен содержать минимум 10 символов')
+    .max(20, 'Телефон не должен превышать 20 символов')
 });
 
 export type ServiceRegistrationFormData = z.infer<typeof serviceRegistrationSchema>;

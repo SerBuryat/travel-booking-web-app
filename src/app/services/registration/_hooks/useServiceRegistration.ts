@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { serviceRegistrationSchema, ServiceRegistrationFormData } from '@/schemas/serviceRegistrationSchema';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -15,6 +16,7 @@ export interface ServiceCreationResult {
 export const useServiceRegistration = () => {
   const [result, setResult] = useState<ServiceCreationResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<ServiceRegistrationFormData>({
     resolver: zodResolver(serviceRegistrationSchema),
@@ -27,11 +29,24 @@ export const useServiceRegistration = () => {
       tarea_id: 0,
       phone: '',
       tg_username: '',
-      serviceOptions: []
+      serviceOptions: [],
+      // Новые поля провайдера
+      providerCompanyName: '',
+      providerContactPerson: '',
+      providerPhone: ''
     }
   });
 
   const onSubmit = async (data: ServiceRegistrationFormData) => {
+    if (!user) {
+      setResult({
+        success: false,
+        message: 'Пользователь не аутентифицирован',
+        error: 'Authentication required'
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setResult(null);
 
@@ -41,7 +56,10 @@ export const useServiceRegistration = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          clientId: user.id // Передаем ID клиента
+        }),
       });
 
       const responseData = await response.json();
@@ -52,7 +70,7 @@ export const useServiceRegistration = () => {
 
       setResult({
         success: true,
-        message: 'Сервис успешно создан!',
+        message: 'Сервис успешно создан! Теперь вы можете перейти в бизнес-аккаунт.',
         serviceId: responseData.service.id
       });
 

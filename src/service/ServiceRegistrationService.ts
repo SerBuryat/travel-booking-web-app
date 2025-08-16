@@ -1,18 +1,22 @@
 import { ServiceRepository } from '@/repository/ServiceRepository';
+import { ProviderService } from '@/service/ProviderService';
 import { ServiceCreateModel } from '@/model/ServiceCreateModel';
 import { CreateServiceEntity } from '@/entity/CreateServiceEntity';
+import { ProviderEntity } from '@/entity/ProviderEntity';
 
 export class ServiceRegistrationService {
   private serviceRepository: ServiceRepository;
+  private providerService: ProviderService;
 
   constructor() {
     this.serviceRepository = new ServiceRepository();
+    this.providerService = new ProviderService();
   }
 
   /**
    * Create new service with related entities
    */
-  async createService(serviceData: ServiceCreateModel): Promise<CreateServiceEntity> {
+  async createService(serviceData: ServiceCreateModel, clientId: number): Promise<CreateServiceEntity> {
     try {
       // Валидация базовых данных (минимальная для MVP)
       if (!serviceData.name || !serviceData.description || !serviceData.price) {
@@ -23,8 +27,26 @@ export class ServiceRegistrationService {
         throw new Error('Price must be greater than 0');
       }
 
-      // Создание сервиса через репозиторий
-      const createdService = await this.serviceRepository.createService(serviceData);
+      // Проверяем обязательные поля провайдера
+      if (!serviceData.providerCompanyName || !serviceData.providerContactPerson || !serviceData.providerPhone) {
+        throw new Error('Provider information is required');
+      }
+
+      // Создаем или получаем существующего провайдера
+      const provider = await this.providerService.createOrGetProvider(
+        clientId,
+        serviceData.providerCompanyName,
+        serviceData.providerPhone,
+        serviceData.providerContactPerson
+      );
+
+      // Создаем сервис с привязкой к провайдеру
+      const serviceWithProvider = {
+        ...serviceData,
+        providerId: provider.id // Добавляем ID провайдера для создания сервиса
+      };
+
+      const createdService = await this.serviceRepository.createService(serviceWithProvider);
       
       return createdService;
     } catch (error) {

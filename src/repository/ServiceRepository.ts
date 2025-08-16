@@ -263,14 +263,14 @@ export class ServiceRepository {
   /**
    * Create service with related entities using prisma include
    */
-  async createService(serviceData: ServiceCreateModel): Promise<CreateServiceEntity> {
+  async createService(serviceData: ServiceCreateModel & { providerId?: number }): Promise<CreateServiceEntity> {
     const result = await prisma.tservices.create({
       data: {
         name: serviceData.name,
         description: serviceData.description,
         price: parseFloat(serviceData.price),
         tcategories_id: serviceData.tcategories_id,
-        provider_id: 7, // Хардкод согласно спецификации MVP
+        provider_id: serviceData.providerId || 7, // Используем переданный providerId или fallback
         active: true,
         status: 'published',
         service_options: serviceData.serviceOptions || null,

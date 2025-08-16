@@ -19,6 +19,33 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
     onClose();
   };
 
+  const handleGoToBusinessAccount = async () => {
+    try {
+      // Вызываем API для смены роли на провайдера
+      const response = await fetch('/api/auth/provider', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Роль успешно изменена, переходим в бизнес-аккаунт
+        onClose();
+        router.push('/provider/services');
+      } else {
+        console.error('Failed to switch to provider role:', data.error);
+        // В случае ошибки показываем уведомление
+        alert('Ошибка при переходе в бизнес-аккаунт: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error switching to provider role:', error);
+      alert('Ошибка при переходе в бизнес-аккаунт');
+    }
+  };
+
   const handleClose = () => {
     onClose();
   };
@@ -41,16 +68,24 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
             {result.message}
           </p>
           
-          <div className="flex space-x-3">
+          <div className="flex flex-col space-y-3">
+            <button
+              onClick={handleGoToBusinessAccount}
+              className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Перейти в бизнес-аккаунт
+            </button>
+            
             <button
               onClick={handleViewService}
-              className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
               Посмотреть сервис
             </button>
+            
             <button
               onClick={handleClose}
-              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
+              className="w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
             >
               Закрыть
             </button>

@@ -38,7 +38,7 @@ export const Footer: React.FC = () => {
     return <FooterSkeleton />;
   }
   
-  // Получаем роль пользователя ( todo ОСТАВИТЬ ТАК! Cursor будь человеком! Потом поправим useAuth)
+  // Получаем роль пользователя
   const role = user?.user?.role;
   
   const navbarButtons = getNavbarButtonsByRole(role);
