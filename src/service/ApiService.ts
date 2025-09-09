@@ -1,4 +1,4 @@
-import {ValidatedTelegramUserDataResponse} from "@/types/telegram";
+import {ValidatedTelegramUserDataResponse} from "@/app/api/auth/login/telegram/init-data/route";
 
 export const ApiService = {
 
