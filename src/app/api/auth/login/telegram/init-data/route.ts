@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validate } from '@telegram-apps/init-data-node';
-import {TelegramUserData, TelegramUserInitData} from '@/types/telegram';
 
-export interface ValidatedTelegramUserDataResponse {
+export interface TelegramUserDataValidationResponse {
   success: boolean;
-  user?: TelegramUserData;
   error?: string;
   details?: string;
 }
 
-export async function POST(request: NextRequest, ctx: RouteContext<"/api/auth/login/telegram/init-data">) {
+export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { initData } = body;
@@ -32,52 +30,28 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/auth/lo
     }
 
     try {
-      // Validate initData using Telegram library
+      // Используем тг либу для валидации `initData` при помощи `BOT_TOKEN`
+      // (пользователь пришел через ссылку mini app, созданного через этого бота)
       validate(initData, botToken);
       
-      // Parse initData to extract user information
-      const urlParams = new URLSearchParams(initData);
-      const userData = urlParams.get('user');
-      
-      if (!userData) {
-        return NextResponse.json(
-          { error: 'No user data found in initData' },
-          { status: 400 }
-        );
-      }
-
-      // Parse user data from URL-encoded JSON with proper typing
-      const parsedUserData = JSON.parse(decodeURIComponent(userData));
-      
-      // Create properly typed TelegramInitData object
-      const telegramInitData: TelegramUserInitData = {
-        user: parsedUserData,
-        auth_date: parseInt(urlParams.get('auth_date') || '0'),
-        query_id: urlParams.get('query_id') || undefined,
-        signature: urlParams.get('signature') || undefined,
-        hash: urlParams.get('hash') || undefined
-      };
-      
-      const response: ValidatedTelegramUserDataResponse = {
-        success: true,
-        user: telegramInitData.user
+      const response: TelegramUserDataValidationResponse = {
+        success: true
       };
       
       return NextResponse.json(response);
 
     } catch (validationError) {
-      console.error('Telegram validation error:', validationError);
-      const errorResponse: ValidatedTelegramUserDataResponse = {
+      const errorResponse: TelegramUserDataValidationResponse = {
         success: false,
-        error: 'Invalid Telegram data',
+        error: 'Invalid Telegram user `initData`',
         details: validationError instanceof Error ? validationError.message : 'Validation failed'
       };
       return NextResponse.json(errorResponse, { status: 401 });
     }
 
   } catch (error) {
-    console.error('Telegram auth error:', error);
-    const errorResponse: ValidatedTelegramUserDataResponse = {
+    console.error('Telegram `initData` validation error:', error);
+    const errorResponse: TelegramUserDataValidationResponse = {
       success: false,
       error: 'Internal server error'
     };

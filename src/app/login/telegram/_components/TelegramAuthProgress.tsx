@@ -1,4 +1,4 @@
-import {TelegramAuthState} from "@/app/login/telegram/_hooks/useLoginWithTelegram";
+import {TelegramAuthState} from "@/app/login/telegram/_hooks/useTelegramAuthState";
 
 interface ProgressStep {
   title: string;

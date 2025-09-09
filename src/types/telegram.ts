@@ -1,10 +1,10 @@
 // Сырые данные которые передает Telegram Mini App
 export interface TelegramUserInitData {
-  query_id?: string;
+  initData: string,
   user: TelegramUserData;
   auth_date: number;
-  signature?: string;
-  hash?: string;
+  signature: string;
+  hash: string;
 }
 
 // Данные пользователя telegram

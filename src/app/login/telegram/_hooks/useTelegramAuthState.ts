@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import {TelegramUserData} from '@/types/telegram';
+import {TelegramUserData, TelegramUserInitData} from '@/types/telegram';
 import { getInitData } from '@/utils/telegramUtils';
 import { useAuth } from '@/contexts/AuthContext';
 import { PAGE_ROUTES } from '@/utils/routes';
@@ -17,35 +17,35 @@ export enum TelegramAuthState {
   ALREADY_AUTHENTICATED
 }
 
-export interface TelegramInitDataValidationError {
+export interface TelegramAuthValidationError {
   message: string;
   details?: string;
 }
 
-export function useLoginWithTelegram() {
+export function useTelegramAuthState() {
   const router = useRouter();
 
   const { loginWithTelegram, isAuthenticated } = useAuth();
 
   const [authState, setAuthState] = useState<TelegramAuthState>(TelegramAuthState.LOADING);
   const [userData, setUserData] = useState<TelegramUserData>();
-  const [error, setError] = useState<TelegramInitDataValidationError | null>(null);
+  const [error, setError] = useState<TelegramAuthValidationError | null>(null);
 
-  const validateInitData = useCallback(async (data: string) => {
+  const validateInitData = useCallback(async (telegramUserInitData: TelegramUserInitData) => {
     setAuthState(TelegramAuthState.VALIDATING);
 
     try {
-      const validatedTelegramUserDataResponse =
-          await ApiService.validateTelegramInitData(data);
+      const telegramUserDataValidation =
+          await ApiService.validateTelegramInitData(telegramUserInitData.initData);
 
-      if (validatedTelegramUserDataResponse.success && validatedTelegramUserDataResponse.user) {
-        setUserData(validatedTelegramUserDataResponse.user);
+      if (telegramUserDataValidation.success) {
+        setUserData(telegramUserInitData.user);
         setAuthState(TelegramAuthState.SUCCESS);
       } else {
         setAuthState(TelegramAuthState.ERROR);
         setError({
-          message: validatedTelegramUserDataResponse.error || 'Ошибка валидации данных',
-          details: validatedTelegramUserDataResponse.details || 'Не удалось проверить подлинность данных Telegram'
+          message: telegramUserDataValidation.error || 'Ошибка валидации данных',
+          details: telegramUserDataValidation.details || 'Не удалось проверить подлинность данных Telegram'
         });
       }
     } catch (error) {
@@ -80,23 +80,22 @@ export function useLoginWithTelegram() {
       router.push(PAGE_ROUTES.PROFILE);
       return;
     } else {
-      // Логика валидации только если пользователь не авторизован
-      const { data: initDataFromHash, error: initDataError } = getInitData();
+      try {
+        const hash = window.location.hash;
+        const telegramUserInitData = getInitData(hash);
 
-      if (initDataError) {
-        setAuthState(TelegramAuthState.INVALID_ACCESS);
-        setError({ message: 'Ошибка доступа к данным авторизации', details: initDataError });
-      } else if (!initDataFromHash) {
-        setAuthState(TelegramAuthState.NO_DATA);
-        setError({ message: 'Не удалось получить данные авторизации из Telegram', details: 'Данные авторизации отсутствуют или повреждены' });
-      } else {
-        // Обрабатываем Promise и добавляем validateInitData в зависимости
-        validateInitData(initDataFromHash).catch(() => {
+        validateInitData(telegramUserInitData).catch(() => {
           setAuthState(TelegramAuthState.ERROR);
-          setError({ 
+          setError({
             message: 'Ошибка валидации данных',
-            details: 'Произошла непредвиденная ошибка при проверке данных'
+            details: 'Произошла ошибка при валидации telegram `initData` пользователя'
           });
+        });
+      } catch (err) {
+        setAuthState(TelegramAuthState.NO_DATA);
+        setError({
+          message: 'Не удалось получить данные авторизации из Telegram',
+          details: 'Данные авторизации отсутствуют или повреждены'
         });
       }
     }

@@ -1,4 +1,4 @@
-import {TelegramAuthState, TelegramInitDataValidationError} from '../_hooks/useLoginWithTelegram';
+import {TelegramAuthState, TelegramAuthValidationError} from '../_hooks/useTelegramAuthState';
 import {TelegramUserData} from '@/types/telegram';
 import {TelegramAuthLoading} from './states/TelegramAuthLoading';
 import {TelegramAuthValidating} from './states/TelegramAuthValidating';
@@ -12,7 +12,7 @@ import {TelegramAuthAlreadyAuthenticated} from './states/TelegramAuthAlreadyAuth
 interface TelegramAuthContentProps {
   state: TelegramAuthState;
   userData: TelegramUserData;
-  error: TelegramInitDataValidationError | null;
+  error: TelegramAuthValidationError | null;
   onLogin: () => void;
 }
 
