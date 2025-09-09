@@ -1,8 +1,8 @@
 import { useRouter } from 'next/navigation';
-import { AuthError } from '../../_hooks/useTelegramAuth';
+import { TelegramInitDataValidationError } from '../../_hooks/useLoginWithTelegram';
 
 interface TelegramAuthInvalidAccessProps {
-  error: AuthError | null;
+  error: TelegramInitDataValidationError | null;
 }
 
 export function TelegramAuthInvalidAccess({ error }: TelegramAuthInvalidAccessProps) {

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { PAGE_ROUTES } from '@/utils/routes';
 
 interface SearchBarProps {
   searchValue?: string;
@@ -33,7 +34,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
         params.set('categoryId', existingCategoryId);
       }
       
-      router.push(`/catalog/result?${params.toString()}`);
+      router.push(`${PAGE_ROUTES.CATALOG.RESULT}?${params.toString()}`);
     }
   };
 
@@ -44,7 +45,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
   };
 
   const handleCancel = () => {
-    router.push('/catalog');
+    router.push(PAGE_ROUTES.CATALOG.ROOT);
   };
 
   return (

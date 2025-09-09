@@ -2,7 +2,7 @@ import { ClientRepository } from '@/repository/ClientRepository';
 import {
   ClientWithAuthType
 } from '@/model/ClientType';
-import { TelegramUser } from "@/types/telegram";
+import { TelegramUserData } from "@/types/telegram";
 import { TelegramDataBuilder } from '@/utils/telegramDataBuilder';
 
 export class ClientService {
@@ -44,7 +44,7 @@ export class ClientService {
    * Создать или обновить клиента с Telegram аутентификацией
    */
   async createOrUpdateWithTelegramAuth(
-    telegramData: TelegramUser,
+    telegramData: TelegramUserData,
     authId: string,
     tokenExpiresAt: Date
   ): Promise<ClientWithAuthType | null> {
@@ -68,7 +68,7 @@ export class ClientService {
    */
   private async updateExistingClient(
     client: ClientWithAuthType,
-    telegramData: TelegramUser
+    telegramData: TelegramUserData
   ): Promise<ClientWithAuthType | null> {
     const updateData = TelegramDataBuilder.buildClientUpdateData(telegramData);
     
@@ -91,7 +91,7 @@ export class ClientService {
    * Создать нового клиента
    */
   private async createNewClient(
-    telegramData: TelegramUser,
+    telegramData: TelegramUserData,
     authId: string,
     tokenExpiresAt: Date
   ): Promise<ClientWithAuthType | null> {

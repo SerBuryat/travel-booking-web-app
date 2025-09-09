@@ -1,6 +1,14 @@
-// Типы для данных пользователя из Telegram Mini App
+// Сырые данные которые передает Telegram Mini App
+export interface TelegramUserInitData {
+  query_id?: string;
+  user: TelegramUserData;
+  auth_date: number;
+  signature?: string;
+  hash?: string;
+}
 
-export interface TelegramUser {
+// Данные пользователя telegram
+export interface TelegramUserData {
   id: number;
   first_name: string;
   last_name?: string;
@@ -9,18 +17,3 @@ export interface TelegramUser {
   allows_write_to_pm?: boolean;
   photo_url?: string;
 }
-
-export interface TelegramInitData {
-  query_id?: string;
-  user: TelegramUser;
-  auth_date: number;
-  signature?: string;
-  hash?: string;
-}
-
-export interface TelegramAuthResponse {
-  success: boolean;
-  user?: TelegramUser;
-  error?: string;
-  details?: string;
-} 

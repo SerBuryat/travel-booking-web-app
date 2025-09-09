@@ -2,7 +2,7 @@ export function TelegramAuthAlreadyAuthenticated() {
   return (
     <div className="bg-white rounded-xl shadow-xl p-6 sm:p-8 max-w-sm mx-auto">
       <div className="text-center">
-        <div className="rounded-full h-10 w-10 sm:h-12 sm:h-12 bg-green-100 flex items-center justify-center mx-auto mb-4">
+        <div className="rounded-full h-10 w-10 sm:h-12 bg-green-100 flex items-center justify-center mx-auto mb-4">
           <svg className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>

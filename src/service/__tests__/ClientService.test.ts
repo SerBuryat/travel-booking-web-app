@@ -1,7 +1,7 @@
 import { ClientService } from '../ClientService';
 import { ClientRepository } from '@/repository/ClientRepository';
 import { TelegramDataBuilder } from '@/utils/telegramDataBuilder';
-import { TelegramUser } from '@/types/telegram';
+import { TelegramUserData } from '@/types/telegram';
 import { ClientWithAuthType } from '@/model/ClientType';
 
 // Мокаем зависимости
@@ -31,7 +31,7 @@ describe('ClientService', () => {
   let mockTelegramDataBuilder: jest.Mocked<typeof TelegramDataBuilder>;
 
   // Мок данные
-  const mockTelegramUser: TelegramUser = {
+  const mockTelegramUser: TelegramUserData = {
     id: 123456789,
     first_name: 'John',
     last_name: 'Doe',

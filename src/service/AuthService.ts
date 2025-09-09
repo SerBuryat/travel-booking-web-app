@@ -1,7 +1,7 @@
 import { ClientService } from './ClientService';
 import { ProviderService } from './ProviderService';
 import { generateJWT, generateRefreshToken } from '@/lib/jwt';
-import { TelegramUser } from '@/types/telegram';
+import { TelegramUserData } from '@/types/telegram';
 
 export interface AuthTokens {
   jwtToken: string;
@@ -29,7 +29,7 @@ export class AuthService {
   /**
    * Аутентификация пользователя через Telegram
    */
-  async authenticateWithTelegram(telegramUser: TelegramUser): Promise<{ user: AuthUser; tokens: AuthTokens } | null> {
+  async authenticateWithTelegram(telegramUser: TelegramUserData): Promise<{ user: AuthUser; tokens: AuthTokens } | null> {
     try {
       const authId = `telegram_${telegramUser.id}`;
       const expiresAt = new Date();

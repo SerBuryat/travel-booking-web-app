@@ -1,7 +1,7 @@
-import { TelegramUser } from '@/types/telegram';
+import { TelegramUserData } from '@/types/telegram';
 
 interface TelegramUserProfileProps {
-  userData: TelegramUser;
+  userData: TelegramUserData;
 }
 
 export function TelegramUserProfile({ userData }: TelegramUserProfileProps) {

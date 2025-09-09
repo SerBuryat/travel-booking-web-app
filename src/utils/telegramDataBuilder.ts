@@ -1,18 +1,18 @@
-import { TelegramUser } from '@/types/telegram';
+import { TelegramUserData } from '@/types/telegram';
 import { CreateClientType, UpdateClientType, CreateClientAuthType } from '@/model/ClientType';
 
 export class TelegramDataBuilder {
   /**
    * Построить полное имя пользователя
    */
-  static buildFullName(telegramData: TelegramUser): string {
+  static buildFullName(telegramData: TelegramUserData): string {
     return telegramData.first_name + (telegramData.last_name ? ` ${telegramData.last_name}` : '');
   }
 
   /**
    * Построить дополнительную информацию
    */
-  static buildAdditionalInfo(telegramData: TelegramUser): any {
+  static buildAdditionalInfo(telegramData: TelegramUserData): any {
     return {
       telegram_id: telegramData.id,
       username: telegramData.username,
@@ -24,7 +24,7 @@ export class TelegramDataBuilder {
   /**
    * Построить данные для создания клиента
    */
-  static buildClientCreateData(telegramData: TelegramUser): CreateClientType {
+  static buildClientCreateData(telegramData: TelegramUserData): CreateClientType {
     return {
       name: this.buildFullName(telegramData),
       photo: telegramData.photo_url,
@@ -35,7 +35,7 @@ export class TelegramDataBuilder {
   /**
    * Построить данные для обновления клиента
    */
-  static buildClientUpdateData(telegramData: TelegramUser): UpdateClientType {
+  static buildClientUpdateData(telegramData: TelegramUserData): UpdateClientType {
     return {
       name: this.buildFullName(telegramData),
       photo: telegramData.photo_url,
@@ -48,7 +48,7 @@ export class TelegramDataBuilder {
    */
   static buildAuthCreateData(
     authId: string,
-    telegramData: TelegramUser,
+    telegramData: TelegramUserData,
     tokenExpiresAt: Date
   ): CreateClientAuthType {
     return {

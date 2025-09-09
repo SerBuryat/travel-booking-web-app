@@ -1,6 +1,7 @@
 import React from 'react';
 import { getServerUser } from '@/lib/server-auth';
 import { redirect } from 'next/navigation';
+import { PAGE_ROUTES } from '@/utils/routes';
 
 export default async function RequestsPage() {
   // Получаем данные пользователя на сервере
@@ -8,7 +9,7 @@ export default async function RequestsPage() {
 
   // Если пользователь не авторизован, перенаправляем
   if (!user) {
-    redirect('/telegram-auth');
+    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
 
   // Здесь можно загрузить данные запросов пользователя из БД

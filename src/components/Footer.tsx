@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { usePathname } from 'next/navigation';
 import { Navbar, getNavbarButtonsByRole } from '@/utils/navbar';
 import { useAuth } from '@/contexts/AuthContext';
+import { PAGE_ROUTES } from '@/utils/routes';
 
 // Skeleton компонент для Footer
 const FooterSkeleton: React.FC = () => (
@@ -29,7 +30,7 @@ export const Footer: React.FC = () => {
   const { user, isLoading } = useAuth();
   
   // Скрываем навбар на странице авторизации Telegram
-  if (pathname === '/telegram-auth') {
+  if (pathname === PAGE_ROUTES.TELEGRAM_AUTH) {
     return null;
   }
 

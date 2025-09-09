@@ -1,10 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { AreaService } from '@/service/AreaService';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const areaService = new AreaService();
-    const areas = await areaService.getAllAreas();
+    const areas = await AreaService.getAll();
 
     return NextResponse.json({
       success: true,
@@ -13,7 +12,6 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Ошибка получения зон:', error);
-    
     return NextResponse.json(
       {
         success: false,

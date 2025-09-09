@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { setJWTCookie, setRefreshTokenCookie, getClientIP, logLoginAttempt } from '@/lib/auth';
 import { AuthService } from '@/service/AuthService';
-import { TelegramUser } from '@/types/telegram';
+import { TelegramUserData } from '@/types/telegram';
 
 // Тип для тела запроса
 interface LoginTelegramRequest {
-  telegramUser: TelegramUser;
+  telegramUser: TelegramUserData;
 }
 
 export async function POST(request: NextRequest) {

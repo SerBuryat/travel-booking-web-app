@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ImageCarousel } from '@/components/ImageCarousel';
 import { ServiceTypeFull } from '@/model/ServiceType';
 import { useRouter } from 'next/navigation';
+import { PAGE_ROUTES } from '@/utils/routes';
 export default function SingleServiceView({ service }: { service: ServiceTypeFull }) {
   // Mock images for carousel (gradient backgrounds)
   const mockImages = [
@@ -22,7 +23,7 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
     try {
       const res = await fetch(`/api/services/${service.id}/click`, { method: 'POST' });
       if (res.status === 401) {
-        router.push('/telegram-auth');
+        router.push(PAGE_ROUTES.TELEGRAM_AUTH);
         return;
       }
     } catch (e) {

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
+import { PAGE_ROUTES } from '@/utils/routes';
 
 interface ProviderProfile {
   id: number;
@@ -90,7 +91,7 @@ export const ServiceRegistrationBanner: React.FC = () => {
   const handleConnectBusiness = async () => {
     if (!user) {
       // Если пользователь не аутентифицирован, перенаправляем на страницу входа
-      router.push('/telegram-auth');
+      router.push(PAGE_ROUTES.TELEGRAM_AUTH);
       return;
     }
 
@@ -107,12 +108,12 @@ export const ServiceRegistrationBanner: React.FC = () => {
         setShowModal(true);
       } else {
         // У пользователя нет бизнес-аккаунта, переходим к регистрации
-        router.push('/services/registration');
+        router.push(PAGE_ROUTES.SERVICES.REGISTRATION);
       }
     } catch (error) {
       console.error('Error checking provider profile:', error);
       // В случае ошибки переходим к регистрации
-      router.push('/services/registration');
+      router.push(PAGE_ROUTES.SERVICES.REGISTRATION);
     } finally {
       setIsChecking(false);
     }
@@ -133,7 +134,7 @@ export const ServiceRegistrationBanner: React.FC = () => {
       if (data.success) {
         // Роль успешно изменена, переходим в бизнес-аккаунт
         setShowModal(false);
-        router.push('/provider/services');
+        router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {
         console.error('Failed to switch to provider role:', data.error);
         // В случае ошибки закрываем модальное окно

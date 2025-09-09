@@ -56,13 +56,6 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
     setSearchTerm('');
   };
 
-  const getSelectedAreaName = () => {
-    if (!selectedArea) return 'Выберите зону';
-    
-    const area = areas.find(a => a.id === selectedArea);
-    return area ? area.name : `Зона ${selectedArea}`;
-  };
-
   const getSelectedAreaDisplay = () => {
     if (!selectedArea) return 'Выберите зону';
     
@@ -80,8 +73,7 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
   };
 
   const filteredAreas = areas.filter(area =>
-    area.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    area.sysname.toLowerCase().includes(searchTerm.toLowerCase())
+    area.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const parentAreas = filteredAreas.filter(area => !area.parent_id);
@@ -98,7 +90,7 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
         type="button"
         onClick={handleOpenModal}
         className={`
-          w-full px-3 py-2 border rounded-md shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+          w-full px-3 py-2 border rounded-md shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black
           ${error ? 'border-red-300' : 'border-gray-300'}
           ${selectedArea ? 'bg-blue-50 border-blue-300' : 'bg-white'}
         `}
@@ -140,7 +132,7 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
                 placeholder="Поиск по названию зоны..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
               />
             </div>
 
@@ -149,7 +141,7 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
               {loading ? (
                 <div className="flex items-center justify-center py-8">
                   <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="ml-2 text-gray-600">Загрузка зон...</span>
+                  <span className="ml-2">Загрузка зон...</span>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -193,7 +185,7 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
 
                   {filteredAreas.length === 0 && searchTerm && (
                     <div className="text-center py-8 text-gray-500">
-                      Зоны не найдены по запросу "{searchTerm}"
+                      Зоны не найдены по запросу &#34;{searchTerm}&#34;
                     </div>
                   )}
 

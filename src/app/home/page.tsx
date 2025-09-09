@@ -9,7 +9,6 @@ import { PrivatePolicyButton } from '@/components/PrivatePolicyButton';
 import { CategoryService } from '@/service/CategoryService';
 
 export default async function HomePage() {
-  // Загружаем данные
   const categoryService = new CategoryService();
   const categories = await categoryService.getAllParentCategories();
   const serviceService = new ServiceService();

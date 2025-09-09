@@ -1,9 +1,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { TelegramUser } from '@/types/telegram';
+import { TelegramUserData } from '@/types/telegram';
 import { useRouter } from 'next/navigation';
 import { UserAuth } from '@/app/api/auth/me/route';
+import { PAGE_ROUTES } from '@/utils/routes';
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
@@ -14,7 +15,7 @@ interface AuthContextType {
   
   // Функции
   checkAuth: () => Promise<void>;
-  loginWithTelegram: (telegramData: TelegramUser) => Promise<void>;
+  loginWithTelegram: (telegramData: TelegramUserData) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -36,11 +37,12 @@ interface AuthProviderProps {
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const router = useRouter();
+
   // Состояние
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserAuth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const router = useRouter();
 
   // Функция проверки аутентификации
   const checkAuth = async () => {
@@ -66,10 +68,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
   
   // Функция входа через Telegram
-  const loginWithTelegram = async (telegramData: TelegramUser) => {
+  const loginWithTelegram = async (telegramData: TelegramUserData) => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/auth/login-telegram', {
+      const response = await fetch('/api/auth/login/telegram', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +110,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setUser(null);
       setIsAuthenticated(false);
-      router.push('/telegram-auth');
+      router.push(PAGE_ROUTES.TELEGRAM_AUTH);
     }
   };
   

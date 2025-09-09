@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { ClientService } from '@/service/ClientService';
 import ProfileHeader from "@/app/profile/_components/ProfileHeader";
 import ProfileMenu from "@/app/profile/_components/ProfileMenu";
+import { PAGE_ROUTES } from '@/utils/routes';
 
 export default async function ProfilePage() {
   // Получаем данные пользователя на сервере
@@ -11,7 +12,7 @@ export default async function ProfilePage() {
 
   // Если пользователь не авторизован, перенаправляем
   if (!user) {
-    redirect('/telegram-auth');
+    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
 
   // Получаем полные данные пользователя из базы
@@ -20,7 +21,7 @@ export default async function ProfilePage() {
 
   // Если пользователь не найден, перенаправляем
   if (!fullUserData) {
-    redirect('/telegram-auth');
+    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
 
   // Передаем полные данные в клиентский компонент

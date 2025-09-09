@@ -1,3 +1,5 @@
+import {TelegramAuthState} from "@/app/login/telegram/_hooks/useLoginWithTelegram";
+
 interface ProgressStep {
   title: string;
   icon: string;
@@ -7,15 +9,29 @@ const STEPS: ProgressStep[] = [
   { title: 'Загрузка', icon: '📱' },
   { title: 'Проверка', icon: '🔐' },
   { title: 'Вход', icon: '🚀' },
-  { title: 'Готово', icon: '✅' },
-  { title: 'Авторизован', icon: '🎉' }
+  { title: 'Готово', icon: '✅' }
 ];
 
-interface TelegramAuthProgressProps {
-  currentStep: number;
+function getCurrentStepByAuthState(authState: TelegramAuthState): number {
+  switch (authState) {
+    case TelegramAuthState.LOADING: return 0;
+    case TelegramAuthState.VALIDATING: return 1;
+    case TelegramAuthState.SUCCESS: return 2;
+    case TelegramAuthState.LOGGING_IN: return 2;
+    case TelegramAuthState.ERROR: return 1;
+    case TelegramAuthState.NO_DATA: return 0;
+    case TelegramAuthState.INVALID_ACCESS: return 0;
+    case TelegramAuthState.ALREADY_AUTHENTICATED: return 3;
+    default: return 0;
+  }
 }
 
-export function TelegramAuthProgress({ currentStep }: TelegramAuthProgressProps) {
+interface TelegramAuthProgressProps {
+  telegramAuthState: TelegramAuthState;
+}
+
+export function TelegramAuthProgress({ telegramAuthState }: TelegramAuthProgressProps) {
+  const currentStep = getCurrentStepByAuthState(telegramAuthState);
   return (
     <div className="flex justify-center mb-6 px-4">
       <div className="flex items-center space-x-4">

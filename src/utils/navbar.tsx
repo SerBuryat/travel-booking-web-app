@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import Badge from '@mui/material/Badge';
+import {PAGE_ROUTES} from "@/utils/routes";
 
 // Navbar Button Component
 interface NavbarButtonProps {
@@ -123,48 +124,40 @@ const MyServicesIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
-// Constants for each page
-export const HOME = '/home';
-export const CATALOG = '/catalog';
-export const PROFILE = '/profile';
-export const MAP = '/map';
-export const REQUESTS = '/requests';
-export const MY_SERVICES = '/provider/services';
-
 // Individual button configurations
 export const HOME_BUTTON: NavbarButtonConfig = {
-  href: HOME,
+  href: PAGE_ROUTES.HOME,
   icon: HomeIcon,
   title: 'Home',
 };
 
 export const CATALOG_BUTTON: NavbarButtonConfig = {
-  href: CATALOG,
+  href: PAGE_ROUTES.CATALOG.ROOT,
   icon: CatalogIcon,
   title: 'Catalog',
 };
 
 export const MY_SERVICES_BUTTON: NavbarButtonConfig = {
-  href: MY_SERVICES,
+  href: PAGE_ROUTES.PROVIDER.SERVICES,
   icon: MyServicesIcon,
   title: 'Мои объекты',
 };
 
 export const PROFILE_BUTTON: NavbarButtonConfig = {
-  href: PROFILE,
+  href: PAGE_ROUTES.PROFILE,
   icon: ProfileIcon,
   title: 'Profile',
   badgeContent: 4,
 };
 
 export const MAP_BUTTON: NavbarButtonConfig = {
-  href: MAP,
+  href: PAGE_ROUTES.MAP,
   icon: MapIcon,
   title: 'Map',
 };
 
 export const REQUESTS_BUTTON: NavbarButtonConfig = {
-  href: REQUESTS,
+  href: PAGE_ROUTES.REQUESTS,
   icon: RequestsIcon,
   title: 'Requests',
 };
@@ -186,9 +179,6 @@ export const PROVIDER_NAVBAR: NavbarButtonConfig[] = [
   PROFILE_BUTTON,
 ];
 
-// Legacy navbar configuration (deprecated)
-export const NAVBAR_BUTTONS: NavbarButtonConfig[] = USER_NAVBAR;
-
 // Function to get navbar buttons by role
 export function getNavbarButtonsByRole(role?: string): NavbarButtonConfig[] {
   if (role === 'provider') {
@@ -196,13 +186,3 @@ export function getNavbarButtonsByRole(role?: string): NavbarButtonConfig[] {
   }
   return USER_NAVBAR;
 }
-
-// Function to get navbar button by href
-export function getNavbarButtonByHref(href: string): NavbarButtonConfig | undefined {
-  return [...USER_NAVBAR, ...PROVIDER_NAVBAR].find(button => button.href === href);
-}
-
-// Function to get all navbar button hrefs
-export function getNavbarButtonHrefs(): string[] {
-  return [...USER_NAVBAR, ...PROVIDER_NAVBAR].map(button => button.href);
-} 

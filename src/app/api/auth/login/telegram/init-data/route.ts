@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validate } from '@telegram-apps/init-data-node';
-import { TelegramAuthResponse, TelegramInitData } from '@/types/telegram';
+import {TelegramUserData, TelegramUserInitData} from '@/types/telegram';
 
-export async function POST(request: NextRequest) {
+export interface ValidatedTelegramUserDataResponse {
+  success: boolean;
+  user?: TelegramUserData;
+  error?: string;
+  details?: string;
+}
+
+export async function POST(request: NextRequest, ctx: RouteContext<"/api/auth/login/telegram/init-data">) {
   try {
     const body = await request.json();
     const { initData } = body;
@@ -19,7 +26,7 @@ export async function POST(request: NextRequest) {
     if (!botToken) {
       console.error('BOT_TOKEN not found in environment variables');
       return NextResponse.json(
-        { error: 'Server configuration error' },
+        { error: 'Server configuration error: BOT_TOKEN not found in `.env`' },
         { status: 500 }
       );
     }
@@ -43,7 +50,7 @@ export async function POST(request: NextRequest) {
       const parsedUserData = JSON.parse(decodeURIComponent(userData));
       
       // Create properly typed TelegramInitData object
-      const telegramInitData: TelegramInitData = {
+      const telegramInitData: TelegramUserInitData = {
         user: parsedUserData,
         auth_date: parseInt(urlParams.get('auth_date') || '0'),
         query_id: urlParams.get('query_id') || undefined,
@@ -51,7 +58,7 @@ export async function POST(request: NextRequest) {
         hash: urlParams.get('hash') || undefined
       };
       
-      const response: TelegramAuthResponse = {
+      const response: ValidatedTelegramUserDataResponse = {
         success: true,
         user: telegramInitData.user
       };
@@ -60,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     } catch (validationError) {
       console.error('Telegram validation error:', validationError);
-      const errorResponse: TelegramAuthResponse = {
+      const errorResponse: ValidatedTelegramUserDataResponse = {
         success: false,
         error: 'Invalid Telegram data',
         details: validationError instanceof Error ? validationError.message : 'Validation failed'
@@ -70,10 +77,10 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Telegram auth error:', error);
-    const errorResponse: TelegramAuthResponse = {
+    const errorResponse: ValidatedTelegramUserDataResponse = {
       success: false,
       error: 'Internal server error'
     };
     return NextResponse.json(errorResponse, { status: 500 });
   }
-} 
+}
