@@ -36,7 +36,6 @@ describe('ClientService', () => {
     first_name: 'John',
     last_name: 'Doe',
     username: 'johndoe',
-    language_code: 'en',
     photo_url: 'https://t.me/i/userpic/320/johndoe.jpg'
   };
 

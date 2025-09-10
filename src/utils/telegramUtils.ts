@@ -1,4 +1,4 @@
-import { TelegramUserInitData } from "@/types/telegram";
+import {TelegramUserInitData} from "@/types/telegram";
 
 /**
  * Получает данные клиента из хэша (`window.location.hash`) при переходе из Telegram Mini App
@@ -6,86 +6,69 @@ import { TelegramUserInitData } from "@/types/telegram";
  * см. docs/help/telegram/telegram-user-init-data.md
  *
  * @returns { data: TelegramUserInitData } - данные клиента в формате TelegramUserInitData
- * @throws { TelegramInitDataError } - ошибка при получении данных из Telegram (отсутствуют данные в URL, пустые данные в URL, не найдены данные в tgWebAppData)
- * @param windowsLocationHash
+ * @throws { Error } - ошибка при получении данных из Telegram (отсутствуют данные в URL, пустые данные в URL, не
+ * найдены данные в tgWebAppData)
+ * @param rawHashData
  */
-export const getInitData = (windowsLocationHash: string) : TelegramUserInitData => {
+export const getInitData = (rawHashData: string) : TelegramUserInitData => {
   // Проверяем, есть ли хэш в URL
-  if (!windowsLocationHash || !windowsLocationHash.startsWith('#')) {
-    throw new TelegramInitDataError(
-        'Отсутствуют данные `initData` пользователя в URL. Убедитесь, что вы перешли из Telegram Mini App.'
+  if (!rawHashData || !rawHashData.startsWith('#')) {
+    throw new Error(
+        'Отсутствует `initData` пользователя в URL. Убедитесь, что вы перешли из Telegram Mini App.'
     );
   }
 
   // Проверяем, есть ли данные в хэше
-  const rawUserDataFromTgHash = windowsLocationHash.substring(1);
+  const rawUserDataFromTgHash = rawHashData.substring(1);
   if (!rawUserDataFromTgHash) {
-    throw new TelegramInitDataError(
+    throw new Error(
         'URL содержит пустые `initData` пользователя. Попробуйте перейти из Telegram Mini App снова.'
     );
   }
 
   // Получаем данные из хэша
   const params = new URLSearchParams(rawUserDataFromTgHash);
-  const initData = params.get('tgWebAppData');
+  const rawInitData = params.get('tgWebAppData');
 
-  // Проверяем, есть ли данные в initData
-  if (!initData) {
-    throw new TelegramInitDataError(
+  // Проверяем, есть ли данные в `rawInitData`(`tgWebAppData`)
+  if (!rawInitData) {
+    throw new Error(
         'Не найдены данные Telegram Web App. Убедитесь, что вы используете правильную ссылку из Telegram.'
     );
   }
 
-  // Получаем данные пользователя из initData
-  const urlParams = new URLSearchParams(initData);
+  // Получаем данные пользователя из rawInitData
+  const urlParams = new URLSearchParams(rawInitData);
   const userData = urlParams.get('user');
 
   if (!userData) {
-    throw new TelegramInitDataError(
-        'Не найдены данные пользователя в Telegram Web App.'
-    );
+    throw new Error('Не найдены данные пользователя в `initData`.');
   }
 
   const authDate = urlParams.get('auth_date');
   if (!authDate) {
-    throw new TelegramInitDataError(
-        'Не найдены данные о времени авторизации в Telegram Web App.'
-    );
+    throw new Error('Не найдены данные времени авторизации в `initData`.');
   }
 
   const signature = urlParams.get('signature');
   if (!signature) {
-    throw new TelegramInitDataError(
-        'Не найдены данные о подписи в Telegram Web App.'
-    );
+    throw new Error('Не найдены данные подписи в `initData`.');
   }
   
   const hash = urlParams.get('hash');
   if (!hash) {
-    throw new TelegramInitDataError(
-        'Не найдены данные о хеше в Telegram Web App.'
-    );
+    throw new Error('Не найдены данные хеша в `initData`.');
   }
 
   // Парсим данные пользователя из URL-encoded JSON с правильным типом
   const parsedUserData = JSON.parse(decodeURIComponent(userData));
 
   // Создаем объект TelegramInitData с правильным типом
-  const telegramInitData: TelegramUserInitData = {
-    initData: initData,
+  return {
+    initData: rawInitData,
     user: parsedUserData,
-    auth_date: parseInt(authDate),
+    authDate: parseInt(authDate),
     signature: signature,
     hash: hash
   };
-
-  return telegramInitData;
-}
-
-// Класс для ошибки при получении данных из Telegram через хэш
-class TelegramInitDataError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'TelegramInitDataError';
-  }
 }

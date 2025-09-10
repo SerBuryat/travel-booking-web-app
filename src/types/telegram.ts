@@ -1,19 +1,16 @@
-// Сырые данные которые передает Telegram Mini App
+// https://docs.telegram-mini-apps.com/platform/init-data#:~:text=This%20section%20provides%20a%20complete%20list%20of%20parameters%20used%20in%20initialization%20data
 export interface TelegramUserInitData {
-  initData: string,
-  user: TelegramUserData;
-  auth_date: number;
-  signature: string;
-  hash: string;
+  initData: string
+  user: TelegramUserData
+  authDate: number
+  signature: string
+  hash: string
 }
 
-// Данные пользователя telegram
 export interface TelegramUserData {
-  id: number;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  language_code?: string;
-  allows_write_to_pm?: boolean;
-  photo_url?: string;
+  id: number
+  first_name: string
+  last_name?: string
+  username?: string
+  photo_url?: string
 }

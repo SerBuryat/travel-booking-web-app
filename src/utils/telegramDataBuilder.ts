@@ -16,7 +16,6 @@ export class TelegramDataBuilder {
     return {
       telegram_id: telegramData.id,
       username: telegramData.username,
-      language_code: telegramData.language_code,
       ...telegramData
     };
   }

@@ -1,28 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { setJWTCookie, setRefreshTokenCookie, getClientIP, logLoginAttempt } from '@/lib/auth';
-import { AuthService } from '@/service/AuthService';
-import { TelegramUserData } from '@/types/telegram';
-
-// Тип для тела запроса
-interface LoginTelegramRequest {
-  telegramUser: TelegramUserData;
-}
+import { setJWTCookie, setRefreshTokenCookie } from '@/lib/auth';
+import {AuthService} from '@/service/AuthService';
+import {TelegramUserInitData} from '@/types/telegram';
+import {TelegramService} from "@/service/TelegramService";
 
 export async function POST(request: NextRequest) {
   try {
-    const body: LoginTelegramRequest = await request.json();
+    const telegramUserInitData : TelegramUserInitData = await request.json();
 
-    // Валидация тела запроса
-    if (!body.telegramUser) {
+    // todo - пока сделаем так, чтобы валидировать телеграм данные пользователя
+    //  (возможно потом, сделаем валидацию и аутентификацию одни endpoint'ом)
+    const validation =
+        TelegramService.validateTelegramInitData(telegramUserInitData);
+
+    if(!validation.success) {
       return NextResponse.json(
-        { error: 'Missing telegramUser in request body' },
-        { status: 400 }
+          { error: validation.error },
+          { status: 400 }
       );
     }
 
-    // Аутентификация
     const authService = new AuthService();
-    const result = await authService.authenticateWithTelegram(body.telegramUser);
+    const result =
+        await authService.authenticateWithTelegram(telegramUserInitData.user);
 
     if (!result) {
       return NextResponse.json(
@@ -31,29 +31,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { user: authUser, tokens } = result;
+    const response = NextResponse.json(result.user);
 
-    // Логирование
-    const clientIP = getClientIP(request);
-    logLoginAttempt(authUser.id, true, clientIP);
-
-    // Создание ответа
-    const response = NextResponse.json({
-      success: true,
-      user: authUser
-    });
-
-    // Установка cookies
-    setJWTCookie(tokens.jwtToken, response);
-    setRefreshTokenCookie(tokens.refreshToken, response);
+    setJWTCookie(result.tokens.jwtToken, response);
+    setRefreshTokenCookie(result.tokens.refreshToken, response);
     
     return response;
-
   } catch (error) {
-    console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      {error: `Error: '${error}' while call '/api/auth/login/telegram'`},
+      {status: 500}
     );
   }
 } 

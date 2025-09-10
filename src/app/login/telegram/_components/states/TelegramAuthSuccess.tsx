@@ -1,9 +1,9 @@
-import { TelegramUserData } from '@/types/telegram';
+import {TelegramUserInitData} from '@/types/telegram';
 import { TelegramUserProfile } from '../TelegramUserProfile';
 import { TelegramAuthLoginButton } from '../TelegramAuthLoginButton';
 
 interface TelegramAuthSuccessProps {
-  userData: TelegramUserData;
+  userData: TelegramUserInitData;
   onLogin: () => void
 }
 
@@ -11,7 +11,7 @@ export function TelegramAuthSuccess({ userData, onLogin }: TelegramAuthSuccessPr
   return (
     <div className="bg-white rounded-xl shadow-xl p-6 sm:p-8 max-w-sm mx-auto">
       <div className="text-center">
-        <TelegramUserProfile userData={userData} />
+        <TelegramUserProfile userData={userData.user} />
 
         {/* Success Message */}
         <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4 mb-6">

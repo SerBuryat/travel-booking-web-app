@@ -1,10 +1,11 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { TelegramUserData } from '@/types/telegram';
+import {TelegramUserInitData} from '@/types/telegram';
 import { useRouter } from 'next/navigation';
 import { UserAuth } from '@/app/api/auth/me/route';
 import { PAGE_ROUTES } from '@/utils/routes';
+import {ApiService} from "@/service/ApiService";
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
@@ -15,7 +16,7 @@ interface AuthContextType {
   
   // Функции
   checkAuth: () => Promise<void>;
-  loginWithTelegram: (telegramData: TelegramUserData) => Promise<void>;
+  loginViaTelegram: (telegramUserInitData: TelegramUserInitData) => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -26,7 +27,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error('`useAuth` must be used within an AuthProvider');
   }
   return context;
 };
@@ -68,32 +69,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
   
   // Функция входа через Telegram
-  const loginWithTelegram = async (telegramData: TelegramUserData) => {
+  const loginViaTelegram = async (telegramUserInitData: TelegramUserInitData) => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await fetch('/api/auth/login/telegram', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ telegramUser: telegramData }),
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        if (result.success && result.user) {
-          setUser(result.user);
-          setIsAuthenticated(true);
-        } else {
-          throw new Error(result.error || 'Ошибка входа через Telegram');
-        }
-      } else {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Ошибка входа через Telegram');
-      }
-    } catch (error) {
-      console.error('Ошибка входа через Telegram:', error);
-      throw error;
+      const authUser = await ApiService.loginWithTelegramUserData(telegramUserInitData);
+      setUser(authUser);
+      setIsAuthenticated(true);
     } finally {
       setIsLoading(false);
     }
@@ -120,12 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
   
   const value: AuthContextType = {
-    isAuthenticated,
-    user,
-    isLoading,
-    checkAuth,
-    loginWithTelegram,
-    logout,
+    isAuthenticated, user, isLoading, checkAuth, loginViaTelegram, logout,
   };
   
   return (
