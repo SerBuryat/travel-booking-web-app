@@ -47,20 +47,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Функция проверки аутентификации
   const checkAuth = async () => {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      const response = await fetch('/api/auth/me');
-      
-      if (response.ok) {
-        const userAuth = await response.json() as UserAuth;
-        setUser(userAuth);
-        setIsAuthenticated(true);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
+      const user = await ApiService.getUserAuth();
+      setUser(user);
+      setIsAuthenticated(true);
     } catch (error) {
-      console.error('Ошибка проверки аутентификации:', error);
+      console.error('Ошибка проверки аутентификации пользователя:', error);
       setUser(null);
       setIsAuthenticated(false);
     } finally {

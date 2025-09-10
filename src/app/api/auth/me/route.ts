@@ -53,22 +53,15 @@ export async function GET(request: NextRequest) {
         { status: 401 }
       );
     }
-    
-    // Log successful authentication check
-    const clientIP = getClientIP(request);
-    logLoginAttempt(user.id, true, clientIP);
 
     
     // Return user profile
     return NextResponse.json({
-      success: true,
-      user: {
-        userId: user.id,
-        authId: auth.auth_id,
-        role: auth.role,
-        providerId: user.providerId
-      } as UserAuth
-    });
+      userId: user.id,
+      authId: auth.auth_id,
+      role: auth.role,
+      providerId: user.providerId
+    } as UserAuth);
 
   } catch (error) {
     console.error('Get user profile error:', error);

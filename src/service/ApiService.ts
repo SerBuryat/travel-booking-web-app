@@ -1,41 +1,24 @@
 import {TelegramUserInitData} from "@/types/telegram";
 import {UserAuth} from "@/app/api/auth/me/route";
 import {TelegramUserDataValidationResponse} from "@/service/TelegramService";
+import {get, post} from "@/service/http/httpClient";
 
 export const ApiService = {
 
   async validateTelegramInitData(telegramUserInitData: TelegramUserInitData) : Promise<TelegramUserDataValidationResponse> {
-    const response = await fetch('/api/auth/login/telegram/validate', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(telegramUserInitData),
-    });
-
-    if(!response.ok) {
-      const { error } = await response.json();
-      throw new Error(`Ошибка валидации 'initData' telegram пользователя. ${error}`);
-    }
-
-    return await response.json();
+    return await post<TelegramUserDataValidationResponse, TelegramUserInitData>(
+      '/api/auth/login/telegram/validate', telegramUserInitData
+    );
   },
 
   async loginWithTelegramUserData(telegramUserInitData: TelegramUserInitData) : Promise<UserAuth> {
-    const response = await fetch('/api/auth/login/telegram', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(telegramUserInitData),
-    });
+    return await post<UserAuth, TelegramUserInitData>(
+      '/api/auth/login/telegram', telegramUserInitData
+    );
+  },
 
-    if(!response.ok) {
-      const { error } = await response.json();
-      throw new Error(`Ошибка аутентификации telegram пользователя. ${error}`);
-    }
-
-    return await response.json();
+  async getUserAuth() : Promise<UserAuth> {
+    return await get<UserAuth>('/api/auth/me');
   }
 
 }
