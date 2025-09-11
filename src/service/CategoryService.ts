@@ -1,7 +1,7 @@
 import {CategoryEntity} from '@/entity/CategoryEntity';
 import {CategoryType, ParentCategoryWithChildren} from '@/model/CategoryType';
 import {CategoryRepository} from '@/repository/CategoryRepository';
-import { getGeneralCategoryCodes } from '@/utils/generalCategories';
+import {getGeneralCategoryCodes} from '@/utils/generalCategories';
 
 export class CategoryService {
   private categoryRepository: CategoryRepository;

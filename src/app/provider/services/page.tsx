@@ -1,24 +1,26 @@
-import { redirect } from 'next/navigation';
-import { getServerUser } from '@/lib/server-auth';
-import { ServiceService } from '@/service/ServiceService';
+import {redirect} from 'next/navigation';
+import {ServiceService} from '@/service/ServiceService';
 import ProviderServicesComponent from './_components/ProviderServicesComponent';
+import {PAGE_ROUTES} from "@/utils/routes";
+import {getUserAuth} from "@/lib/auth/user-auth";
 
 export default async function ProviderServicesPage() {
+
+  let userAuth;
   try {
-    // Получаем данные пользователя с валидацией токена
-    const user = await getServerUser();
-    
-    // Проверяем роль пользователя
-    const auth = user.tclients_auth.find(auth => auth.is_active);
-    if (!auth || auth.role !== 'provider' || !user.providerId) {
-      redirect('/home');
+    userAuth = await getUserAuth();
+    if (userAuth.role !== 'provider' || !userAuth.providerId) {
+      redirect(PAGE_ROUTES.HOME);
     }
+  } catch (error) {
+    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
+  }
 
-    // Предзагружаем сервисы провайдера на сервере
-    const serviceService = new ServiceService();
-    const services = await serviceService.getAllServicesByProviderId(user.providerId);
+  // Предзагружаем сервисы провайдера на сервере
+  const serviceService = new ServiceService();
+  const services = await serviceService.getAllServicesByProviderId(userAuth.providerId);
 
-    return (
+  return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="mb-6">
@@ -29,17 +31,12 @@ export default async function ProviderServicesPage() {
               Управляйте своими сервисами и отслеживайте их эффективность
             </p>
           </div>
-          
-          <ProviderServicesComponent 
-            providerId={user.providerId} 
-            services={services}
+
+          <ProviderServicesComponent
+              providerId={userAuth.providerId}
+              services={services}
           />
         </div>
       </div>
-    );
-  } catch (error) {
-    // Если произошла ошибка валидации, редиректим на главную
-    console.error('Provider services page error:', error);
-    redirect('/home');
-  }
+  );
 }

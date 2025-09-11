@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 
 export const PrivatePolicyButton: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

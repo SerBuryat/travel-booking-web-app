@@ -1,7 +1,7 @@
 import {TelegramUserInitData} from "@/types/telegram";
-import {UserAuth} from "@/app/api/auth/me/route";
 import {TelegramUserDataValidationResponse} from "@/service/TelegramService";
 import {get, post} from "@/service/http/httpClient";
+import {UserAuth} from "@/lib/auth/user-auth";
 
 export const ApiService = {
 

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import {NextRequest, NextResponse} from 'next/server';
 import {TelegramService, TelegramUserDataValidationResponse} from "@/service/TelegramService";
 import {TelegramUserInitData} from "@/types/telegram";
 

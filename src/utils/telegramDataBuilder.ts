@@ -1,5 +1,5 @@
-import { TelegramUserData } from '@/types/telegram';
-import { CreateClientType, UpdateClientType, CreateClientAuthType } from '@/model/ClientType';
+import {TelegramUserData} from '@/types/telegram';
+import {CreateClientAuthType, CreateClientType, UpdateClientType} from '@/model/ClientType';
 
 export class TelegramDataBuilder {
   /**

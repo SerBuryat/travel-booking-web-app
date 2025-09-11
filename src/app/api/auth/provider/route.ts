@@ -1,13 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyJWT } from '@/lib/jwt';
-import {
-  getJWTFromRequest, 
-  getClientIP, 
-  logLoginAttempt,
-  setJWTCookie,
-  setRefreshTokenCookie
-} from '@/lib/auth';
-import { AuthService } from '@/service/AuthService';
+import {NextRequest, NextResponse} from 'next/server';
+import {getJWTFromCookies, setJWTCookie, setRefreshTokenCookie, verifyJWT} from '@/lib/auth/auth-utils';
+import {AuthService} from '@/service/AuthService';
 
 export interface ProviderSwitchResponse {
   success: boolean;
@@ -28,8 +21,7 @@ export interface ProviderSwitchResponse {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get JWT token from cookies
-    const token = getJWTFromRequest(request);
+    const token = await getJWTFromCookies();
     
     if (!token) {
       return NextResponse.json(
@@ -47,7 +39,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if user is already a provider
     if (payload.role === 'provider') {
       return NextResponse.json(
         { success: false, error: 'User is already a provider' },
@@ -55,27 +46,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get client IP for logging
-    const clientIP = getClientIP(request);
-
     // Switch user to provider role
     const authService = new AuthService();
     const result = await authService.authProvider(payload.userId, payload.authId);
     
     if (!result) {
-      // Log failed attempt
-      logLoginAttempt(payload.userId, false, clientIP);
-      
       return NextResponse.json(
         { success: false, error: 'Failed to switch to provider role. Make sure you have a business account.' },
         { status: 400 }
       );
     }
 
-    // Log successful role switch
-    logLoginAttempt(payload.userId, true, clientIP);
-
-    // Create response
     const response = NextResponse.json({
       success: true,
       user: result.user,

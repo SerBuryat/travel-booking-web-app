@@ -1,5 +1,5 @@
-import { AreaEntity } from '@/entity/AreaEntity';
-import { AreaRepository } from '@/repository/AreaRepository';
+import {AreaEntity} from '@/entity/AreaEntity';
+import {AreaRepository} from '@/repository/AreaRepository';
 
 export const AreaService = {
 

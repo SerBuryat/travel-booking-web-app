@@ -1,5 +1,5 @@
 // Тест для проверки работы моков Prisma
-import { prisma } from '@/lib/prisma';
+import {prisma} from '@/lib/db/prisma';
 
 describe('Prisma Mock Test', () => {
   it('should have mocked prisma client', () => {

@@ -1,6 +1,6 @@
 import {TelegramUserInitData} from '@/types/telegram';
-import { TelegramUserProfile } from '../TelegramUserProfile';
-import { TelegramAuthLoginButton } from '../TelegramAuthLoginButton';
+import {TelegramUserProfile} from '../TelegramUserProfile';
+import {TelegramAuthLoginButton} from '../TelegramAuthLoginButton';
 
 interface TelegramAuthSuccessProps {
   userData: TelegramUserInitData;

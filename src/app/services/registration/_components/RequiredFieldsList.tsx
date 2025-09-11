@@ -1,6 +1,6 @@
 import React from 'react';
-import { UseFormWatch, FieldErrors } from 'react-hook-form';
-import { ServiceRegistrationFormData } from '@/schemas/serviceRegistrationSchema';
+import {FieldErrors, UseFormWatch} from 'react-hook-form';
+import {ServiceRegistrationFormData} from '@/schemas/serviceRegistrationSchema';
 
 interface RequiredFieldsListProps {
   watch: UseFormWatch<ServiceRegistrationFormData>;

@@ -1,12 +1,12 @@
 'use client';
 import React from 'react';
-import { ShortViewServiceComponent } from '@/components/ShortViewServiceComponent';
-import { HorizontalViewServiceComponent } from '@/components/HorizontalViewServiceComponent';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { SearchBar } from '@/components/SearchBar';
-import { ServiceType } from '@/model/ServiceType';
-import { CategoryEntity } from '@/entity/CategoryEntity';
-import { ChildCategoryButton } from '@/components/ChildCategoryButton';
+import {ShortViewServiceComponent} from '@/components/ShortViewServiceComponent';
+import {HorizontalViewServiceComponent} from '@/components/HorizontalViewServiceComponent';
+import {useRouter, useSearchParams} from 'next/navigation';
+import {SearchBar} from '@/components/SearchBar';
+import {ServiceType} from '@/model/ServiceType';
+import {CategoryEntity} from '@/entity/CategoryEntity';
+import {ChildCategoryButton} from '@/components/ChildCategoryButton';
 
 interface ServicesClientProps {
   category: CategoryEntity;

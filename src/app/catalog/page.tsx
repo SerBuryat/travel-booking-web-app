@@ -1,5 +1,5 @@
-import { Header } from '@/components/Header';
-import { SearchBar } from '@/components/SearchBar';
+import {Header} from '@/components/Header';
+import {SearchBar} from '@/components/SearchBar';
 import Catalog from "@/app/catalog/Catalog";
 
 export default async function CatalogPage() {

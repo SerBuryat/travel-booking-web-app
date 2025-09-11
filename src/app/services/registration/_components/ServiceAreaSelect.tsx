@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { AreaEntity } from '@/entity/AreaEntity';
+import React, {useEffect, useState} from 'react';
+import {AreaEntity} from '@/entity/AreaEntity';
 
 interface ServiceAreaSelectProps {
   selectedArea: number;

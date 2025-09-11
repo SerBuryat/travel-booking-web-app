@@ -1,36 +1,36 @@
 import React from 'react';
-import { getServerUser } from '@/lib/server-auth';
-import { redirect } from 'next/navigation';
-import { ClientService } from '@/service/ClientService';
+import {redirect} from 'next/navigation';
+import {ClientService} from '@/service/ClientService';
 import ProfileHeader from "@/app/profile/_components/ProfileHeader";
 import ProfileMenu from "@/app/profile/_components/ProfileMenu";
-import { PAGE_ROUTES } from '@/utils/routes';
+import {PAGE_ROUTES} from '@/utils/routes';
+import {getUserAuth} from "@/lib/auth/user-auth";
+import {ClientWithAuthType} from "@/model/ClientType";
 
 export default async function ProfilePage() {
-  // Получаем данные пользователя на сервере
-  const user = await getServerUser();
 
-  // Если пользователь не авторизован, перенаправляем
+  const user = await getUser();
   if (!user) {
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
 
-  // Получаем полные данные пользователя из базы
-  const clientService = new ClientService();
-  const fullUserData = await clientService.getByIdWithAuth(user.id);
-
-  // Если пользователь не найден, перенаправляем
-  if (!fullUserData) {
-    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
-  }
-
-  // Передаем полные данные в клиентский компонент
   return (
       <div className="min-h-screen bg-gray-50">
-        <ProfileHeader user={fullUserData} />
+        <ProfileHeader user={user} />
         <div className="max-w-md mx-auto pt-6 px-4">
           <ProfileMenu/>
         </div>
       </div>
   );
 } 
+
+// todo - такой логики на страницах быть не должно
+async function getUser(): Promise<ClientWithAuthType | null> {
+  try {
+    const userAuth = await getUserAuth();
+    const clientService = new ClientService();
+    return await clientService.getByIdWithAuth(userAuth.userId);
+  } catch (error) {
+    return null;
+  }
+}

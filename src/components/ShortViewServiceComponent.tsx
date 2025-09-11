@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { ServiceType } from '@/model/ServiceType';
+import {useRouter} from 'next/navigation';
+import {ServiceType} from '@/model/ServiceType';
 
 interface ShortViewServiceComponentProps {
   service: ServiceType;

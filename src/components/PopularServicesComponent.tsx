@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { ShortViewServiceComponent } from './ShortViewServiceComponent';
-import { ServiceType } from '@/model/ServiceType';
+import {ShortViewServiceComponent} from './ShortViewServiceComponent';
+import {ServiceType} from '@/model/ServiceType';
 
 interface PopularServicesComponentProps {
   services: ServiceType[];

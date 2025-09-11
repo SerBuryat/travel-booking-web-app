@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useMemo } from 'react';
-import { usePathname } from 'next/navigation';
-import { Navbar, getNavbarButtonsByRole } from '@/utils/navbar';
-import { useAuth } from '@/contexts/AuthContext';
-import { PAGE_ROUTES } from '@/utils/routes';
+import React from 'react';
+import {usePathname} from 'next/navigation';
+import {getNavbarButtonsByRole, Navbar} from '@/utils/navbar';
+import {useAuth} from '@/contexts/AuthContext';
+import {PAGE_ROUTES} from '@/utils/routes';
 
 // Skeleton компонент для Footer
 const FooterSkeleton: React.FC = () => (
@@ -40,8 +40,7 @@ export const Footer: React.FC = () => {
   }
   
   // Получаем роль пользователя
-  const role = user?.user?.role;
-  
+  const role = user?.role;
   const navbarButtons = getNavbarButtonsByRole(role);
 
   return (

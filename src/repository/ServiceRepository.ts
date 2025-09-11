@@ -1,8 +1,8 @@
-import { prisma } from '@/lib/prisma';
-import { ServiceEntity } from '@/entity/ServiceEntity';
-import { ContactsType } from '@/model/ContactsType';
-import { CreateServiceEntity } from '@/entity/CreateServiceEntity';
-import { ServiceCreateModel } from '@/model/ServiceCreateModel';
+import {prisma} from '@/lib/db/prisma';
+import {ServiceEntity} from '@/entity/ServiceEntity';
+import {ContactsType} from '@/model/ContactsType';
+import {CreateServiceEntity} from '@/entity/CreateServiceEntity';
+import {ServiceCreateModel} from '@/model/ServiceCreateModel';
 
 export class ServiceRepository {
   /**

@@ -1,23 +1,23 @@
 'use client';
 
 import React from 'react';
-import { useServiceRegistration } from '../_hooks/useServiceRegistration';
-import { ServiceNameInput } from './ServiceNameInput';
-import { ServiceDescriptionInput } from './ServiceDescriptionInput';
-import { ServicePriceInput } from './ServicePriceInput';
-import { CategorySelectionModal } from './CategorySelectionModal';
-import { ServiceAddressInput } from './ServiceAddressInput';
-import { ServiceAreaSelect } from './ServiceAreaSelect';
-import { ServicePhoneInput } from './ServicePhoneInput';
-import { ServiceTelegramInput } from './ServiceTelegramInput';
-import { ServiceOptionsSelection } from './ServiceOptionsSelection';
-import { ProviderCompanyNameInput } from './ProviderCompanyNameInput';
-import { ProviderContactPersonInput } from './ProviderContactPersonInput';
-import { ProviderPhoneInput } from './ProviderPhoneInput';
-import { RequiredFieldsList } from './RequiredFieldsList';
-import { CreateServiceButton } from './CreateServiceButton';
-import { ProgressBar } from './ProgressBar';
-import { ResultModal } from './ResultModal';
+import {useServiceRegistration} from '../_hooks/useServiceRegistration';
+import {ServiceNameInput} from './ServiceNameInput';
+import {ServiceDescriptionInput} from './ServiceDescriptionInput';
+import {ServicePriceInput} from './ServicePriceInput';
+import {CategorySelectionModal} from './CategorySelectionModal';
+import {ServiceAddressInput} from './ServiceAddressInput';
+import {ServiceAreaSelect} from './ServiceAreaSelect';
+import {ServicePhoneInput} from './ServicePhoneInput';
+import {ServiceTelegramInput} from './ServiceTelegramInput';
+import {ServiceOptionsSelection} from './ServiceOptionsSelection';
+import {ProviderCompanyNameInput} from './ProviderCompanyNameInput';
+import {ProviderContactPersonInput} from './ProviderContactPersonInput';
+import {ProviderPhoneInput} from './ProviderPhoneInput';
+import {RequiredFieldsList} from './RequiredFieldsList';
+import {CreateServiceButton} from './CreateServiceButton';
+import {ProgressBar} from './ProgressBar';
+import {ResultModal} from './ResultModal';
 
 export const ServiceRegistrationForm: React.FC = () => {
   const { form, onSubmit, isSubmitting, errors, result, resetResult } = useServiceRegistration();

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ParentCategoryWithChildren } from '@/model/CategoryType';
+import React, {useEffect, useState} from 'react';
+import {ParentCategoryWithChildren} from '@/model/CategoryType';
 
 interface CategorySelectionModalProps {
   selectedCategory: number;

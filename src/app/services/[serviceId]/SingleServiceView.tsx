@@ -1,9 +1,10 @@
 'use client';
-import React, { useCallback, useMemo, useState } from 'react';
-import { ImageCarousel } from '@/components/ImageCarousel';
-import { ServiceTypeFull } from '@/model/ServiceType';
-import { useRouter } from 'next/navigation';
-import { PAGE_ROUTES } from '@/utils/routes';
+import React, {useCallback, useState} from 'react';
+import {ImageCarousel} from '@/components/ImageCarousel';
+import {ServiceTypeFull} from '@/model/ServiceType';
+import {useRouter} from 'next/navigation';
+import {PAGE_ROUTES} from '@/utils/routes';
+
 export default function SingleServiceView({ service }: { service: ServiceTypeFull }) {
   // Mock images for carousel (gradient backgrounds)
   const mockImages = [

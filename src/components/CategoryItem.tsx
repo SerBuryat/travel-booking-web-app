@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { DEFAULT_CATEGORY_ICON } from "@/utils/generalCategories";
+import {useRouter} from 'next/navigation';
+import {DEFAULT_CATEGORY_ICON} from "@/utils/generalCategories";
 
 export interface Category {
   id: number;

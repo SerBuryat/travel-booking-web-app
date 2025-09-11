@@ -1,4 +1,4 @@
-import { CategoryEntity } from '@/entity/CategoryEntity';
+import {CategoryEntity} from '@/entity/CategoryEntity';
 
 export interface CategoryType {
   id: number;

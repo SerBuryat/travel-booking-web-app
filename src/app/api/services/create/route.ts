@@ -1,121 +1,77 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { ServiceRegistrationService } from '@/service/ServiceRegistrationService';
-import { ServiceCreateModel } from '@/model/ServiceCreateModel';
-import { getServerUser } from '@/lib/server-auth';
+import {NextRequest, NextResponse} from 'next/server';
+import {ServiceRegistrationService} from '@/service/ServiceRegistrationService';
+import {ServiceCreateModel} from '@/model/ServiceCreateModel';
+import {getUserAuth} from '@/lib/auth/user-auth';
+import {withErrorHandling} from '@/lib/api/error-handler';
 
-export async function POST(request: NextRequest) {
-  try {
-    // Получаем данные пользователя с валидацией токена
-    const user = await getServerUser();
-    
-    if (!user) {
-      return NextResponse.json(
-        { error: 'User not authenticated' },
-        { status: 401 }
-      );
-    }
+async function handlePost(request: NextRequest) {
+  const userAuth = await getUserAuth();
 
-    // Парсинг JSON из тела запроса
-    const body = await request.json();
-    
-    // Валидация обязательных полей сервиса
-    if (!body.name || !body.description || !body.price || !body.tcategories_id || !body.address || !body.tarea_id) {
-      return NextResponse.json(
-        { 
-          error: 'Missing required service fields',
-          required: ['name', 'description', 'price', 'tcategories_id', 'address', 'tarea_id']
-        },
-        { status: 400 }
-      );
-    }
+  const body = await request.json();
 
-    // Валидация обязательных полей провайдера
-    if (!body.providerCompanyName || !body.providerContactPerson || !body.providerPhone) {
-      return NextResponse.json(
-        { 
-          error: 'Missing required provider fields',
-          required: ['providerCompanyName', 'providerContactPerson', 'providerPhone']
-        },
-        { status: 400 }
-      );
-    }
-
-    // Создание модели данных
-    const serviceData: ServiceCreateModel = {
-      name: body.name,
-      description: body.description,
-      price: body.price,
-      tcategories_id: Number(body.tcategories_id),
-      address: body.address,
-      tarea_id: Number(body.tarea_id),
-      phone: body.phone,
-      tg_username: body.tg_username,
-      serviceOptions: body.serviceOptions || [],
-      // Новые поля провайдера
-      providerCompanyName: body.providerCompanyName,
-      providerContactPerson: body.providerContactPerson,
-      providerPhone: body.providerPhone
-    };
-
-    // Валидация числовых полей
-    if (!Number.isFinite(serviceData.tcategories_id) || !Number.isFinite(serviceData.tarea_id)) {
-      return NextResponse.json(
-        { error: 'Invalid category_id or area_id' },
-        { status: 400 }
-      );
-    }
-
-    // Валидация цены
-    if (isNaN(parseFloat(serviceData.price)) || parseFloat(serviceData.price) <= 0) {
-      return NextResponse.json(
-        { error: 'Invalid price value' },
-        { status: 400 }
-      );
-    }
-
-    // Создание сервиса через сервисный слой
-    const serviceRegistrationService = new ServiceRegistrationService();
-    const createdService = await serviceRegistrationService.createService(serviceData, user.id);
-
-    // Возврат успешного ответа
+  if (!body.name || !body.description || !body.price || !body.tcategories_id || !body.address || !body.tarea_id) {
     return NextResponse.json(
-      { 
-        success: true,
-        message: 'Service created successfully',
-        service: createdService
+      {
+        error: 'Missing required service fields',
+        required: ['name', 'description', 'price', 'tcategories_id', 'address', 'tarea_id']
       },
-      { status: 201 }
-    );
-
-  } catch (error) {
-    console.error('Create service error:', error);
-    
-    // Обработка известных ошибок
-    if (error instanceof Error) {
-      if (error.message === 'Required fields are missing') {
-        return NextResponse.json(
-          { error: 'Required service fields are missing' },
-          { status: 400 }
-        );
-      }
-      if (error.message === 'Provider information is required') {
-        return NextResponse.json(
-          { error: 'Provider information is required' },
-          { status: 400 }
-        );
-      }
-      if (error.message === 'Price must be greater than 0') {
-        return NextResponse.json(
-          { error: 'Price must be greater than 0' },
-          { status: 400 }
-        );
-      }
-    }
-
-    // Общая ошибка сервера
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+      { status: 400 }
     );
   }
+
+  if (!body.providerCompanyName || !body.providerContactPerson || !body.providerPhone) {
+    return NextResponse.json(
+      {
+        error: 'Missing required provider fields',
+        required: ['providerCompanyName', 'providerContactPerson', 'providerPhone']
+      },
+      { status: 400 }
+    );
+  }
+
+  const serviceData: ServiceCreateModel = {
+    name: body.name,
+    description: body.description,
+    price: body.price,
+    tcategories_id: Number(body.tcategories_id),
+    address: body.address,
+    tarea_id: Number(body.tarea_id),
+    phone: body.phone,
+    tg_username: body.tg_username,
+    serviceOptions: body.serviceOptions || [],
+    providerCompanyName: body.providerCompanyName,
+    providerContactPerson: body.providerContactPerson,
+    providerPhone: body.providerPhone
+  };
+
+  if (!Number.isFinite(serviceData.tcategories_id) || !Number.isFinite(serviceData.tarea_id)) {
+    return NextResponse.json(
+      { error: 'Invalid category_id or area_id' },
+      { status: 400 }
+    );
+  }
+
+  if (isNaN(parseFloat(serviceData.price)) || parseFloat(serviceData.price) <= 0) {
+    return NextResponse.json(
+      { error: 'Invalid price value' },
+      { status: 400 }
+    );
+  }
+
+  const serviceRegistrationService = new ServiceRegistrationService();
+  const createdService = await serviceRegistrationService.createService(serviceData, userAuth.userId);
+
+  return NextResponse.json(
+    {
+      success: true,
+      message: 'Service created successfully',
+      service: createdService
+    },
+    { status: 201 }
+  );
 }
+
+export const POST = withErrorHandling(handlePost, {
+  authErrorMessage: 'Unauthorized',
+  defaultErrorMessage: 'Internal server error'
+});

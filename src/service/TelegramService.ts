@@ -1,5 +1,5 @@
 import {TelegramUserInitData} from "@/types/telegram";
-import { validate } from "@telegram-apps/init-data-node";
+import {validate} from "@telegram-apps/init-data-node";
 
 export interface TelegramUserDataValidationResponse {
   success: boolean;

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { ClientWithAuthType } from '@/model/ClientType';
+import React, {useState} from 'react';
+import {ClientWithAuthType} from '@/model/ClientType';
 import UserInfoModal from './UserInfoModal';
 
 interface ProfileCardProps {

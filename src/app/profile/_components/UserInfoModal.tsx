@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ClientWithAuthType } from '@/model/ClientType';
+import {ClientWithAuthType} from '@/model/ClientType';
 
 interface UserInfoModalProps {
   isOpen: boolean;

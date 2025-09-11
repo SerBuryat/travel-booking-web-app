@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { PopularServicesComponent } from './PopularServicesComponent';
-import { ServiceType } from '@/model/ServiceType';
-import { CategoryEntity } from '@/entity/CategoryEntity';
-import { ChildCategoryButton } from './ChildCategoryButton';
+import React, {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {PopularServicesComponent} from './PopularServicesComponent';
+import {ServiceType} from '@/model/ServiceType';
+import {CategoryEntity} from '@/entity/CategoryEntity';
+import {ChildCategoryButton} from './ChildCategoryButton';
 
 interface ResultViewProps {
   searchValue: string;

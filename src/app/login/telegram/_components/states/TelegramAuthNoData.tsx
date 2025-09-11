@@ -1,4 +1,4 @@
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 
 export function TelegramAuthNoData() {
   const router = useRouter();

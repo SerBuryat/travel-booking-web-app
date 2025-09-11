@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+import {useRouter} from 'next/navigation';
 import BaseMenuItem from './BaseMenuItem';
 
 export default function SupportMenuItem() {

@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { UseFormRegister, FieldError } from 'react-hook-form';
-import { ServiceRegistrationFormData } from '@/schemas/serviceRegistrationSchema';
+import {FieldError, UseFormRegister} from 'react-hook-form';
+import {ServiceRegistrationFormData} from '@/schemas/serviceRegistrationSchema';
 
 interface ServicePhoneInputProps {
   register: UseFormRegister<ServiceRegistrationFormData>;

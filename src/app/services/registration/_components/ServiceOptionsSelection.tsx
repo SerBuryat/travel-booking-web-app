@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ServiceOptions, getAllOptions } from '@/utils/serviceOptions';
+import React, {useEffect, useState} from 'react';
+import {getAllOptions} from '@/utils/serviceOptions';
 
 interface ServiceOptionsSelectionProps {
   selectedOptions: string[];

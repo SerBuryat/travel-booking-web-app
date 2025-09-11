@@ -1,5 +1,5 @@
 import React from 'react';
-import { CategoryEntity } from '@/entity/CategoryEntity';
+import {CategoryEntity} from '@/entity/CategoryEntity';
 
 interface ChildCategoryButtonProps {
   category: CategoryEntity;

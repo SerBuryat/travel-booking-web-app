@@ -1,9 +1,9 @@
 "use client";
 import React from 'react';
 import {useTelegramAuthState} from './_hooks/useTelegramAuthState';
-import { TelegramAuthHeader } from './_components/TelegramAuthHeader';
-import { TelegramAuthProgress } from './_components/TelegramAuthProgress';
-import { TelegramAuthContent } from './_components/TelegramAuthContent';
+import {TelegramAuthHeader} from './_components/TelegramAuthHeader';
+import {TelegramAuthProgress} from './_components/TelegramAuthProgress';
+import {TelegramAuthContent} from './_components/TelegramAuthContent';
 
 export default function TelegramAuthPage() {
 

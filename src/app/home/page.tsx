@@ -1,12 +1,12 @@
 import React from 'react';
-import { ServiceService } from '@/service/ServiceService';
-import { Header } from '@/components/Header';
-import { SearchBar } from '@/components/SearchBar';
-import { AllCategoriesForHomeComponent } from '@/components/AllCategoriesForHomeComponent';
-import { PopularServicesComponent } from '@/components/PopularServicesComponent';
-import { RegistryServiceButton } from '@/components/RegistryServiceButton';
-import { PrivatePolicyButton } from '@/components/PrivatePolicyButton';
-import { CategoryService } from '@/service/CategoryService';
+import {ServiceService} from '@/service/ServiceService';
+import {Header} from '@/components/Header';
+import {SearchBar} from '@/components/SearchBar';
+import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
+import {PopularServicesComponent} from '@/components/PopularServicesComponent';
+import {RegistryServiceButton} from '@/components/RegistryServiceButton';
+import {PrivatePolicyButton} from '@/components/PrivatePolicyButton';
+import {CategoryService} from '@/service/CategoryService';
 
 export default async function HomePage() {
   const categoryService = new CategoryService();

@@ -1,9 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import {TelegramUserData, TelegramUserInitData} from '@/types/telegram';
-import { getInitData } from '@/utils/telegramUtils';
-import { useAuth } from '@/contexts/AuthContext';
-import { PAGE_ROUTES } from '@/utils/routes';
+import {useCallback, useEffect, useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {TelegramUserInitData} from '@/types/telegram';
+import {getInitData} from '@/utils/telegramUtils';
+import {useAuth} from '@/contexts/AuthContext';
+import {PAGE_ROUTES} from '@/utils/routes';
 import {ApiService} from "@/service/ApiService";
 
 export enum TelegramAuthState {

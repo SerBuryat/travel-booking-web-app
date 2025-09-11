@@ -1,13 +1,13 @@
-import { ClientService } from '../ClientService';
-import { ClientRepository } from '@/repository/ClientRepository';
-import { TelegramDataBuilder } from '@/utils/telegramDataBuilder';
-import { TelegramUserData } from '@/types/telegram';
-import { ClientWithAuthType } from '@/model/ClientType';
+import {ClientService} from '../ClientService';
+import {ClientRepository} from '@/repository/ClientRepository';
+import {TelegramDataBuilder} from '@/utils/telegramDataBuilder';
+import {TelegramUserData} from '@/types/telegram';
+import {ClientWithAuthType} from '@/model/ClientType';
 
 // Мокаем зависимости
 jest.mock('@/repository/ClientRepository');
 jest.mock('@/utils/telegramDataBuilder');
-jest.mock('@/lib/prisma', () => ({
+jest.mock('@/lib/db/prisma', () => ({
   prisma: {
     tclients: {
       findUnique: jest.fn(),

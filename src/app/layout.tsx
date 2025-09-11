@@ -1,8 +1,8 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type {Metadata} from "next";
+import {Inter} from "next/font/google";
 import "./globals.css";
-import { Footer } from "@/components/Footer";
-import { AuthProvider } from "@/contexts/AuthContext";
+import {Footer} from "@/components/Footer";
+import {AuthProvider} from "@/contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "700"] });
 

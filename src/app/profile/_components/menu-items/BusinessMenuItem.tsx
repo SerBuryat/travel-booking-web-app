@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import React, {useState} from 'react';
+import {useRouter} from 'next/navigation';
 import BaseMenuItem from './BaseMenuItem';
 import {ProviderSwitchResponse} from "@/app/api/auth/provider/route";
 

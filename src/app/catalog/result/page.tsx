@@ -1,9 +1,9 @@
-import { ServiceService } from '@/service/ServiceService';
-import { Header } from '@/components/Header';
-import { SearchBar } from '@/components/SearchBar';
+import {ServiceService} from '@/service/ServiceService';
+import {Header} from '@/components/Header';
+import {SearchBar} from '@/components/SearchBar';
 import React from 'react';
 import ResultView from '@/components/ResultView';
-import { GeneralCategoriesListComponent } from '@/components/GeneralCategoriesListComponent';
+import {GeneralCategoriesListComponent} from '@/components/GeneralCategoriesListComponent';
 
 export default async function ResultPage({ searchParams }: { searchParams: Promise<{ search?: string; categoryId?: string }> }) {
   const params = await searchParams;

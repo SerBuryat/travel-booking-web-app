@@ -1,28 +1,28 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getServerUser } from '@/lib/server-auth';
-import { ServicesClicksService } from '@/service/ServicesClicksService';
+import {NextRequest, NextResponse} from 'next/server';
+import {ServicesClicksService} from '@/service/ServicesClicksService';
+import {getUserAuth} from '@/lib/auth/user-auth';
+import {withErrorHandling} from '@/lib/api/error-handler';
 
-export async function POST(_req: NextRequest, { params }: { params: { serviceId: string } }) {
+async function handlePost(_request: NextRequest, { params }: { params: { serviceId: string } }) {
   const id = Number(params.serviceId);
   if (!Number.isFinite(id)) {
     return NextResponse.json({ error: 'Invalid serviceId' }, { status: 400 });
   }
 
-  let user;
-  try {
-    user = await getServerUser();
-  } catch {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
-
+  const userAuth = await getUserAuth();
   const clicksService = new ServicesClicksService();
+
   try {
-    const created = await clicksService.create(user.id, id);
+    const created = await clicksService.create(userAuth.userId, id);
     return NextResponse.json({ id: created.id, timestamp: created.timestamp }, { status: 201 });
   } catch {
-    // If unique violation path reached, createUniqueClick already returns existing
     return NextResponse.json({ ok: true }, { status: 200 });
   }
 }
+
+export const POST = withErrorHandling(handlePost, {
+  authErrorMessage: 'Unauthorized',
+  defaultErrorMessage: 'Internal server error'
+});
 
 

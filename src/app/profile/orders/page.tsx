@@ -2,12 +2,19 @@ import React from 'react';
 import Link from 'next/link';
 import ProfileHeader from '@/app/profile/_components/ProfileHeader';
 import OrdersList from '@/app/profile/orders/_components/OrdersList';
-import { getServerUser } from '@/lib/server-auth';
-import { ServicesClicksService } from '@/service/ServicesClicksService';
+import {ServicesClicksService} from '@/service/ServicesClicksService';
+import {getUserAuth} from "@/lib/auth/user-auth";
+import {redirect} from "next/navigation";
+import {PAGE_ROUTES} from "@/utils/routes";
+import {ClientService} from "@/service/ClientService";
+import {ClientWithAuthType} from "@/model/ClientType";
 
 export default async function ProfileOrdersPage() {
-  // Получаем данные пользователя на сервере
-  const user = await getServerUser();
+  const user = await getUser();
+  if (!user) {
+    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
+  }
+
   const clicksService = new ServicesClicksService();
   const clicks = await clicksService.getByClientId(user.id);
   const orders = clicks.map((c) => ({
@@ -34,6 +41,17 @@ export default async function ProfileOrdersPage() {
       </div>
     </div>
   );
+}
+
+// todo - такой логики на страницах быть не должно
+async function getUser(): Promise<ClientWithAuthType | null> {
+  try {
+    const userAuth = await getUserAuth();
+    const clientService = new ClientService();
+    return await clientService.getByIdWithAuth(userAuth.userId);
+  } catch (error) {
+    return null;
+  }
 }
 
 

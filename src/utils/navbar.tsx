@@ -1,7 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
+import {usePathname} from 'next/navigation';
+import SvgIcon, {SvgIconProps} from '@mui/material/SvgIcon';
 import Badge from '@mui/material/Badge';
 import {PAGE_ROUTES} from "@/utils/routes";
 

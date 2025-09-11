@@ -1,5 +1,5 @@
-import { ProviderRepository } from '@/repository/ProviderRepository';
-import { ProviderEntity } from '@/entity/ProviderEntity';
+import {ProviderRepository} from '@/repository/ProviderRepository';
+import {ProviderEntity} from '@/entity/ProviderEntity';
 
 export class ProviderService {
   private providerRepository: ProviderRepository;

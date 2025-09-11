@@ -1,12 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyRefreshToken } from '@/lib/jwt';
-import { 
-  getRefreshTokenFromRequest, 
-  clearAuthCookies, 
-  getClientIP, 
-  logLoginAttempt 
-} from '@/lib/auth';
-import { ClientService } from '@/service/ClientService';
+import {NextRequest, NextResponse} from 'next/server';
+import {clearAuthCookies, getRefreshTokenFromRequest, verifyRefreshToken} from '@/lib/auth/auth-utils';
+import {ClientService} from '@/service/ClientService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,10 +20,6 @@ export async function POST(request: NextRequest) {
       // Deactivate auth in database
       const clientService = new ClientService();
       await clientService.deactivateAuth(decoded.authId);
-      
-      // Log logout
-      const clientIP = getClientIP(request);
-      logLoginAttempt(decoded.userId, false, clientIP);
     }
 
     // Clear cookies regardless of token validity

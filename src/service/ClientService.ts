@@ -1,9 +1,7 @@
-import { ClientRepository } from '@/repository/ClientRepository';
-import {
-  ClientWithAuthType
-} from '@/model/ClientType';
-import { TelegramUserData } from "@/types/telegram";
-import { TelegramDataBuilder } from '@/utils/telegramDataBuilder';
+import {ClientRepository} from '@/repository/ClientRepository';
+import {ClientWithAuthType} from '@/model/ClientType';
+import {TelegramUserData} from "@/types/telegram";
+import {TelegramDataBuilder} from '@/utils/telegramDataBuilder';
 
 export class ClientService {
   private clientRepository: ClientRepository;

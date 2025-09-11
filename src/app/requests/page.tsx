@@ -1,19 +1,22 @@
 import React from 'react';
-import { getServerUser } from '@/lib/server-auth';
-import { redirect } from 'next/navigation';
-import { PAGE_ROUTES } from '@/utils/routes';
+import {redirect} from 'next/navigation';
+import {PAGE_ROUTES} from '@/utils/routes';
+import {getUserAuth} from "@/lib/auth/user-auth";
+import {ClientService} from "@/service/ClientService";
 
 export default async function RequestsPage() {
-  // Получаем данные пользователя на сервере
-  const user = await getServerUser();
+  let user;
+  try {
+    const userAuth = await getUserAuth();
+    const clientService = new ClientService();
+    user = await clientService.getByIdWithAuth(userAuth.userId);
 
-  // Если пользователь не авторизован, перенаправляем
-  if (!user) {
+    if (!user) {
+      redirect(PAGE_ROUTES.TELEGRAM_AUTH);
+    }
+  } catch (error) {
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
-
-  // Здесь можно загрузить данные запросов пользователя из БД
-  // const requests = await getRequestsByUserId(user.id);
 
   return (
     <div className="min-h-screen bg-white pb-24 sm:pb-0">

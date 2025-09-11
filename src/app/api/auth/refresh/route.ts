@@ -1,14 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyRefreshToken, generateJWT, generateRefreshToken } from '@/lib/jwt';
-import { 
-  getRefreshTokenFromRequest, 
-  setJWTCookie, 
-  setRefreshTokenCookie, 
-  getClientIP, 
-  logLoginAttempt 
-} from '@/lib/auth';
-import { ClientService } from '@/service/ClientService';
-import { ProviderService } from '@/service/ProviderService';
+import {NextRequest, NextResponse} from 'next/server';
+import {
+  generateJWT,
+  generateRefreshToken,
+  getRefreshTokenFromRequest,
+  setJWTCookie,
+  setRefreshTokenCookie,
+  verifyRefreshToken
+} from '@/lib/auth/auth-utils';
+import {ClientService} from '@/service/ClientService';
+import {ProviderService} from '@/service/ProviderService';
 
 export async function POST(request: NextRequest) {
   try {
@@ -76,10 +76,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    // Log token refresh
-    const clientIP = getClientIP(request);
-    logLoginAttempt(user.id, true, clientIP);
 
     // Create response with new tokens in cookies
     const response = NextResponse.json({

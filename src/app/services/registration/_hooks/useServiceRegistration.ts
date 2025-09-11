@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { serviceRegistrationSchema, ServiceRegistrationFormData } from '@/schemas/serviceRegistrationSchema';
-import { useAuth } from '@/contexts/AuthContext';
+import {useState} from 'react';
+import {useForm} from 'react-hook-form';
+import {zodResolver} from '@hookform/resolvers/zod';
+import {ServiceRegistrationFormData, serviceRegistrationSchema} from '@/schemas/serviceRegistrationSchema';
+import {useAuth} from '@/contexts/AuthContext';
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -30,7 +30,6 @@ export const useServiceRegistration = () => {
       phone: '',
       tg_username: '',
       serviceOptions: [],
-      // Новые поля провайдера
       providerCompanyName: '',
       providerContactPerson: '',
       providerPhone: ''
@@ -58,7 +57,7 @@ export const useServiceRegistration = () => {
         },
         body: JSON.stringify({
           ...data,
-          clientId: user.id // Передаем ID клиента
+          clientId: user.userId
         }),
       });
 

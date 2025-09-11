@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AuthContext';
-import { PAGE_ROUTES } from '@/utils/routes';
+import React, {useState} from 'react';
+import {useRouter} from 'next/navigation';
+import {useAuth} from '@/contexts/AuthContext';
+import {PAGE_ROUTES} from '@/utils/routes';
 
 interface ProviderProfile {
   id: number;

@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
-import { ServiceCreationResult } from '../_hooks/useServiceRegistration';
+import {useRouter} from 'next/navigation';
+import {ServiceCreationResult} from '../_hooks/useServiceRegistration';
+import {PAGE_ROUTES} from "@/utils/routes";
 
 interface ResultModalProps {
   result: ServiceCreationResult;
@@ -34,7 +35,7 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
       if (data.success) {
         // Роль успешно изменена, переходим в бизнес-аккаунт
         onClose();
-        router.push('/provider/services');
+        router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {
         console.error('Failed to switch to provider role:', data.error);
         // В случае ошибки показываем уведомление

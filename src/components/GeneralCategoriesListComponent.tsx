@@ -1,7 +1,7 @@
 import React from 'react';
 import {getGeneralCategoryByCode} from "@/utils/generalCategories";
-import { CategoryService } from '@/service/CategoryService';
-import { CategoryItem } from './CategoryItem';
+import {CategoryService} from '@/service/CategoryService';
+import {CategoryItem} from './CategoryItem';
 
 export interface Category {
   id: number;

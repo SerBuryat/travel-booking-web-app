@@ -1,5 +1,5 @@
 import React from 'react';
-import { UseFormRegister, FieldError } from 'react-hook-form';
+import {FieldError, UseFormRegister} from 'react-hook-form';
 
 interface ProviderContactPersonInputProps {
   register: UseFormRegister<any>;

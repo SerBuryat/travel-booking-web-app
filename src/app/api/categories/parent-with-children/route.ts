@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { CategoryService } from '@/service/CategoryService';
+import {NextRequest, NextResponse} from 'next/server';
+import {CategoryService} from '@/service/CategoryService';
 
 export async function GET(request: NextRequest) {
   try {

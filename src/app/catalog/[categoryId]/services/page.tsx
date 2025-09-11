@@ -1,8 +1,8 @@
-import { CategoryService } from '@/service/CategoryService';
-import { ServiceService } from '@/service/ServiceService';
-import { CategoryHeaderComponent } from '@/components/CategoryHeaderComponent';
+import {CategoryService} from '@/service/CategoryService';
+import {ServiceService} from '@/service/ServiceService';
+import {CategoryHeaderComponent} from '@/components/CategoryHeaderComponent';
 import ServicesClient from './ServicesClient';
-import { notFound } from 'next/navigation';
+import {notFound} from 'next/navigation';
 
 interface PageProps {
   params: Promise<{ categoryId: string }>;

@@ -1,11 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 import {TelegramUserInitData} from '@/types/telegram';
-import { useRouter } from 'next/navigation';
-import { UserAuth } from '@/app/api/auth/me/route';
-import { PAGE_ROUTES } from '@/utils/routes';
+import {useRouter} from 'next/navigation';
+import {PAGE_ROUTES} from '@/utils/routes';
 import {ApiService} from "@/service/ApiService";
+import {UserAuth} from "@/lib/auth/user-auth";
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(user);
       setIsAuthenticated(true);
     } catch (error) {
-      console.error('Ошибка проверки аутентификации пользователя:', error);
+      console.info('Ошибка аутентификации. Пользователь не зарегистрирован или не вошел в аккаунт', error);
       setUser(null);
       setIsAuthenticated(false);
     } finally {

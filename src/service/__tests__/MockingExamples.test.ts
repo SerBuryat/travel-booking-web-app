@@ -1,5 +1,5 @@
-import { ClientService } from '../ClientService';
-import { ClientRepository } from '@/repository/ClientRepository';
+import {ClientService} from '../ClientService';
+import {ClientRepository} from '@/repository/ClientRepository';
 
 // Примеры различных подходов к мокированию в TypeScript/Jest
 

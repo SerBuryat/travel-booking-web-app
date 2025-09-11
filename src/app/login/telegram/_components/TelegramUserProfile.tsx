@@ -1,4 +1,4 @@
-import { TelegramUserData } from '@/types/telegram';
+import {TelegramUserData} from '@/types/telegram';
 
 interface TelegramUserProfileProps {
   userData: TelegramUserData;

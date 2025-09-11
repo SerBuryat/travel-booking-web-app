@@ -1,7 +1,7 @@
-import { ClientService } from './ClientService';
-import { ProviderService } from './ProviderService';
-import { generateJWT, generateRefreshToken } from '@/lib/jwt';
-import { TelegramUserData } from '@/types/telegram';
+import {ClientService} from './ClientService';
+import {ProviderService} from './ProviderService';
+import {generateJWT, generateRefreshToken} from '@/lib/auth/auth-utils';
+import {TelegramUserData} from '@/types/telegram';
 
 export interface AuthTokens {
   jwtToken: string;

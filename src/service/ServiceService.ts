@@ -1,6 +1,6 @@
-import { ServiceEntity } from '@/entity/ServiceEntity';
-import { ServiceType, ServiceTypeFull } from '@/model/ServiceType';
-import { CategoryService } from './CategoryService';
+import {ServiceEntity} from '@/entity/ServiceEntity';
+import {ServiceType, ServiceTypeFull} from '@/model/ServiceType';
+import {CategoryService} from './CategoryService';
 
 export class ServiceService {
   private categoryService: CategoryService;

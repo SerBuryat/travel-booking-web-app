@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
-import { CategoryEntity } from '@/entity/CategoryEntity';
+import {prisma} from '@/lib/db/prisma';
+import {CategoryEntity} from '@/entity/CategoryEntity';
 
 export class CategoryRepository {
 

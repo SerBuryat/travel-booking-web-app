@@ -1,5 +1,5 @@
 import React from 'react';
-import { ServiceService } from '@/service/ServiceService';
+import {ServiceService} from '@/service/ServiceService';
 import SingleServiceView from './SingleServiceView';
 
 export default async function ServicePage({ params }: { params: Promise<{ serviceId: string }> }) {

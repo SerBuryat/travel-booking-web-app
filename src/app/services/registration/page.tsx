@@ -1,5 +1,5 @@
 import React from 'react';
-import { ServiceRegistrationForm } from './_components/ServiceRegistrationForm';
+import {ServiceRegistrationForm} from './_components/ServiceRegistrationForm';
 
 export default function ServiceRegistrationPage() {
   return (

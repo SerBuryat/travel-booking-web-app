@@ -1,8 +1,7 @@
-import { ServiceRepository } from '@/repository/ServiceRepository';
-import { ProviderService } from '@/service/ProviderService';
-import { ServiceCreateModel } from '@/model/ServiceCreateModel';
-import { CreateServiceEntity } from '@/entity/CreateServiceEntity';
-import { ProviderEntity } from '@/entity/ProviderEntity';
+import {ServiceRepository} from '@/repository/ServiceRepository';
+import {ProviderService} from '@/service/ProviderService';
+import {ServiceCreateModel} from '@/model/ServiceCreateModel';
+import {CreateServiceEntity} from '@/entity/CreateServiceEntity';
 
 export class ServiceRegistrationService {
   private serviceRepository: ServiceRepository;

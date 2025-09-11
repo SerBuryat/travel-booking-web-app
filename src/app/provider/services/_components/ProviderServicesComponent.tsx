@@ -1,4 +1,4 @@
-import { ServiceType } from '@/model/ServiceType';
+import {ServiceType} from '@/model/ServiceType';
 
 interface ProviderServicesComponentProps {
   providerId?: number;

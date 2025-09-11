@@ -1,7 +1,5 @@
-import { prisma } from '@/lib/prisma';
-import { 
-  ProviderEntity
-} from '@/entity/ProviderEntity';
+import {prisma} from '@/lib/db/prisma';
+import {ProviderEntity} from '@/entity/ProviderEntity';
 
 export class ProviderRepository {
 

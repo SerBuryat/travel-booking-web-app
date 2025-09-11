@@ -1,10 +1,10 @@
-import { prisma } from '@/lib/prisma';
-import { 
+import {prisma} from '@/lib/db/prisma';
+import {
   ClientWithAuthType,
-  CreateClientType, 
-  UpdateClientType,
   CreateClientAuthType,
-  UpdateClientAuthType
+  CreateClientType,
+  UpdateClientAuthType,
+  UpdateClientType
 } from '@/model/ClientType';
 
 export class ClientRepository {

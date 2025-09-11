@@ -1,7 +1,7 @@
 "use client";
-import React, { useState, useRef } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import { PAGE_ROUTES } from '@/utils/routes';
+import React, {useRef, useState} from 'react';
+import {useRouter, useSearchParams} from 'next/navigation';
+import {PAGE_ROUTES} from '@/utils/routes';
 
 interface SearchBarProps {
   searchValue?: string;

@@ -1,5 +1,5 @@
-import { CategoryEntity } from '@/entity/CategoryEntity';
-import { ContactsType } from '@/model/ContactsType';
+import {CategoryEntity} from '@/entity/CategoryEntity';
+import {ContactsType} from '@/model/ContactsType';
 
 export interface ServiceType {
   id: number;
