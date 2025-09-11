@@ -1,7 +1,7 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {TelegramUserInitData} from '@/types/telegram';
-import {getInitData} from '@/utils/telegramUtils';
+import {getInitData} from '@/lib/telegram/telegram-init-data';
 import {useAuth} from '@/contexts/AuthContext';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {ApiService} from "@/service/ApiService";

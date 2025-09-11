@@ -10,7 +10,7 @@ import {TelegramUserInitData} from "@/types/telegram";
  * найдены данные в tgWebAppData)
  * @param rawHashData
  */
-export const getInitData = (rawHashData: string) : TelegramUserInitData => {
+export function getInitData(rawHashData: string) : TelegramUserInitData {
   // Проверяем, есть ли хэш в URL
   if (!rawHashData || !rawHashData.startsWith('#')) {
     throw new Error(
