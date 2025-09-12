@@ -5,7 +5,7 @@ import {TelegramUserInitData} from '@/types/telegram';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {ApiService} from "@/service/ApiService";
-import {UserAuth} from "@/lib/auth/user-auth";
+import {UserAuth} from "@/lib/auth/userAuth";
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {

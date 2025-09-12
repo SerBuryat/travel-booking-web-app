@@ -43,6 +43,29 @@ export function setRefreshTokenCookie(token: string, response: NextResponse): Ne
   return response;
 }
 
+// Server Actions cookie setters (no NextResponse context)
+export async function setJWTCookieInAction(token: string): Promise<void> {
+  const c = await cookies();
+  c.set(JWT_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60,
+    path: '/',
+  });
+}
+
+export async function setRefreshTokenCookieInAction(token: string): Promise<void> {
+  const c = await cookies();
+  c.set(REFRESH_COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60,
+    path: '/',
+  });
+}
+
 export function clearAuthCookies(response: NextResponse): NextResponse {
   response.cookies.delete(JWT_COOKIE_NAME);
   response.cookies.delete(REFRESH_COOKIE_NAME);
@@ -60,12 +83,9 @@ function generateRandomBytes(length: number): string {
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-export function generateJWT(userId: number, role: string, authId: string, providerId?: number): string {
+export function generateJWT(userId: number, role: string, authId: number, providerId?: number): string {
   const payload: JWTPayload = {
-    userId,
-    role,
-    authId,
-    ...(providerId && { providerId }),
+    userId, role, authId, ...(providerId && { providerId }),
   };
 
   return jwt.sign(payload, JWT_SECRET, {
@@ -73,13 +93,9 @@ export function generateJWT(userId: number, role: string, authId: string, provid
   });
 }
 
-export function generateRefreshToken(userId: number, authId: string): string {
+export function generateRefreshToken(userId: number, authId: number): string {
   const tokenId = generateRandomBytes(16);
-  const payload: RefreshTokenPayload = {
-    userId,
-    authId,
-    tokenId,
-  };
+  const payload: RefreshTokenPayload = { userId, authId, tokenId };
 
   return jwt.sign(payload, JWT_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
@@ -102,6 +118,26 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
     console.error('Refresh token verification error:', error);
     return null;
   }
+}
+
+export interface AuthTokens {
+  jwtToken: string;
+  refreshToken: string;
+  expiresAt: Date;
+}
+
+/**
+ * Генерация JWT токенов
+ */
+export function generateTokens(userId: number, role: string, authId: number, providerId?: number): AuthTokens {
+  const expiresAt = new Date();
+  expiresAt.setHours(expiresAt.getHours() + 1);
+
+  return {
+    jwtToken: generateJWT(userId, role, authId, providerId),
+    refreshToken: generateRefreshToken(userId, authId),
+    expiresAt
+  };
 }
 
 

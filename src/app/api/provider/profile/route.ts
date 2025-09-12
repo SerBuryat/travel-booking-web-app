@@ -1,7 +1,7 @@
 import {type NextRequest, NextResponse} from 'next/server';
 import {ProviderService} from '@/service/ProviderService';
-import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
-import {withErrorHandling} from '@/lib/api/error-handler';
+import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
+import {withErrorHandling} from '@/lib/api/errorHandler';
 
 export interface ProviderProfileResponse {
   success: boolean;

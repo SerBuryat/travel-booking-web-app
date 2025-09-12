@@ -1,9 +1,9 @@
 import {prisma} from '@/lib/db/prisma';
-import {getJWTFromCookies, verifyJWT} from '@/lib/auth/auth-utils';
+import {getJWTFromCookies, verifyJWT} from '@/lib/auth/authUtils';
 
 export interface UserAuth {
   userId: number;
-  authId: string;
+  authId: number;
   role: string;
   providerId?: number;
 }
@@ -61,14 +61,14 @@ async function getClientIdById(clientId: number): Promise<number> {
   return client.id;
 }
 
-async function getClientAuthIdAndRoleByAuthId(authId: string): Promise<{ authId: string; role: string }> {
+async function getClientAuthIdAndRoleByAuthId(authId: number): Promise<{ authId: number; role: string }> {
   const clientAuth = await prisma.tclients_auth.findFirst({
     where: {
-      auth_id: authId,
+      id: authId,
       is_active: true
     },
     select: {
-      auth_id: true,
+      id: true,
       role: true
     }
   });
@@ -78,7 +78,7 @@ async function getClientAuthIdAndRoleByAuthId(authId: string): Promise<{ authId:
   }
 
   return {
-    authId: clientAuth.auth_id!,
+    authId: clientAuth.id,
     role: clientAuth.role
   };
 }

@@ -13,21 +13,21 @@ export class ClientService {
   /**
    * Найти клиента по ID с активной аутентификацией
    */
-  async findByIdWithActiveAuth(id: number, authId: string): Promise<ClientWithAuthType | null> {
+  async findByIdWithActiveAuth(id: number, authId: number): Promise<ClientWithAuthType | null> {
     return await this.clientRepository.findByIdWithActiveAuth(id, authId);
   }
 
   /**
    * Обновить refresh token
    */
-  async updateRefreshToken(authId: string, refreshToken: string, expiresAt: Date): Promise<boolean> {
+  async updateRefreshToken(authId: number, refreshToken: string, expiresAt: Date): Promise<boolean> {
     return await this.clientRepository.updateRefreshToken(authId, refreshToken, expiresAt);
   }
 
   /**
    * Деактивировать аутентификацию клиента
    */
-  async deactivateAuth(authId: string): Promise<boolean> {
+  async deactivateAuth(authId: number): Promise<boolean> {
     return await this.clientRepository.deactivateAuth(authId);
   }
 
@@ -42,12 +42,9 @@ export class ClientService {
    * Создать или обновить клиента с Telegram аутентификацией
    */
   async createOrUpdateWithTelegramAuth(
-    telegramData: TelegramUserData,
-    authId: string,
-    tokenExpiresAt: Date
+    telegramData: TelegramUserData, authId: string, tokenExpiresAt: Date
   ): Promise<ClientWithAuthType | null> {
     try {
-      console.log(telegramData);
       const client = await this.clientRepository.findByAuthId(authId);
       
       if (client) {

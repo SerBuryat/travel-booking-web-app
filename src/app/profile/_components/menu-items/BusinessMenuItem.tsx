@@ -3,12 +3,12 @@
 import React, {useState} from 'react';
 import {useRouter} from 'next/navigation';
 import BaseMenuItem from './BaseMenuItem';
-import {ProviderSwitchResponse} from "@/app/api/auth/provider/route";
+import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/provider/switchToProvider";
 
 export default function BusinessMenuItem() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [apiResponse, setApiResponse] = useState<ProviderSwitchResponse | null>(null);
+  const [apiResponse, setApiResponse] = useState<ProviderSwitchResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const icon = (
@@ -22,14 +22,7 @@ export default function BusinessMenuItem() {
   const handleSwitchToProvider = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/provider', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data: ProviderSwitchResponse = await response.json();
+      const data = await switchToProvider();
       setApiResponse(data);
       setIsModalOpen(true);
     } catch (error) {

@@ -1,13 +1,12 @@
-// Типы для JWT токенов
 export interface JWTPayload {
-  userId: number;
-  role: string;
-  authId: string;
-  providerId?: number; // Опциональный ID провайдера для роли 'provider'
+  userId: number; // tclients.id
+  role: string; // tclients_auth.role
+  authId: number; // tclients_auth.id
+  providerId?: number; // tproviders.id
 }
 
 export interface RefreshTokenPayload {
   userId: number;
-  authId: string;
+  authId: number;
   tokenId: string;
 }

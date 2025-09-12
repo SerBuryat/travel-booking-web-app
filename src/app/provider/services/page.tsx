@@ -2,7 +2,7 @@ import {redirect} from 'next/navigation';
 import {ServiceService} from '@/service/ServiceService';
 import ProviderServicesComponent from './_components/ProviderServicesComponent';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
+import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 
 export default async function ProviderServicesPage() {
 

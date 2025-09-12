@@ -4,6 +4,7 @@ import React from 'react';
 import {useRouter} from 'next/navigation';
 import {ServiceCreationResult} from '../_hooks/useServiceRegistration';
 import {PAGE_ROUTES} from "@/utils/routes";
+import {switchToProvider} from "@/lib/auth/provider/switchToProvider";
 
 interface ResultModalProps {
   result: ServiceCreationResult;
@@ -22,24 +23,16 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
 
   const handleGoToBusinessAccount = async () => {
     try {
-      // Вызываем API для смены роли на провайдера
-      const response = await fetch('/api/auth/provider', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const data = await switchToProvider()!;
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (data!.success) {
         // Роль успешно изменена, переходим в бизнес-аккаунт
         onClose();
         router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {
-        console.error('Failed to switch to provider role:', data.error);
+        console.error('Failed to switch to provider role:', data!.error);
         // В случае ошибки показываем уведомление
-        alert('Ошибка при переходе в бизнес-аккаунт: ' + data.error);
+        alert('Ошибка при переходе в бизнес-аккаунт: ' + data!.error);
       }
     } catch (error) {
       console.error('Error switching to provider role:', error);

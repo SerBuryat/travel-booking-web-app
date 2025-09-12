@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {clearAuthCookies, getRefreshTokenFromRequest, verifyRefreshToken} from '@/lib/auth/auth-utils';
+import {clearAuthCookies, getRefreshTokenFromRequest, verifyRefreshToken} from '@/lib/auth/authUtils';
 import {ClientService} from '@/service/ClientService';
 
 export async function POST(request: NextRequest) {

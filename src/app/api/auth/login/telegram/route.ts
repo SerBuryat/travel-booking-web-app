@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {setJWTCookie, setRefreshTokenCookie} from '@/lib/auth/auth-utils';
+import {setJWTCookie, setRefreshTokenCookie} from '@/lib/auth/authUtils';
 import {AuthService} from '@/service/AuthService';
 import {TelegramUserInitData} from '@/types/telegram';
 import {TelegramService} from "@/service/TelegramService";

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import ProfileHeader from '@/app/profile/_components/ProfileHeader';
 import OrdersList from '@/app/profile/orders/_components/OrdersList';
 import {ServicesClicksService} from '@/service/ServicesClicksService';
-import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
+import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {redirect} from "next/navigation";
 import {PAGE_ROUTES} from "@/utils/routes";
 import {ClientService} from "@/service/ClientService";

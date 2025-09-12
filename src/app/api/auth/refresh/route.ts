@@ -6,7 +6,7 @@ import {
   setJWTCookie,
   setRefreshTokenCookie,
   verifyRefreshToken
-} from '@/lib/auth/auth-utils';
+} from '@/lib/auth/authUtils';
 import {ClientService} from '@/service/ClientService';
 import {ProviderService} from '@/service/ProviderService';
 
