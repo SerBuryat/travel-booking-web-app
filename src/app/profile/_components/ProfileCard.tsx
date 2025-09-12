@@ -21,23 +21,6 @@ export default function ProfileCard({ user }: ProfileCardProps) {
     return name[0]?.toUpperCase() || 'U';
   };
 
-  // Получение основной информации пользователя
-  const getUserInfo = () => {
-    const activeAuth = user.tclients_auth.find(auth => auth.is_active);
-    const authContext = activeAuth?.auth_context as any;
-    
-    return {
-      id: user.id,
-      name: user.name,
-      role: activeAuth?.role || 'user',
-      photo: user.photo ?? authContext?.photo_url,
-      telegram_id: authContext?.id,
-      username: authContext?.username
-    };
-  };
-
-  const userInfo = getUserInfo();
-
   return (
     <>
       <div 
@@ -45,22 +28,22 @@ export default function ProfileCard({ user }: ProfileCardProps) {
         onClick={() => setIsModalOpen(true)}
       >
         {/* Аватарка */}
-        {userInfo.photo ? (
+        {user.photo ? (
           <img
-            src={userInfo.photo}
-            alt={userInfo.name}
+            src={user.photo}
+            alt={user.name}
             className="w-16 h-16 rounded-full object-cover"
           />
         ) : (
           <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white text-lg font-bold">
-            {getInitials(userInfo.name)}
+            {getInitials(user.name)}
           </div>
         )}
         
         {/* Имя и ID */}
         <div className="flex-1">
-          <div className="font-bold text-gray-900">{userInfo.name}</div>
-          <div className="text-blue-600 text-sm">id#{userInfo.id}</div>
+          <div className="font-bold text-gray-900">{user.name}</div>
+          <div className="text-blue-600 text-sm">id#{user.id}</div>
         </div>
         
         {/* Стрелочка */}

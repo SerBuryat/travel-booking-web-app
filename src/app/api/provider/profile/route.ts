@@ -1,6 +1,6 @@
 import {type NextRequest, NextResponse} from 'next/server';
 import {ProviderService} from '@/service/ProviderService';
-import {getUserAuth} from "@/lib/auth/user-auth";
+import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
 import {withErrorHandling} from '@/lib/api/error-handler';
 
 export interface ProviderProfileResponse {
@@ -17,7 +17,7 @@ export interface ProviderProfileResponse {
 }
 
 async function handleGet(_request: NextRequest) {
-  const userAuth = await getUserAuth();
+  const userAuth = await getUserAuthOrThrow();
 
   const providerService = new ProviderService();
   const provider = await providerService.getProviderForClient(userAuth.userId);

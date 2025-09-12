@@ -1,20 +1,13 @@
 import React from 'react';
 import {redirect} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
-import {getUserAuth} from "@/lib/auth/user-auth";
+import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
 import {ClientService} from "@/service/ClientService";
+import {ClientWithAuthType} from "@/model/ClientType";
 
 export default async function RequestsPage() {
-  let user;
-  try {
-    const userAuth = await getUserAuth();
-    const clientService = new ClientService();
-    user = await clientService.getByIdWithAuth(userAuth.userId);
-
-    if (!user) {
-      redirect(PAGE_ROUTES.TELEGRAM_AUTH);
-    }
-  } catch (error) {
+  const user = await getUser();
+  if(!user) {
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
 
@@ -30,8 +23,19 @@ export default async function RequestsPage() {
               Пользователь: {user.name} (ID: {user.id})
             </p>
           </div>
+
         </div>
       </div>
     </div>
   );
-} 
+}
+
+async function getUser(): Promise<ClientWithAuthType | null> {
+  try {
+    const userAuth = await getUserAuthOrThrow();
+    const clientService = new ClientService();
+    return await clientService.getByIdWithAuth(userAuth.userId);
+  } catch (error) {
+    return null;
+  }
+}

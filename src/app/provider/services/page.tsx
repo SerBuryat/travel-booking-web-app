@@ -2,13 +2,13 @@ import {redirect} from 'next/navigation';
 import {ServiceService} from '@/service/ServiceService';
 import ProviderServicesComponent from './_components/ProviderServicesComponent';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {getUserAuth} from "@/lib/auth/user-auth";
+import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
 
 export default async function ProviderServicesPage() {
 
   let userAuth;
   try {
-    userAuth = await getUserAuth();
+    userAuth = await getUserAuthOrThrow();
     if (userAuth.role !== 'provider' || !userAuth.providerId) {
       redirect(PAGE_ROUTES.HOME);
     }

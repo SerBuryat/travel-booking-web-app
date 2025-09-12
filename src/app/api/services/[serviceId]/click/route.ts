@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {ServicesClicksService} from '@/service/ServicesClicksService';
-import {getUserAuth} from '@/lib/auth/user-auth';
+import {getUserAuthOrThrow} from '@/lib/auth/user-auth';
 import {withErrorHandling} from '@/lib/api/error-handler';
 
 async function handlePost(_request: NextRequest, { params }: { params: { serviceId: string } }) {
@@ -9,7 +9,7 @@ async function handlePost(_request: NextRequest, { params }: { params: { service
     return NextResponse.json({ error: 'Invalid serviceId' }, { status: 400 });
   }
 
-  const userAuth = await getUserAuth();
+  const userAuth = await getUserAuthOrThrow();
   const clicksService = new ServicesClicksService();
 
   try {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 import ProfileHeader from '@/app/profile/_components/ProfileHeader';
 import OrdersList from '@/app/profile/orders/_components/OrdersList';
 import {ServicesClicksService} from '@/service/ServicesClicksService';
-import {getUserAuth} from "@/lib/auth/user-auth";
+import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
 import {redirect} from "next/navigation";
 import {PAGE_ROUTES} from "@/utils/routes";
 import {ClientService} from "@/service/ClientService";
@@ -46,7 +46,7 @@ export default async function ProfileOrdersPage() {
 // todo - такой логики на страницах быть не должно
 async function getUser(): Promise<ClientWithAuthType | null> {
   try {
-    const userAuth = await getUserAuth();
+    const userAuth = await getUserAuthOrThrow();
     const clientService = new ClientService();
     return await clientService.getByIdWithAuth(userAuth.userId);
   } catch (error) {

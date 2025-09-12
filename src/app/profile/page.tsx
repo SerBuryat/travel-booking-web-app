@@ -4,7 +4,7 @@ import {ClientService} from '@/service/ClientService';
 import ProfileHeader from "@/app/profile/_components/ProfileHeader";
 import ProfileMenu from "@/app/profile/_components/ProfileMenu";
 import {PAGE_ROUTES} from '@/utils/routes';
-import {getUserAuth} from "@/lib/auth/user-auth";
+import {getUserAuthOrThrow} from "@/lib/auth/user-auth";
 import {ClientWithAuthType} from "@/model/ClientType";
 
 export default async function ProfilePage() {
@@ -27,10 +27,11 @@ export default async function ProfilePage() {
 // todo - такой логики на страницах быть не должно
 async function getUser(): Promise<ClientWithAuthType | null> {
   try {
-    const userAuth = await getUserAuth();
+    const userAuth = await getUserAuthOrThrow();
     const clientService = new ClientService();
     return await clientService.getByIdWithAuth(userAuth.userId);
   } catch (error) {
+    console.error('Ошибка получения пользователя:', error);
     return null;
   }
 }

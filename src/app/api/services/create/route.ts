@@ -1,11 +1,11 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {ServiceRegistrationService} from '@/service/ServiceRegistrationService';
 import {ServiceCreateModel} from '@/model/ServiceCreateModel';
-import {getUserAuth} from '@/lib/auth/user-auth';
+import {getUserAuthOrThrow} from '@/lib/auth/user-auth';
 import {withErrorHandling} from '@/lib/api/error-handler';
 
 async function handlePost(request: NextRequest) {
-  const userAuth = await getUserAuth();
+  const userAuth = await getUserAuthOrThrow();
 
   const body = await request.json();
 

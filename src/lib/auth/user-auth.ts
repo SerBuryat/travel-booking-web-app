@@ -28,7 +28,7 @@ export class UserAuthError extends Error {
  * @throws {Error} "Client with id {id} not found" — если пользователь не найден
  * @throws {Error} "Client auth with auth_id {authId} not found" — если активная auth-запись не найдена
  */
-export async function getUserAuth(): Promise<UserAuth> {
+export async function getUserAuthOrThrow(): Promise<UserAuth> {
   const token = await getJWTFromCookies();
   if (!token) {
     throw new UserAuthError('JWT is required');
