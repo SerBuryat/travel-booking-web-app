@@ -26,21 +26,6 @@ export class CategoryService {
       isParent: entity.parent_id === null
     };
   }
-
-  /**
-   * Maps CategoryType back to CategoryEntity
-   */
-  static mapToCategoryEntity(type: CategoryType): CategoryEntity {
-    return {
-      id: type.id,
-      code: type.code,
-      sysname: type.sysname,
-      name: type.name,
-      photo: type.photo,
-      parent_id: type.parent_id
-    };
-  }
-
   /**
    * Gets general categories (accommodation, food, transport, tours)
    */

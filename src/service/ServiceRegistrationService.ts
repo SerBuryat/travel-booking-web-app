@@ -45,9 +45,7 @@ export class ServiceRegistrationService {
         providerId: provider.id // Добавляем ID провайдера для создания сервиса
       };
 
-      const createdService = await this.serviceRepository.createService(serviceWithProvider);
-      
-      return createdService;
+      return await this.serviceRepository.createService(serviceWithProvider);
     } catch (error) {
       // Логирование ошибки для отладки
       console.error('Error creating service:', error);

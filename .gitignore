@@ -44,3 +44,4 @@ next-env.d.ts
 # Prisma
 /.idea/dataSources.xml
 /.idea/misc.xml
+/.idea/sqlDataSources.xml

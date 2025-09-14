@@ -6,6 +6,7 @@ import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {ApiService} from "@/service/ApiService";
 import {UserAuth} from "@/lib/auth/userAuth";
+import {authWithTelegram} from "@/lib/auth/telegram/telegramAuth";
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
@@ -63,9 +64,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   
   // Функция входа через Telegram
   const loginViaTelegram = async (telegramUserInitData: TelegramUserInitData) => {
-    setIsLoading(true);
     try {
-      const authUser = await ApiService.loginWithTelegramUserData(telegramUserInitData);
+      setIsLoading(true);
+      const authUser = await authWithTelegram(telegramUserInitData);
       setUser(authUser);
       setIsAuthenticated(true);
     } finally {

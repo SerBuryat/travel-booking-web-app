@@ -8,28 +8,6 @@ export class ServiceService {
   constructor() {
     this.categoryService = new CategoryService();
   }
-
-  /**
-   * Maps raw service data to ServiceEntity
-   */
-  static mapToServiceEntity(rawService: any): ServiceEntity {
-    return {
-      id: rawService.id,
-      name: rawService.name,
-      description: rawService.description ?? '',
-      price: rawService.price ? String(rawService.price) : '0',
-      tcategories_id: rawService.tcategories_id,
-      provider_id: rawService.provider_id,
-      status: rawService.status,
-      created_at: rawService.created_at instanceof Date 
-        ? rawService.created_at.toISOString() 
-        : String(rawService.created_at),
-      priority: rawService.priority ? String(rawService.priority) : '0',
-      rating: rawService.rating ? Number(rawService.rating) : undefined,
-      view_count: rawService.view_count || 0,
-    };
-  }
-
   /**
    * Maps ServiceEntity to ServiceType with category relation
    */

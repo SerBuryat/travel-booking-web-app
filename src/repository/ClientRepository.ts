@@ -1,11 +1,5 @@
 import {prisma} from '@/lib/db/prisma';
-import {
-  ClientWithAuthType,
-  CreateClientAuthType,
-  CreateClientType,
-  UpdateClientAuthType,
-  UpdateClientType
-} from '@/model/ClientType';
+import {ClientWithAuthType} from '@/model/ClientType';
 
 export class ClientRepository {
 
@@ -87,60 +81,6 @@ export class ClientRepository {
       return client as ClientWithAuthType | null;
     } catch (error) {
       console.error('Error finding client by auth_id:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Создать клиента с аутентификацией (nested writes)
-   */
-  async createWithAuth(data: CreateClientType & { tclients_auth: { create: CreateClientAuthType } }): Promise<ClientWithAuthType | null> {
-    try {
-      const client = await prisma.tclients.create({
-        data: {
-          name: data.name,
-          email: data.email,
-          photo: data.photo,
-          additional_info: data.additional_info,
-          tarea_id: data.tarea_id,
-          tclients_auth: data.tclients_auth,
-        },
-        include: {
-          tclients_auth: true,
-        },
-      });
-      return client as ClientWithAuthType;
-    } catch (error) {
-      console.error('Error creating client with auth:', error);
-      return null;
-    }
-  }
-
-  /**
-   * Обновить клиента с аутентификацией (nested writes)
-   */
-  async updateWithAuth(
-    id: number, 
-    data: UpdateClientType & { tclients_auth?: { update: { where: { id: number }, data: Partial<UpdateClientAuthType> } } }
-  ): Promise<ClientWithAuthType | null> {
-    try {
-      const client = await prisma.tclients.update({
-        where: { id },
-        data: {
-          name: data.name,
-          email: data.email,
-          photo: data.photo,
-          additional_info: data.additional_info,
-          tarea_id: data.tarea_id,
-          ...(data.tclients_auth && { tclients_auth: data.tclients_auth }),
-        },
-        include: {
-          tclients_auth: true,
-        },
-      });
-      return client as ClientWithAuthType;
-    } catch (error) {
-      console.error('Error updating client with auth:', error);
       return null;
     }
   }

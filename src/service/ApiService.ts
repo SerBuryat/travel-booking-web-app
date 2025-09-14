@@ -11,12 +11,6 @@ export const ApiService = {
     );
   },
 
-  async loginWithTelegramUserData(telegramUserInitData: TelegramUserInitData) : Promise<UserAuth> {
-    return await post<UserAuth, TelegramUserInitData>(
-      '/api/auth/login/telegram', telegramUserInitData
-    );
-  },
-
   async getUserAuth() : Promise<UserAuth> {
     return await get<UserAuth>('/api/auth/me');
   }
