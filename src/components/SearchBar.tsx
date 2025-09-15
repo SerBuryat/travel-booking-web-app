@@ -1,6 +1,6 @@
 "use client";
 import React, {useRef, useState} from 'react';
-import {useRouter, useSearchParams} from 'next/navigation';
+import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 
 interface SearchBarProps {
@@ -14,7 +14,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
   const [focused, setFocused] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -24,15 +23,9 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
       }
       setError(undefined);
       
-      // Build query parameters preserving existing categoryId
+      // Простой поиск без сохранения categoryId для MVP
       const params = new URLSearchParams();
       params.set('search', value);
-      
-      // Preserve existing categoryId if present
-      const existingCategoryId = searchParams.get('categoryId');
-      if (existingCategoryId) {
-        params.set('categoryId', existingCategoryId);
-      }
       
       router.push(`${PAGE_ROUTES.CATALOG.RESULT}?${params.toString()}`);
     }

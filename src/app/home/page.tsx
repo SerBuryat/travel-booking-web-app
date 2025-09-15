@@ -1,12 +1,15 @@
 import React from 'react';
 import {ServiceService} from '@/service/ServiceService';
 import {Header} from '@/components/Header';
-import {SearchBar} from '@/components/SearchBar';
+import {SearchBarWrapper} from '@/components/SearchBarWrapper';
 import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
 import {PopularServicesComponent} from '@/components/PopularServicesComponent';
 import {RegistryServiceButton} from '@/components/RegistryServiceButton';
 import {PrivatePolicyButton} from '@/components/PrivatePolicyButton';
 import {CategoryService} from '@/service/CategoryService';
+
+// Принудительно делаем страницу динамической
+export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   const categoryService = new CategoryService();
@@ -19,7 +22,7 @@ export default async function HomePage() {
       <div className="max-w-md mx-auto">
         {/* Header с поисковой строкой */}
         <Header>
-          <SearchBar />
+          <SearchBarWrapper />
         </Header>
 
         {/* Список всех категорий */}

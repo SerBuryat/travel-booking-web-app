@@ -2,6 +2,9 @@ import {Header} from '@/components/Header';
 import {SearchBar} from '@/components/SearchBar';
 import Catalog from "@/app/catalog/Catalog";
 
+// Принудительно делаем страницу динамической
+export const dynamic = 'force-dynamic';
+
 export default async function CatalogPage() {
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>

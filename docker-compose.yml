@@ -2,16 +2,9 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
+    image: travel-booking-web-app-dev:latest
+    container_name: travel-booking-web-app-dev
     environment:
-      # SSH Tunnel Configuration
-      - SSH_HOST=${SSH_HOST}
-      - SSH_USER=${SSH_USER}
-      - SSH_PASSWORD=${SSH_PASSWORD}
       # Database Configuration (через SSH tunnel)
       - DATABASE_URL=${DATABASE_URL}
       - DB_HOST=localhost
@@ -28,28 +21,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
       - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
+    ports:
+      - "3000:3000"
     env_file:
       - .env
-    volumes:
-      - .:/app
-      - /app/node_modules
     restart: unless-stopped
-    # Убираем зависимость от локальной БД
-    # depends_on:
-    #   - db
-
-  # Локальная БД для разработки (закомментирована для продакшена)
-  # db:
-  #   image: postgres:15
-  #   environment:
-  #     - POSTGRES_USER=${DB_USER}
-  #     - POSTGRES_PASSWORD=${DB_PASSWORD}
-  #     - POSTGRES_DB=${DB_NAME}
-  #   ports:
-  #     - "5432:5432"
-  #   volumes:
-  #     - postgres_data:/var/lib/postgresql/data
-  #   restart: unless-stopped
-
-# volumes:
-#   postgres_data: 

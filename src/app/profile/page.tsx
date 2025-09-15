@@ -7,6 +7,9 @@ import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {ClientWithAuthType} from "@/model/ClientType";
 
+// Принудительно делаем страницу динамической
+export const dynamic = 'force-dynamic';
+
 export default async function ProfilePage() {
 
   const user = await getUser();

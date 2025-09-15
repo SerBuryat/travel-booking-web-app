@@ -1,38 +1,52 @@
-# Используем официальный Node.js образ
-FROM node:18-alpine
+# syntax=docker.io/docker/dockerfile:1
 
-# Устанавливаем SSH клиент и необходимые инструменты
-RUN apk add --no-cache openssh-client bash expect netcat-openbsd
+FROM node:20-alpine AS base
 
-# Устанавливаем рабочую директорию
+# Install dependencies only when needed
+FROM base AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Копируем файлы зависимостей
-COPY package*.json ./
+# Install dependencies based on the preferred package manager
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* .npmrc* ./
+RUN npm ci
 
-# Устанавливаем зависимости
-RUN npm ci --only=production
-
-# Копируем исходный код
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Создаем директорию для SSH ключей
-RUN mkdir -p /app/.ssh && chmod 700 /app/.ssh
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Создаем скрипт для установки SSH tunnel
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN npx prisma generate
+RUN npm run build
 
-# Создаем пользователя для безопасности
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S nextjs -u 1001
+# Production image, copy all the files and run next
+FROM base AS runner
+WORKDIR /app
 
-# Меняем владельца файлов
-RUN chown -R nextjs:nodejs /app
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Открываем порт
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+COPY --from=builder /app/public ./public
+
+# Automatically leverage output traces to reduce image size
+# https://nextjs.org/docs/advanced-features/output-file-tracing
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+
+USER nextjs
+
 EXPOSE 3000
 
-# Используем entrypoint скрипт
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["npm", "start"] 
+ENV PORT=3000
+
+# server.js is created by next build from the standalone output
+# https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
+ENV HOSTNAME="0.0.0.0"
+CMD ["node", "server.js"]
