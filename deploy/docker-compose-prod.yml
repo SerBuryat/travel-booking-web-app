@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  app:
+    image: travel-booking-web-app.cr.cloud.ru/travel-booking-web-app
+    container_name: travel-booking-web-app
+    environment:
+      # Database Configuration (через SSH tunnel)
+      - DATABASE_URL=${DATABASE_URL}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      # Next.js Environment
+      - NODE_ENV=${NODE_ENV}
+      # Telegram Bot Configuration
+      - BOT_TOKEN=${BOT_TOKEN}
+      - BOT_NAME=${BOT_NAME}
+      # JWT Authentication
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
+      - CLOUD_RU_KEY_ID=${CLOUD_RU_KEY_ID}
+      - CLOUD_RU_KEY_SECRET=${CLOUD_RU_KEY_SECRET}
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    restart: unless-stopped
