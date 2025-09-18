@@ -4,10 +4,11 @@ services:
   app:
     image: travel-booking-web-app.cr.cloud.ru/travel-booking-web-app
     container_name: travel-booking-web-app
+    network_mode: "host"
     environment:
-      # Database Configuration (через SSH tunnel)
+      # Database Configuration (подключение к PostgreSQL на хосте)
       - DATABASE_URL=${DATABASE_URL}
-      - DB_HOST=${DB_HOST}
+      - DB_HOST=localhost
       - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
@@ -23,8 +24,6 @@ services:
       - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
       - CLOUD_RU_KEY_ID=${CLOUD_RU_KEY_ID}
       - CLOUD_RU_KEY_SECRET=${CLOUD_RU_KEY_SECRET}
-    ports:
-      - "3000:3000"
     env_file:
       - .env
     restart: unless-stopped

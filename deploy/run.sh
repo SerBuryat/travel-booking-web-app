@@ -14,6 +14,13 @@ if [ ! -f "docker-compose-prod.yml" ]; then
     exit 1
 fi
 
+# Проверяем, что nginx установлен
+if ! command -v nginx &> /dev/null; then
+    echo "❌ Ошибка: nginx не установлен"
+    echo "Запустите сначала: ./scripts/setup-nginx-ssl.sh"
+    exit 1
+fi
+
 # Проверяем наличие .env
 if [ ! -f ".env" ]; then
     echo "❌ Ошибка: файл .env не найден в текущей директории"
