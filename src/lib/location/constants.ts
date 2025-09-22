@@ -1,0 +1,1 @@
+export const SELECTABLE_AREA_TIER = 3;
