@@ -10,7 +10,7 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ user }: ProfileHeaderProps) {
   return (
-    <div className="px-4 py-3">
+    <div className="px-4 pt-0">
       <ProfileCard user={user} />
     </div>
   );

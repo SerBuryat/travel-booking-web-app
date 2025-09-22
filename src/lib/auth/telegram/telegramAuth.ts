@@ -6,10 +6,11 @@ import { TelegramUserInitData, TelegramUserData } from '@/types/telegram';
 import { TelegramService } from '@/service/TelegramService';
 import { UserAuth } from '@/lib/auth/userAuth';
 import { AuthRole } from '@/model/ClientType';
-import {tclients_auth} from "@prisma/client";
+import {tarea, tclients_auth} from "@prisma/client";
 
 const TELEGRAM_AUTH_TYPE = 'telegram';
 const AUTH_ROLE = 'user';
+const DEFAULT_AREA_SYSNAME = 'Olkhon';
 
 /**
  * Аутентификация пользователя через Telegram
@@ -194,4 +195,33 @@ interface CreateClientAuthData {
   role: string;
   last_login: Date;
   is_active: boolean;
+}
+
+/**
+ * Возвращает id default area (из константы DEFAULT_AREA_SYSNAME) 
+ * и если нет, то первую по tier
+ * @throws {Error} Если default area не найдена
+ */
+async function getDefaultAreaId(): Promise<number> {
+  let defaultArea: tarea | null = null;
+  try {
+    defaultArea = await prisma.tarea.findFirst({
+      where: {
+        sysname: DEFAULT_AREA_SYSNAME
+      }
+    });
+  } catch (error) {
+    console.error('Error finding default area. Trying to find first by tier.', error);
+    defaultArea = await prisma.tarea.findFirst({
+      where: {
+        tier: 3
+      }
+    });
+  }
+
+  if (!defaultArea) {
+    throw new Error('Default area not found');
+  }
+
+  return defaultArea.id;
 }
