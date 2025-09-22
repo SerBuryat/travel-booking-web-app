@@ -2,18 +2,22 @@ import {redirect} from 'next/navigation';
 import {ServiceService} from '@/service/ServiceService';
 import ProviderServicesComponent from './_components/ProviderServicesComponent';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
+import {getUserAuthOrThrow, UserAuth} from "@/lib/auth/userAuth";
 
 export default async function ProviderServicesPage() {
 
-  let userAuth;
+  let userAuth: UserAuth;
   try {
     userAuth = await getUserAuthOrThrow();
-    if (userAuth.role !== 'provider' || !userAuth.providerId) {
-      redirect(PAGE_ROUTES.HOME);
-    }
+    console.log('userAuth', userAuth);
   } catch (error) {
+    console.log('Error in ProviderServicesPage - server side', error);
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
+  }
+
+  // Проверяем роль и права доступа после успешной аутентификации
+  if (userAuth.role !== 'provider' || !userAuth.providerId) {
+    redirect(PAGE_ROUTES.HOME);
   }
 
   // Предзагружаем сервисы провайдера на сервере

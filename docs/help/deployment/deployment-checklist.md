@@ -26,6 +26,7 @@
 - BOT_TOKEN=...
 - NEXTAUTH_URL=https://your-domain
 - JWT_SECRET=...
+- PRISMA_LOG_LEVELS=error
 - (добавить свои: TELEGRAM_APP_ID, TELEGRAM_APP_HASH и т.п.)
 
 Храним prod.env на VPS или прокидываем из CI при деплое; не коммитим в репозиторий.
@@ -133,5 +134,57 @@ Pipeline шаги:
 - Rollback: политика хранения прошлых тегов, автоматизация отката в CI.
 
 Эта памятка — базовый ориентир. Дальше по ней создадим Dockerfile, docker-compose.prod.yml, Nginx конфиг, GitHub Actions, prod.env и проверим полный цикл.
+
+## Настройка логирования Prisma
+
+### Управление через переменные окружения
+
+Логирование Prisma теперь настраивается через переменную `PRISMA_LOG_LEVELS` в `.env` файле:
+
+```bash
+# Только ошибки (рекомендуется для продакшена)
+PRISMA_LOG_LEVELS=error
+
+# Предупреждения и ошибки
+PRISMA_LOG_LEVELS=warn,error
+
+# Все логи (для отладки)
+PRISMA_LOG_LEVELS=query,info,warn,error
+
+# Только SQL запросы и ошибки
+PRISMA_LOG_LEVELS=query,error
+```
+
+### Доступные уровни логирования:
+- `query` - SQL запросы к базе данных
+- `info` - информационные сообщения
+- `warn` - предупреждения
+- `error` - ошибки
+
+### Изменение настроек без пересборки образа:
+
+1. Отредактируйте `.env` файл на сервере
+2. Перезапустите контейнер:
+   ```bash
+   docker compose down
+   docker compose up -d
+   ```
+
+### Примеры конфигураций:
+
+**Продакшен (минимальные логи):**
+```bash
+PRISMA_LOG_LEVELS=error
+```
+
+**Разработка (все логи):**
+```bash
+PRISMA_LOG_LEVELS=query,info,warn,error
+```
+
+**Отладка производительности (только запросы и ошибки):**
+```bash
+PRISMA_LOG_LEVELS=query,error
+```
 
 

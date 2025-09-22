@@ -70,10 +70,11 @@ async function updateUserRole(userAuth: UserAuth, role: string) : Promise<void> 
   }
 
   if (role === 'provider') {
-    const hasProvider = await hasActiveProvider(userAuth.userId);
-    if (!hasProvider) {
+    const activeProviderId = await getActiveProviderId(userAuth.userId);
+    if (!activeProviderId) {
       throw new Error('No active business account found. Please register a service first.');
     }
+    userAuth.providerId = activeProviderId.id;
   }
 
   const clientAuth = await getClientAuthById(userAuth.authId);
@@ -100,15 +101,14 @@ async function existsByClientId(clientId: number): Promise<boolean> {
   return !!client;
 }
 
-async function hasActiveProvider(clientId: number): Promise<boolean> {
-  const provider = await prisma.tproviders.findFirst({
+async function getActiveProviderId(clientId: number): Promise<{id: number}> {
+  return  await prisma.tproviders.findFirst({
     where: {
       tclients_id: clientId,
       status: 'active'
     },
     select: { id: true }
   });
-  return !!provider;
 }
 
 async function getClientAuthById(authId: number) {
