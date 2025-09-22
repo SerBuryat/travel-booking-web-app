@@ -16,30 +16,30 @@ services:
       - ./init-scripts:/docker-entrypoint-initdb.d
     restart: unless-stopped
 
-  app:
-    image: travel-booking-web-app-dev:latest
-    container_name: travel-booking-web-app-dev
-    environment:
-      # Database Configuration (через SSH tunnel)
-      - DB_HOST=${DB_HOST}
-      - DB_PORT=${DB_PORT}
-      - DB_USER=${DB_USER}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - DB_NAME=${DB_NAME}
-      # Next.js Environment
-      - NODE_ENV=${NODE_ENV}
-      # Telegram Bot Configuration
-      - BOT_TOKEN=${BOT_TOKEN}
-      - BOT_NAME=${BOT_NAME}
-      # JWT Authentication
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
-      - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
-    restart: unless-stopped
+#  app:
+#    image: travel-booking-web-app-dev:latest
+#    container_name: travel-booking-web-app-dev
+#    environment:
+#      # Database Configuration (через SSH tunnel)
+#      - DB_HOST=${DB_HOST}
+#      - DB_PORT=${DB_PORT}
+#      - DB_USER=${DB_USER}
+#      - DB_PASSWORD=${DB_PASSWORD}
+#      - DB_NAME=${DB_NAME}
+#      # Next.js Environment
+#      - NODE_ENV=${NODE_ENV}
+#      # Telegram Bot Configuration
+#      - BOT_TOKEN=${BOT_TOKEN}
+#      - BOT_NAME=${BOT_NAME}
+#      # JWT Authentication
+#      - JWT_SECRET=${JWT_SECRET}
+#      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+#      - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
+#    ports:
+#      - "3000:3000"
+#    env_file:
+#      - .env
+#    restart: unless-stopped
 
 volumes:
   postgres_data:

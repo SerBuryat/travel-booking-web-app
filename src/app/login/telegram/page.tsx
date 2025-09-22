@@ -5,9 +5,6 @@ import {TelegramAuthHeader} from './_components/TelegramAuthHeader';
 import {TelegramAuthProgress} from './_components/TelegramAuthProgress';
 import {TelegramAuthContent} from './_components/TelegramAuthContent';
 
-// Принудительно делаем страницу динамической
-export const dynamic = 'force-dynamic';
-
 export default function TelegramAuthPage() {
 
   const {authState, userData, error, handleLoginWithTelegramUserInitData} = useTelegramAuthState();
