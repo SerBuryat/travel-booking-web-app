@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - deploy
 env:
   CLOUD_RU_ARTIFACT_REGISTRY_URI: travel-booking-web-app.cr.cloud.ru
 

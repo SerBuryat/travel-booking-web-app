@@ -43,16 +43,6 @@ export class ServiceService {
   }
 
   /**
-   * Get services by category IDs with category relations
-   */
-  async getServicesByCategoryIds(categoryIds: number[]): Promise<ServiceType[]> {
-    const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const serviceRepository = new ServiceRepository();
-    const services = await serviceRepository.findAllByCategoryIdIn(categoryIds);
-    return this.mapToServiceTypes(services);
-  }
-
-  /**
    * Get service by ID with category relation
    */
   async getServiceById(serviceId: number): Promise<ServiceTypeFull | null> {
@@ -62,37 +52,6 @@ export class ServiceService {
     if (!service) return null;
     return this.mapToServiceTypeFull(service);
   }
-
-  /**
-   * Get popular services by name with category relations
-   */
-  async getPopularServicesByName(search: string): Promise<ServiceType[]> {
-    const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const serviceRepository = new ServiceRepository();
-    const services = await serviceRepository.findPopularByLikeName(search);
-    return this.mapToServiceTypes(services);
-  }
-
-  /**
-   * Get popular services by name and filter by category IDs
-   */
-  async getPopularServicesByNameAndCategoryIn(search: string, categoryIds: number[]): Promise<ServiceType[]> {
-    const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const serviceRepository = new ServiceRepository();
-    const services = await serviceRepository.findPopularByLikeNameAndCategoryIn(search, categoryIds);
-    return this.mapToServiceTypes(services);
-  }
-
-  /**
-   * Get popular services with category relations
-   */
-  async getPopularServices(popularCount: number = 10): Promise<ServiceType[]> {
-    const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const serviceRepository = new ServiceRepository();
-    const services = await serviceRepository.findPopular(popularCount);
-    return this.mapToServiceTypes(services);
-  }
-
   /**
    * Get all services by provider ID with category relations
    */

@@ -1,8 +1,8 @@
 import {CategoryService} from '@/service/CategoryService';
-import {ServiceService} from '@/service/ServiceService';
 import {CategoryHeaderComponent} from '@/components/CategoryHeaderComponent';
 import ServicesClient from './ServicesClient';
 import {notFound} from 'next/navigation';
+import {servicesForCategories} from "@/lib/service/searchServices";
 
 interface PageProps {
   params: Promise<{ categoryId: string }>;
@@ -27,8 +27,7 @@ async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { 
       selectedChildIds.length > 0
         ? [categoryId, ...selectedChildIds]
         : [categoryId, ...childCategoriesIds];
-  const serviceService = new ServiceService();
-  const services = await serviceService.getServicesByCategoryIds(serviceCategoryIds);
+  const services = await servicesForCategories(serviceCategoryIds);
 
   return (
     <>
