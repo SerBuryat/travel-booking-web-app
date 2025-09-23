@@ -15,9 +15,9 @@ interface SearchServiceOptions {
 /**
  * Поиск сервисов по введенному значению.
  * - name LIKE searchValue (case-insensitive contains)
- * - сортировка по популярности (см. buildOrderBy)
- * - фильтр по категории (если передан categoryId)
- * - возвращаем все поля tservices и включаем все поля tcategories
+ * - сортировка по популярности (priority desc)
+ * - фильтр по категории (если передан categoryIds)
+ * - фильтр по локации пользователя (если авторизован)
  *
  * @param {string} searchValue Строка поиска по полю name (подстрочное совпадение, регистронезависимое)
  * @param {SearchServiceOptions} [options] Дополнительные опции фильтрации и ограничения
@@ -38,24 +38,35 @@ export async function searchServices(
   // Определяем areaId текущего пользователя (если авторизован и локация выбрана)
   const resolvedAreaId = await resolveAreaIdFromUser();
 
-  // Конструируем части запроса: where, orderBy, take
-  const where = buildWhere(normalizedSearch, options.categoryIds, resolvedAreaId);
-  const orderBy = buildOrderBy();
+  // Конструируем where с поиском по имени
+  const where = buildWhereWithSearch(normalizedSearch, options.categoryIds, resolvedAreaId);
   const take = Number.isFinite(options.take as number) ? (options.take as number) : DEFAULT_TAKE_SERVICES;
 
-  const services = await prisma.tservices.findMany({
-    where,              // Фильтры по имени, категории и локации
-    orderBy,            // Сортировка по «популярности»
-    take,               // Лимит записей
-    include: { tcategories: true }, // Присоединяем полную категорию
-  });
+  return await fetchServices(where, take);
+}
 
-  if (services.length === 0) {
-    return [];
-  }
+/**
+ * Получение популярных сервисов без поиска по имени.
+ * - сортировка по популярности (priority desc)
+ * - фильтр по категории (если передан categoryIds)
+ * - фильтр по локации пользователя (если авторизован)
+ *
+ * @param {SearchServiceOptions} [options] Дополнительные опции фильтрации и ограничения
+ * @param {number[]} [options.categoryIds] Если задано непустым массивом — фильтрация по множеству `tcategories_id`
+ * @param {number} [options.take=10] Ограничение на количество записей
+ * @returns {Promise<ServiceType[]>} Массив сервисов с полем category
+ */
+export async function popularServices(
+  options: SearchServiceOptions = {}
+): Promise<ServiceType[]> {
+  // Определяем areaId текущего пользователя (если авторизован и локация выбрана)
+  const resolvedAreaId = await resolveAreaIdFromUser();
 
-  // Преобразуем структуру: tcategories -> category
-  return services.map(mapToSearchableService);
+  // Конструируем where без поиска по имени
+  const where = buildWhereWithoutSearch(options.categoryIds, resolvedAreaId);
+  const take = Number.isFinite(options.take as number) ? (options.take as number) : DEFAULT_TAKE_SERVICES;
+
+  return await fetchServices(where, take);
 }
 
 /**
@@ -92,19 +103,38 @@ async function resolveAreaIdFromUser(): Promise<number | null> {
 }
 
 /**
- * Собирает объект where для Prisma-запроса tservices.findMany.
+ * Общая функция для получения сервисов из БД с маппингом.
+ * Выполняет запрос к БД и преобразует результат в ServiceType[].
  *
- * Правила:
- * - всегда фильтруем по name contains (регистронезависимо)
- * - если передан categoryId (не null/undefined) — фильтруем по tcategories_id
- * - если передан areaId (не null/undefined) — наличие хотя бы одной записи в tlocations с tarea_id = areaId
+ * @param {any} where Условия фильтрации для Prisma
+ * @param {number} take Лимит записей
+ * @returns {Promise<ServiceType[]>} Массив сервисов с полем category
+ */
+async function fetchServices(where: any, take: number): Promise<ServiceType[]> {
+  const services = await prisma.tservices.findMany({
+    where,              // Фильтры по имени, категории и локации
+    orderBy: { priority: 'desc' },            // Сортировка по «популярности»
+    take,               // Лимит записей
+    include: { tcategories: true }, // Присоединяем полную категорию
+  });
+
+  if (services.length === 0) {
+    return [];
+  }
+
+  // Преобразуем структуру: tcategories -> category
+  return services.map(mapToSearchableService);
+}
+
+/**
+ * Собирает объект where для поиска сервисов с фильтром по имени.
  *
  * @param {string} searchValue Нормализованное значение поиска
  * @param {number[]|undefined} categoryIds Список идентификаторов категорий; если не задан или пуст — фильтр не применяется
  * @param {number|null|undefined} areaId Идентификатор локации (area) или null/undefined, чтобы исключить фильтр
- * @returns {import('@prisma/client').Prisma.tservicesWhereInput} Where-условие для Prisma
+ * @returns {any} Where-условие для Prisma
  */
-function buildWhere(
+function buildWhereWithSearch(
   searchValue: string,
   categoryIds?: number[] | undefined,
   areaId?: number | null
@@ -130,21 +160,33 @@ function buildWhere(
 }
 
 /**
- * Формирует порядок сортировки для «популярных» сервисов.
- * Приоритеты: просмотры → рейтинг → число оценок → приоритет → дата создания.
+ * Собирает объект where для получения популярных сервисов без поиска по имени.
  *
- * @returns {Array<Record<string, 'asc' | 'desc'>>} Массив условий сортировки
+ * @param {number[]|undefined} categoryIds Список идентификаторов категорий; если не задан или пуст — фильтр не применяется
+ * @param {number|null|undefined} areaId Идентификатор локации (area) или null/undefined, чтобы исключить фильтр
+ * @returns {any} Where-условие для Prisma
  */
-function buildOrderBy(): Array<Record<string, 'asc' | 'desc'>> {
-  // Простейная эвристика «популярности»: сначала по количеству просмотров, затем по рейтингу,
-  // затем по количеству оценок, затем по приоритету и дате создания.
-  return [
-    { view_count: 'desc' as const },
-    { rating: 'desc' as const },
-    { rating_count: 'desc' as const },
-    { priority: 'desc' as const },
-    { created_at: 'desc' as const },
-  ];
+function buildWhereWithoutSearch(
+  categoryIds?: number[] | undefined,
+  areaId?: number | null
+): any {
+  const where: any = {
+    active: true
+  };
+
+  if (Array.isArray(categoryIds) && categoryIds.length > 0) {
+    // Фильтрация по множеству категорий, если список непустой
+    Object.assign(where, { tcategories_id: { in: categoryIds } });
+  }
+
+  if (areaId != null) {
+    // Фильтрация по наличию локации с заданным tarea_id
+    Object.assign(where, {
+      tlocations: { some: { tarea_id: areaId } },
+    });
+  }
+
+  return where;
 }
 
 /**

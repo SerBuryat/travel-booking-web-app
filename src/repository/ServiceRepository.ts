@@ -88,35 +88,6 @@ export class ServiceRepository {
   }
 
   /**
-   * Get popular services
-   */
-  async findPopular(popularCount: number = 10): Promise<ServiceEntity[]> {
-    const services = await prisma.tservices.findMany({
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        price: true,
-        tcategories_id: true,
-        priority: true,
-        rating: true,
-      },
-      orderBy: { priority: 'desc' },
-      take: popularCount,
-    });
-    
-    return services.map(s => ({
-      id: s.id,
-      name: s.name,
-      description: s.description ?? '',
-      price: s.price ? String(s.price) : '0',
-      tcategories_id: s.tcategories_id,
-      priority: s.priority ? String(s.priority) : '0',
-      rating: s.rating ? Number(s.rating) : undefined,
-    }));
-  }
-
-  /**
    * Get all services by provider ID
    */
   async getAllByProviderId(providerId: number): Promise<ServiceEntity[]> {

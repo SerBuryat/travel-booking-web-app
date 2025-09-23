@@ -62,17 +62,6 @@ export class ServiceService {
     if (!service) return null;
     return this.mapToServiceTypeFull(service);
   }
-
-  /**
-   * Get popular services with category relations
-   */
-  async getPopularServices(popularCount: number = 10): Promise<ServiceType[]> {
-    const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const serviceRepository = new ServiceRepository();
-    const services = await serviceRepository.findPopular(popularCount);
-    return this.mapToServiceTypes(services);
-  }
-
   /**
    * Get all services by provider ID with category relations
    */

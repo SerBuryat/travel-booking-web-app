@@ -1,17 +1,16 @@
 import React from 'react';
-import {ServiceService} from '@/service/ServiceService';
 import {GeneralCategoriesListComponent} from '@/components/GeneralCategoriesListComponent';
 import {PopularServicesComponent} from '@/components/PopularServicesComponent';
 import {ServiceRegistrationBanner} from '@/components/ServiceRegistrationBanner';
+import {popularServices} from "@/lib/service/searchServices";
 
 export default async function Catalog() {
-  const serviceService = new ServiceService();
-  const popularServices = await serviceService.getPopularServices(6);
+  const services = await popularServices({take: 6});
 
   return (
     <>
       <GeneralCategoriesListComponent />
-      <PopularServicesComponent services={popularServices} />
+      <PopularServicesComponent services={services} />
       <ServiceRegistrationBanner />
     </>
   );

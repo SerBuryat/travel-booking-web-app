@@ -1,5 +1,4 @@
 import React from 'react';
-import {ServiceService} from '@/service/ServiceService';
 import {Header} from '@/components/Header';
 import {SearchBarWrapper} from '@/components/SearchBarWrapper';
 import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
@@ -7,6 +6,7 @@ import {PopularServicesComponent} from '@/components/PopularServicesComponent';
 import {RegistryServiceButton} from '@/components/RegistryServiceButton';
 import {PrivatePolicyButton} from '@/components/PrivatePolicyButton';
 import {CategoryService} from '@/service/CategoryService';
+import {popularServices} from "@/lib/service/searchServices";
 
 // Принудительно делаем страницу динамической
 export const dynamic = 'force-dynamic';
@@ -14,8 +14,7 @@ export const dynamic = 'force-dynamic';
 export default async function HomePage() {
   const categoryService = new CategoryService();
   const categories = await categoryService.getAllParentCategories();
-  const serviceService = new ServiceService();
-  const popularServices = await serviceService.getPopularServices(6);
+  const services = await popularServices({take: 6});
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -32,7 +31,7 @@ export default async function HomePage() {
 
         {/* Популярные сервисы */}
         <div>
-          <PopularServicesComponent services={popularServices} />
+          <PopularServicesComponent services={services} />
         </div>
 
         {/* Кнопки Registry service и Private policy */}
