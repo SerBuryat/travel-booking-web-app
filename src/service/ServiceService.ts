@@ -43,16 +43,6 @@ export class ServiceService {
   }
 
   /**
-   * Get services by category IDs with category relations
-   */
-  async getServicesByCategoryIds(categoryIds: number[]): Promise<ServiceType[]> {
-    const { ServiceRepository } = await import('@/repository/ServiceRepository');
-    const serviceRepository = new ServiceRepository();
-    const services = await serviceRepository.findAllByCategoryIdIn(categoryIds);
-    return this.mapToServiceTypes(services);
-  }
-
-  /**
    * Get service by ID with category relation
    */
   async getServiceById(serviceId: number): Promise<ServiceTypeFull | null> {

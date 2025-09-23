@@ -5,34 +5,6 @@ import {CreateServiceEntity} from '@/entity/CreateServiceEntity';
 import {ServiceCreateModel} from '@/model/ServiceCreateModel';
 
 export class ServiceRepository {
-  /**
-   * Find all services by category IDs
-   */
-  async findAllByCategoryIdIn(categoryIds: number[]): Promise<ServiceEntity[]> {
-    const services = await prisma.tservices.findMany({
-      where: {
-        tcategories_id: { in: categoryIds },
-      },
-      select: {
-        id: true,
-        name: true,
-        description: true,
-        price: true,
-        tcategories_id: true,
-        rating: true,
-      },
-      orderBy: { id: 'asc' },
-    });
-    
-    return services.map(s => ({
-      id: s.id,
-      name: s.name,
-      description: s.description ?? '',
-      price: s.price ? String(s.price) : '0',
-      tcategories_id: s.tcategories_id,
-      rating: s.rating ? Number(s.rating) : undefined,
-    }));
-  }
 
   /**
    * Get service by ID including contacts

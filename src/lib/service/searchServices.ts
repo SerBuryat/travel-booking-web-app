@@ -70,6 +70,36 @@ export async function popularServices(
 }
 
 /**
+ * Получение сервисов по списку категорий.
+ * - сортировка по популярности (priority desc)
+ * - фильтр по переданным categoryIds (обязательно)
+ * - фильтр по локации пользователя (если авторизован)
+ *
+ * @param {number[]} categoryIds Список идентификаторов категорий для поиска
+ * @param {SearchServiceOptions} [options] Дополнительные опции фильтрации и ограничения
+ * @param {number} [options.take=10] Ограничение на количество записей
+ * @returns {Promise<ServiceType[]>} Массив сервисов с полем category
+ */
+export async function servicesForCategories(
+  categoryIds: number[],
+  options: SearchServiceOptions = {}
+): Promise<ServiceType[]> {
+  // Проверяем, что передан непустой массив категорий
+  if (!Array.isArray(categoryIds) || categoryIds.length === 0) {
+    return [];
+  }
+
+  // Определяем areaId текущего пользователя (если авторизован и локация выбрана)
+  const resolvedAreaId = await resolveAreaIdFromUser();
+
+  // Конструируем where с обязательной фильтрацией по категориям
+  const where = buildWhereForCategories(categoryIds, resolvedAreaId);
+  const take = Number.isFinite(options.take as number) ? (options.take as number) : DEFAULT_TAKE_SERVICES;
+
+  return await fetchServices(where, take);
+}
+
+/**
  * Нормализует входное значение поиска.
  * Удаляет пробелы по краям и предотвращает выполнение запроса при пустой строке.
  *
@@ -178,6 +208,33 @@ function buildWhereWithoutSearch(
     // Фильтрация по множеству категорий, если список непустой
     Object.assign(where, { tcategories_id: { in: categoryIds } });
   }
+
+  if (areaId != null) {
+    // Фильтрация по наличию локации с заданным tarea_id
+    Object.assign(where, {
+      tlocations: { some: { tarea_id: areaId } },
+    });
+  }
+
+  return where;
+}
+
+/**
+ * Собирает объект where для поиска сервисов по категориям.
+ * Обязательно фильтрует по переданным categoryIds.
+ *
+ * @param {number[]} categoryIds Список идентификаторов категорий (обязательно непустой)
+ * @param {number|null|undefined} areaId Идентификатор локации (area) или null/undefined, чтобы исключить фильтр
+ * @returns {any} Where-условие для Prisma
+ */
+function buildWhereForCategories(
+  categoryIds: number[],
+  areaId?: number | null
+): any {
+  const where: any = {
+    active: true,
+    tcategories_id: { in: categoryIds } // Обязательная фильтрация по категориям
+  };
 
   if (areaId != null) {
     // Фильтрация по наличию локации с заданным tarea_id
