@@ -7,6 +7,7 @@ import {PAGE_ROUTES} from '@/utils/routes';
 import {ApiService} from "@/service/ApiService";
 import {UserAuth} from "@/lib/auth/userAuth";
 import {authWithTelegram} from "@/lib/auth/telegram/telegramAuth";
+import {mockTelegramAuth} from "@/lib/auth/telegram/mockTelegramAuth";
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
@@ -55,8 +56,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setIsAuthenticated(true);
     } catch (error) {
       console.info('Ошибка аутентификации. Пользователь не зарегистрирован или не вошел в аккаунт', error);
-      setUser(null);
-      setIsAuthenticated(false);
+
+      // В dev-режиме пробуем выполнить мок-авторизацию Telegram
+      if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_MOCK_AUTH === 'true') {
+        try {
+          const authUser = await mockTelegramAuth();
+          setUser(authUser);
+          setIsAuthenticated(true);
+        } catch (mockError) {
+          console.info('Мок авторизация Telegram не выполнена', mockError);
+          setUser(null);
+          setIsAuthenticated(false);
+        }
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+      }
     } finally {
       setIsLoading(false);
     }
