@@ -9,11 +9,10 @@ import {ChildCategoryButton} from './ChildCategoryButton';
 interface ResultViewProps {
   searchValue: string;
   services: ServiceType[];
-  categories: CategoryEntity[];
   selectedCategoryIds: number[];
 }
 
-export default function ResultView({ searchValue, services, categories, selectedCategoryIds }: ResultViewProps) {
+export default function ResultView({ searchValue, services, selectedCategoryIds }: ResultViewProps) {
   const router = useRouter();
   const [selectedCategories, setSelectedCategories] = useState<number[]>(selectedCategoryIds);
 
@@ -44,12 +43,23 @@ export default function ResultView({ searchValue, services, categories, selected
     router.push(`/catalog/result${queryString ? `?${queryString}` : ''}`);
   };
 
+  // Достаем уникальные категории из сервисов
+  const uniqueCategories =
+      services.map(service => service.category)
+      .filter(Boolean)
+      .reduce((unique: any[], category: any) => {
+        if (!unique.find(c => c.id === category.id)) {
+          unique.push(category);
+        }
+        return unique;
+      }, []);
+
   return (
     <div className="w-full max-w-3xl mx-auto pt-4 px-4 bg-white">
       {/* Categories list */}
-      {categories.length > 0 && (
+      {uniqueCategories.length > 0 && (
         <div className="flex flex-wrap">
-          {categories.map((cat: CategoryEntity) => (
+          {uniqueCategories.map((cat: CategoryEntity) => (
             <ChildCategoryButton
               key={cat.id}
               category={cat}
