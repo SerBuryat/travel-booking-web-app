@@ -4,6 +4,7 @@ import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {ClientService} from "@/service/ClientService";
 import {ClientWithAuthType} from "@/model/ClientType";
+import {CreateRequestButton} from "./_components";
 
 export default async function RequestsPage() {
   const user = await getUser();
@@ -12,19 +13,19 @@ export default async function RequestsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-24 sm:pb-0">
-      <div className="max-w-4xl mx-auto pt-2 px-4">
-        <div className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
-          <h1 className="text-2xl font-bold text-gray-800 mb-6">Мои запросы</h1>
-          
-          <div className="text-center py-8">
-            <p className="text-gray-600">Здесь будут отображаться ваши запросы</p>
-            <p className="text-sm text-gray-500 mt-2">
-              Пользователь: {user.name} (ID: {user.id})
-            </p>
-          </div>
+    <div className="max-w-4xl mx-auto pt-2 px-4">
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">Мои запросы</h1>
+      
+      <div className="text-center py-8">
+        <p className="text-gray-600">Здесь будут отображаться ваши запросы</p>
+        <p className="text-sm text-gray-500 mt-2">
+          Пользователь: {user.name} (ID: {user.id})
+        </p>
+      </div>
 
-        </div>
+      {/* Sticky Create Request Button */}
+      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
+        <CreateRequestButton />
       </div>
     </div>
   );
