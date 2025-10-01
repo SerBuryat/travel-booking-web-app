@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TransportRequestData, transportRequestSchema } from '@/schemas/requests/create';
+import { createTransportRequest } from '@/lib/request/create/createTransportRequest';
 
 export interface RequestSubmissionResult {
   success: boolean;
@@ -20,14 +21,13 @@ export const useTransportRequest = () => {
     resolver: zodResolver(transportRequestSchema),
     mode: 'onChange', // Валидация в реальном времени
     defaultValues: {
-      from: '',
-      to: '',
-      departureDate: '',
-      departureTime: '',
-      transportType: '',
-      passengers: 1,
-      budget: '',
-      additionalNotes: ''
+      budget: 0,
+      comment: null,
+      tbids_transport_attrs: {
+        provision_time: undefined as unknown as Date,
+        adults_qty: 1,
+        kids_qty: null,
+      }
     }
   });
 
@@ -36,25 +36,11 @@ export const useTransportRequest = () => {
     setResult(null);
 
     try {
-      // TODO: Заменить на реальный API endpoint
-      const response = await fetch('/api/requests/transport', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || 'Ошибка при отправке заявки');
-      }
-
+      const responseData = await createTransportRequest(data);
       setResult({
         success: true,
         message: 'Заявка на транспорт успешно отправлена!',
-        requestId: responseData.requestId
+        requestId: responseData.id
       });
 
       // Сброс формы при успехе

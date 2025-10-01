@@ -12,68 +12,53 @@ export default function AccomodationRequestPage() {
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Проживание</h1>
       
       <form onSubmit={onSubmit} className="space-y-4">
-            <FormField
-              {...form.register('destination')}
-              name="destination"
-              label="Город назначения"
-              placeholder="Введите город"
-              required
-              error={errors.destination}
-            />
-            
-            <FormField
-              {...form.register('checkIn')}
-              name="checkIn"
-              label="Дата заезда"
-              type="date"
-              required
-              error={errors.checkIn}
-            />
-            
-            <FormField
-              {...form.register('checkOut')}
-              name="checkOut"
-              label="Дата выезда"
-              type="date"
-              required
-              error={errors.checkOut}
-            />
-            
-            <FormField
-              {...form.register('guests', { valueAsNumber: true })}
-              name="guests"
-              label="Количество гостей"
-              type="number"
-              placeholder="Введите количество гостей"
-              required
-              error={errors.guests}
-            />
-            
-            <FormField
-              {...form.register('accommodationType')}
-              name="accommodationType"
-              label="Тип размещения"
-              placeholder="Отель, апартаменты, хостел..."
-              error={errors.accommodationType}
-            />
-            
-            <FormField
-              {...form.register('budget')}
-              name="budget"
-              label="Бюджет"
-              placeholder="Введите ваш бюджет"
-              error={errors.budget}
-            />
-            
-            <FormField
-              {...form.register('additionalNotes')}
-              name="additionalNotes"
-              label="Дополнительные пожелания"
-              type="textarea"
-              placeholder="Расскажите о ваших предпочтениях..."
-              rows={4}
-              error={errors.additionalNotes}
-            />
+        {/* tarea_id и type заполняются на сервере */}
+        <FormField
+            {...form.register('tbids_accomodation_attrs.date_from')}
+            name="tbids_accomodation_attrs.date_from"
+            label="Дата заезда (date_from)"
+            type="date"
+            required
+            error={errors.tbids_accomodation_attrs?.date_from as any}
+        />
+        <FormField
+            {...form.register('tbids_accomodation_attrs.date_to')}
+            name="tbids_accomodation_attrs.date_to"
+            label="Дата выезда (date_to)"
+            type="date"
+            required
+            error={errors.tbids_accomodation_attrs?.date_to as any}
+        />
+        <FormField
+            {...form.register('tbids_accomodation_attrs.adults_qty', { valueAsNumber: true })}
+            name="tbids_accomodation_attrs.adults_qty"
+            label="Взрослые (adults_qty)"
+            type="number"
+            required
+            error={errors.tbids_accomodation_attrs?.adults_qty as any}
+        />
+        <FormField
+            {...form.register('tbids_accomodation_attrs.kids_qty', { valueAsNumber: true })}
+            name="tbids_accomodation_attrs.kids_qty"
+            label="Дети (kids_qty)"
+            type="number"
+            error={errors.tbids_accomodation_attrs?.kids_qty as any}
+        />
+        <FormField
+            {...form.register('comment')}
+            name="comment"
+            label="Комментарий"
+            type="textarea"
+            error={errors.comment}
+        />
+        <FormField
+            {...form.register('budget', { valueAsNumber: true })}
+            name="budget"
+            label="Бюджет"
+            type="number"
+            required
+            error={errors.budget}
+        />
       </form>
 
       {/* Submit Buttons */}

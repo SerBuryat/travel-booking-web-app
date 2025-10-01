@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AccomodationRequestData, accomodationRequestSchema } from '@/schemas/requests/create';
+import { createAccomodationRequest } from '@/lib/request/create/createAccomodationRequest';
 
 export interface RequestSubmissionResult {
   success: boolean;
@@ -20,13 +21,14 @@ export const useAccomodationRequest = () => {
     resolver: zodResolver(accomodationRequestSchema),
     mode: 'onChange', // Валидация в реальном времени
     defaultValues: {
-      destination: '',
-      checkIn: '',
-      checkOut: '',
-      guests: 1,
-      accommodationType: '',
-      budget: '',
-      additionalNotes: ''
+      budget: 0,
+      comment: null,
+      tbids_accomodation_attrs: {
+        date_from: undefined as unknown as Date,
+        date_to: undefined as unknown as Date,
+        adults_qty: 1,
+        kids_qty: null,
+      }
     }
   });
 
@@ -35,25 +37,11 @@ export const useAccomodationRequest = () => {
     setResult(null);
 
     try {
-      // TODO: Заменить на реальный API endpoint
-      const response = await fetch('/api/requests/accomodation', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || 'Ошибка при отправке заявки');
-      }
-
+      const responseData = await createAccomodationRequest(data);
       setResult({
         success: true,
         message: 'Заявка на проживание успешно отправлена!',
-        requestId: responseData.requestId
+        requestId: responseData.id
       });
 
       // Сброс формы при успехе

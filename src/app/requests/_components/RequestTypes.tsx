@@ -7,23 +7,27 @@ export interface RequestType {
   id: string;
   name: string;
   href: string;
+  sysname: 'accommodation' | 'transport' | 'entertainment';
 }
 
 export const REQUEST_TYPES: RequestType[] = [
   {
     id: 'accomodation',
     name: 'Проживание',
-    href: '/requests/create/accomodation'
+    href: '/requests/create/accomodation',
+    sysname: 'accommodation'
   },
   {
     id: 'transport',
     name: 'Транспорт',
-    href: '/requests/create/transport'
+    href: '/requests/create/transport',
+    sysname: 'transport'
   },
   {
     id: 'entertainment',
     name: 'Туры/активности',
-    href: '/requests/create/entertainment'
+    href: '/requests/create/entertainment',
+    sysname: 'entertainment'
   }
 ];
 

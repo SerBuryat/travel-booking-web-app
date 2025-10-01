@@ -5,7 +5,8 @@ import { FieldError } from 'react-hook-form';
 
 interface FormFieldProps {
   label: string;
-  type?: 'text' | 'email' | 'tel' | 'textarea' | 'number' | 'date';
+  type?: 'text' | 'email' | 'tel' | 'textarea' | 'number' | 'date' | 'datetime-local';
+
   placeholder?: string;
   required?: boolean;
   error?: FieldError;

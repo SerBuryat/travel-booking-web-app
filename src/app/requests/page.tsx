@@ -1,10 +1,11 @@
 import React from 'react';
+import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {ClientService} from "@/service/ClientService";
 import {ClientWithAuthType} from "@/model/ClientType";
-import {CreateRequestButton} from "./_components";
+// import {CreateRequestButton} from "./_components";
 
 export default async function RequestsPage() {
   const user = await getUser();
@@ -25,7 +26,21 @@ export default async function RequestsPage() {
 
       {/* Sticky Create Request Button */}
       <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
-        <CreateRequestButton />
+        <Link
+          href="/requests/create"
+          className="text-black"
+          style={{
+            backgroundColor: '#95E59D',
+            borderRadius: 30,
+            fontSize: 17,
+            fontWeight: 400,
+            padding: '8px 16px',
+            cursor: 'pointer',
+            opacity: 1
+          }}
+        >
+          Создать заявку
+        </Link>
       </div>
     </div>
   );

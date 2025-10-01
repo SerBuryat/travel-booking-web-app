@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import Link from 'next/link';
 
 interface CreateRequestButtonProps {
   href?: string;
@@ -10,8 +9,7 @@ interface CreateRequestButtonProps {
   disabled?: boolean;
 }
 
-export const CreateRequestButton: React.FC<CreateRequestButtonProps> = ({ 
-  href = '/requests/create',
+export const CreateRequestButton: React.FC<CreateRequestButtonProps> = ({
   onClick,
   children = 'Создать заявку',
   disabled = false
@@ -25,19 +23,6 @@ export const CreateRequestButton: React.FC<CreateRequestButtonProps> = ({
     cursor: disabled ? 'not-allowed' : 'pointer',
     opacity: disabled ? 0.6 : 1
   };
-
-  if (href && !disabled) {
-    return (
-      <Link href={href}>
-        <button
-          className="text-black"
-          style={buttonStyle}
-        >
-          {children}
-        </button>
-      </Link>
-    );
-  }
 
   return (
     <button

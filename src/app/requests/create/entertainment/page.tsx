@@ -12,75 +12,38 @@ export default function EntertainmentRequestPage() {
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Туры/активности</h1>
       
       <form onSubmit={onSubmit} className="space-y-4">
-            <FormField
-              {...form.register('location')}
-              name="location"
-              label="Город/регион"
-              placeholder="Где хотите провести активность"
-              required
-              error={errors.location}
-            />
-            
-            <FormField
-              {...form.register('activityDate')}
-              name="activityDate"
-              label="Дата проведения"
-              type="date"
-              required
-              error={errors.activityDate}
-            />
-            
-            <FormField
-              {...form.register('activityType')}
-              name="activityType"
-              label="Тип активности"
-              placeholder="Экскурсия, поход, экстремальный спорт..."
-              error={errors.activityType}
-            />
-            
-            <FormField
-              {...form.register('participants', { valueAsNumber: true })}
-              name="participants"
-              label="Количество участников"
-              type="number"
-              placeholder="Введите количество участников"
-              required
-              error={errors.participants}
-            />
-            
-            <FormField
-              {...form.register('difficultyLevel')}
-              name="difficultyLevel"
-              label="Уровень сложности"
-              placeholder="Начинающий, средний, продвинутый..."
-              error={errors.difficultyLevel}
-            />
-            
-            <FormField
-              {...form.register('duration')}
-              name="duration"
-              label="Продолжительность"
-              placeholder="Сколько часов/дней"
-              error={errors.duration}
-            />
-            
-            <FormField
-              {...form.register('budget')}
-              name="budget"
-              label="Бюджет"
-              placeholder="Введите ваш бюджет"
-              error={errors.budget}
-            />
-            
-            <FormField
-              {...form.register('additionalNotes')}
-              name="additionalNotes"
-              label="Особые пожелания"
-              type="textarea"
-              placeholder="Расскажите о ваших интересах и предпочтениях..."
-              rows={4}
-              error={errors.additionalNotes}
-            />
+        {/* tarea_id и type заполняются на сервере */}
+        <FormField
+            {...form.register('tbids_entertainment_attrs.provision_time')}
+            name="tbids_entertainment_attrs.provision_time"
+            label="Время предоставления (provision_time)"
+            type="datetime-local"
+            required
+            error={errors.tbids_entertainment_attrs?.provision_time as any}
+        />
+        <FormField
+            {...form.register('tbids_entertainment_attrs.adults_qty', { valueAsNumber: true })}
+            name="tbids_entertainment_attrs.adults_qty"
+            label="Взрослые (adults_qty)"
+            type="number"
+            required
+            error={errors.tbids_entertainment_attrs?.adults_qty as any}
+        />
+        <FormField
+            {...form.register('comment')}
+            name="comment"
+            label="Комментарий"
+            type="textarea"
+            error={errors.comment}
+        />
+        <FormField
+            {...form.register('budget', { valueAsNumber: true })}
+            name="budget"
+            label="Бюджет"
+            type="number"
+            required
+            error={errors.budget}
+        />
       </form>
 
       {/* Submit Buttons */}

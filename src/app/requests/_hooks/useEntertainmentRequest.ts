@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EntertainmentRequestData, entertainmentRequestSchema } from '@/schemas/requests/create';
+import { createEntertainmentRequest } from '@/lib/request/create/createEntertainmentRequest';
 
 export interface RequestSubmissionResult {
   success: boolean;
@@ -20,14 +21,12 @@ export const useEntertainmentRequest = () => {
     resolver: zodResolver(entertainmentRequestSchema),
     mode: 'onChange', // Валидация в реальном времени
     defaultValues: {
-      location: '',
-      activityDate: '',
-      activityType: '',
-      participants: 1,
-      difficultyLevel: '',
-      duration: '',
-      budget: '',
-      additionalNotes: ''
+      budget: 0,
+      comment: null,
+      tbids_entertainment_attrs: {
+        provision_time: undefined as unknown as Date,
+        adults_qty: 1,
+      }
     }
   });
 
@@ -36,25 +35,11 @@ export const useEntertainmentRequest = () => {
     setResult(null);
 
     try {
-      // TODO: Заменить на реальный API endpoint
-      const response = await fetch('/api/requests/entertainment', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || 'Ошибка при отправке заявки');
-      }
-
+      const responseData = await createEntertainmentRequest(data);
       setResult({
         success: true,
         message: 'Заявка на туры/активности успешно отправлена!',
-        requestId: responseData.requestId
+        requestId: responseData.id
       });
 
       // Сброс формы при успехе
