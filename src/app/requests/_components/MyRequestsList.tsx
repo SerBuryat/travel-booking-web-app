@@ -1,14 +1,14 @@
 "use client";
 
 import React from "react";
-import { MyRequestView } from "@/lib/view/types";
+import { RequestView } from "@/lib/request/view/types";
 
 type Props = {
-  items: MyRequestView[];
+  items: RequestView[];
 };
 
 export default function MyRequestsList({ items }: Props) {
-  const statusToColor: Record<MyRequestView["status"], string> = {
+  const statusToColor: Record<RequestView["status"], string> = {
     open: "bg-green-500",
     client_closed: "bg-orange-500",
     client_cancelled: "bg-gray-400",
@@ -24,7 +24,7 @@ export default function MyRequestsList({ items }: Props) {
             key={`${r.number}-${idx}`}
             type="button"
             className="w-full flex gap-2 items-center border-b border-gray-200 bg-white"
-            onClick={() => alert("Детальное отображение скоро...")}
+            onClick={() => window.location.href = `/requests/${r.id}`}
           >
             <div className={`h-auto w-1 self-stretch ${colorClass}`} />
             <div className="flex-1 px-4 py-3 text-left">

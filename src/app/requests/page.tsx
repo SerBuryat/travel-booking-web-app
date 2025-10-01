@@ -5,8 +5,8 @@ import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {ClientService} from "@/service/ClientService";
 import {ClientWithAuthType} from "@/model/ClientType";
-import { showMyRequests } from "@/lib/view/showMyRequests";
-import { MyRequestView } from "@/lib/view/types";
+import { clientRequests } from "@/lib/request/view/clientRequests";
+import { RequestView } from "@/lib/request/view/types";
 import MyRequestsList from "./_components/MyRequestsList";
 
 export default async function RequestsPage() {
@@ -14,7 +14,7 @@ export default async function RequestsPage() {
   if(!user) {
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
-  const requests: MyRequestView[] = await showMyRequests(user.id);
+  const requests: RequestView[] = await clientRequests(user.id);
 
   return (
     <div className="max-w-4xl mx-auto pt-2 px-4">
