@@ -29,7 +29,7 @@ export async function createAccomodationRequest(dto: AccomodationFormDto): Promi
       tclients_id: user.userId,
       // from dto (schema is 1:1 to columns)
       tarea_id: location.id,
-      type: 'standart',
+      type: 'standard',
       budget: dto.budget,
       status: 'open',
       comment: dto.comment ?? null,
