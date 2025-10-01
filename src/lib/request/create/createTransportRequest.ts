@@ -22,7 +22,7 @@ export async function createTransportRequest(dto: TransportFormDto): Promise<Cre
     data: {
       tclients_id: user.userId,
       tarea_id: location.id,
-      type: 'standart',
+      type: 'standard',
       budget: dto.budget,
       status: 'open',
       comment: dto.comment ?? null,
