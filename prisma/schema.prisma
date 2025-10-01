@@ -34,6 +34,10 @@ model talerts {
   tproviders_id Int
   created_at    DateTime   @default(now()) @db.Timestamp(6)
   is_read       Boolean    @default(false)
+  is_seen       Boolean?
+  tservices_id  Int?
+  variables     String?
+  tservices     tservices? @relation(fields: [tservices_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_talerts_tservices")
   tbids         tbids      @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   tproviders    tproviders @relation(fields: [tproviders_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 }
@@ -60,23 +64,31 @@ model tarea {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model tbids {
-  id          Int          @id @default(autoincrement())
-  tclients_id Int
-  tarea_id    Int
-  type        String       @db.VarChar(20)
-  start_date  DateTime     @db.Date
-  nights_from Int          @db.SmallInt
-  nights_to   Int?         @db.SmallInt
-  budget      Decimal      @db.Decimal(12, 2)
-  status      String       @db.VarChar(20)
-  comment     String?
-  created_at  DateTime     @default(now()) @db.Timestamp(6)
-  talerts     talerts[]
-  tarea       tarea        @relation(fields: [tarea_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  tclients    tclients     @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  tproposals  tproposals[]
+  id                        Int                         @id @default(autoincrement())
+  tclients_id               Int
+  tarea_id                  Int
+  type                      String                      @db.VarChar(20)
+  budget                    Decimal                     @db.Decimal(12, 2)
+  status                    String                      @db.VarChar(20)
+  comment                   String?
+  created_at                DateTime                    @default(now()) @db.Timestamp(6)
+  is_flexible               Boolean?                    @default(false)
+  number                    String?                     @db.VarChar(15)
+  tcategories_id            Int?
+  talerts                   talerts[]
+  tarea                     tarea                       @relation(fields: [tarea_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tcategories               tcategories?                @relation(fields: [tcategories_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  tclients                  tclients                    @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tbids_accomodation_attrs  tbids_accomodation_attrs[]
+  tbids_entertainment_attrs tbids_entertainment_attrs[]
+  tbids_food_attrs          tbids_food_attrs[]
+  tbids_health_attrs        tbids_health_attrs[]
+  tbids_package_attrs       tbids_package_attrs[]
+  tbids_transport_attrs     tbids_transport_attrs[]
+  tproposals                tproposals[]
 
   @@index([tarea_id], map: "idx_tbids_area")
+  @@index([tcategories_id], map: "idx_tbids_category")
 }
 
 model tcategories {
@@ -87,23 +99,12 @@ model tcategories {
   photo             String?               @db.VarChar(255)
   parent_id         Int?
   path              Unsupported("ltree")?
+  tbids             tbids[]
   tcategories       tcategories?          @relation("tcategoriesTotcategories", fields: [parent_id], references: [id], onUpdate: NoAction)
   other_tcategories tcategories[]         @relation("tcategoriesTotcategories")
   tservices         tservices[]
-  tcategories_options tcategories_options[]
 
   @@index([path], map: "idx_categories_path", type: Gist)
-}
-
-/// Options for service categories (e.g., "WiFi", "Parking" for "Hotel" category)
-model tcategories_options {
-  id          Int         @id @default(autoincrement())
-  category_id Int
-  name        String      @db.VarChar(255)
-  description String?
-  tcategories tcategories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([category_id], map: "idx_tcategories_options_category")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -121,22 +122,22 @@ model tclients {
   tclients_settings tclients_settings[]
   tproviders        tproviders[]
   treviews          treviews[]
-  tservices_clicks tservices_clicks[]
+  tservices_clicks  tservices_clicks[]
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model tclients_auth {
-  id             Int       @id @default(autoincrement())
-  tclients_id    Int
-  auth_type      String?   @db.VarChar(20)
-  auth_id        String?   @db.VarChar(255)
-  last_login     DateTime? @db.Timestamp(6)
-  auth_context   Json?
-  refresh_token  String?   @db.VarChar(1000)
+  id               Int       @id @default(autoincrement())
+  tclients_id      Int
+  auth_type        String?   @db.VarChar(20)
+  auth_id          String?   @db.VarChar(255)
+  last_login       DateTime? @db.Timestamp(6)
+  auth_context     Json?
+  refresh_token    String?   @db.VarChar(1000)
   token_expires_at DateTime? @db.Timestamp(6)
-  is_active      Boolean   @default(true)
-  role           String    @default("user") @db.VarChar(20)
-  tclients       tclients  @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  is_active        Boolean   @default(true)
+  role             String    @default("user") @db.VarChar(20)
+  tclients         tclients  @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([auth_type, auth_id])
 }
@@ -169,7 +170,6 @@ model tservices_clicks {
   tclients_id  Int
   tservices_id Int
   timestamp    DateTime  @default(now()) @db.Timestamp(6)
-
   tclients     tclients  @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   tservices    tservices @relation(fields: [tservices_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -196,12 +196,15 @@ model tlocations {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model tnotifications {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  user_role  String   @db.VarChar(10)
-  message    String
-  is_read    Boolean  @default(false)
-  created_at DateTime @default(now()) @db.Timestamp(6)
+  id           Int       @id @default(autoincrement())
+  user_id      Int
+  user_role    String    @db.VarChar(10)
+  message      String
+  is_read      Boolean   @default(false)
+  created_at   DateTime  @default(now()) @db.Timestamp(6)
+  is_sent      Boolean?
+  ttemplate_id BigInt
+  ttemplate    ttemplate @relation(fields: [ttemplate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tnotifications_ttemplate")
 
   @@index([user_id, user_role], map: "idx_notifications_user")
 }
@@ -274,30 +277,106 @@ model treviews {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model tservices {
-  id             Int          @id @default(autoincrement())
-  name           String       @db.VarChar(255)
-  description    String?
-  tcategories_id Int
-  price          Decimal      @db.Decimal(12, 2)
-  provider_id    Int
-  active         Boolean      @default(true)
-  status         String       @default("draft") @db.VarChar(20)
-  created_at     DateTime     @default(now()) @db.Timestamp(6)
-  priority       Int          @default(0) @db.SmallInt
-  rating         Decimal?     @default(0.0) @db.Decimal(3, 2)
-  rating_count   Int?         @default(0)
-  view_count     Int?         @default(0)
-  service_options Json?        // Массив опций сервиса
-  tcontacts      tcontacts[]
-  tlocations     tlocations[]
-  tpayments      tpayments[]
-  tphotos        tphotos[]
-  tproposals     tproposals[]
-  treviews       treviews[]
-  tproviders     tproviders   @relation(fields: [provider_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  tcategories    tcategories  @relation(fields: [tcategories_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  description      String?
+  tcategories_id   Int
+  price            Decimal            @db.Decimal(12, 2)
+  provider_id      Int
+  active           Boolean            @default(true)
+  status           String             @default("draft") @db.VarChar(20)
+  created_at       DateTime           @default(now()) @db.Timestamp(6)
+  priority         Int                @default(0) @db.SmallInt
+  rating           Decimal?           @default(0.0) @db.Decimal(3, 2)
+  rating_count     Int?               @default(0)
+  view_count       Int?               @default(0)
+  service_options  Json?
+  talerts          talerts[]
+  tcontacts        tcontacts[]
+  tlocations       tlocations[]
+  tpayments        tpayments[]
+  tphotos          tphotos[]
+  tproposals       tproposals[]
+  treviews         treviews[]
+  tproviders       tproviders         @relation(fields: [provider_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tcategories      tcategories        @relation(fields: [tcategories_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  tservices_clicks tservices_clicks[]
 
   @@index([tcategories_id], map: "idx_tservices_category")
   @@index([price], map: "idx_tservices_price")
-  tservices_clicks tservices_clicks[]
+}
+
+model tbids_accomodation_attrs {
+  id         Int       @id @default(autoincrement())
+  tbids_id   Int
+  date_from  DateTime? @db.Date
+  date_to    DateTime? @db.Date
+  adults_qty Int?      @db.SmallInt
+  kids_qty   Int?      @db.SmallInt
+  tbids      tbids     @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([tbids_id], map: "idx_tbids_accomodation_attrs_bid")
+}
+
+model tbids_entertainment_attrs {
+  id             Int       @id @default(autoincrement())
+  tbids_id       Int
+  provision_time DateTime? @db.Timestamp(6)
+  adults_qty     Int?      @db.SmallInt
+  tbids          tbids     @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([tbids_id], map: "idx_tbids_entertainment_attrs_bid")
+}
+
+model tbids_food_attrs {
+  id             Int       @id @default(autoincrement())
+  tbids_id       Int
+  provision_time DateTime? @db.Timestamp(6)
+  adults_qty     Int?      @db.SmallInt
+  kids_qty       Int?      @db.SmallInt
+  tbids          tbids     @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([tbids_id], map: "idx_tbids_food_attrs_bid")
+}
+
+model tbids_health_attrs {
+  id             Int       @id @default(autoincrement())
+  tbids_id       Int
+  provision_time DateTime? @db.Timestamp(6)
+  adults_qty     Int?      @db.SmallInt
+  tbids          tbids     @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([tbids_id], map: "idx_tbids_health_attrs_bid")
+}
+
+model tbids_package_attrs {
+  id             Int       @id @default(autoincrement())
+  tbids_id       Int
+  provision_time DateTime? @db.Timestamp(6)
+  adults_qty     Int?      @db.SmallInt
+  kids_qty       Int?      @db.SmallInt
+  start_date     DateTime? @db.Date
+  nights_from    Int?      @db.SmallInt
+  nights_to      Int?      @db.SmallInt
+  tbids          tbids     @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([tbids_id], map: "idx_tbids_package_attrs_bid")
+}
+
+model tbids_transport_attrs {
+  id             Int       @id @default(autoincrement())
+  tbids_id       Int
+  provision_time DateTime? @db.Timestamp(6)
+  adults_qty     Int?      @db.SmallInt
+  kids_qty       Int?      @db.SmallInt
+  tbids          tbids     @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([tbids_id], map: "idx_tbids_transport_attrs_bid")
+}
+
+model ttemplate {
+  id             BigInt           @id @default(autoincrement())
+  text           String
+  action_name    String           @db.VarChar(255)
+  tnotifications tnotifications[]
 }
