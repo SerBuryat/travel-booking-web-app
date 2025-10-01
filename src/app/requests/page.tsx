@@ -5,24 +5,30 @@ import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {ClientService} from "@/service/ClientService";
 import {ClientWithAuthType} from "@/model/ClientType";
-// import {CreateRequestButton} from "./_components";
+import { showMyRequests } from "@/lib/view/showMyRequests";
+import { MyRequestView } from "@/lib/view/types";
+import MyRequestsList from "./_components/MyRequestsList";
 
 export default async function RequestsPage() {
   const user = await getUser();
   if(!user) {
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
+  const requests: MyRequestView[] = await showMyRequests(user.id);
 
   return (
     <div className="max-w-4xl mx-auto pt-2 px-4">
       <h1 className="text-2xl font-bold text-gray-800 mb-6">Мои запросы</h1>
-      
-      <div className="text-center py-8">
-        <p className="text-gray-600">Здесь будут отображаться ваши запросы</p>
-        <p className="text-sm text-gray-500 mt-2">
-          Пользователь: {user.name} (ID: {user.id})
-        </p>
-      </div>
+      {requests.length === 0 ? (
+        <div className="text-center py-8">
+          <p className="text-gray-600">У вас нет созданных заявок</p>
+          <p className="text-sm text-gray-500 mt-2">
+            Пользователь: {user.name} (ID: {user.id})
+          </p>
+        </div>
+      ) : (
+        <MyRequestsList items={requests} />
+      )}
 
       {/* Sticky Create Request Button */}
       <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
