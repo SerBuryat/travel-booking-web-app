@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AccomodationRequestData, accomodationRequestSchema } from '@/schemas/requests/create';
-import { createAccomodationRequest } from '@/lib/request/create/createAccomodationRequest';
+import {createAccommodationRequest} from "@/lib/request/create/createRequest";
 
 export interface RequestSubmissionResult {
   success: boolean;
@@ -37,7 +37,7 @@ export const useAccomodationRequest = () => {
     setResult(null);
 
     try {
-      const responseData = await createAccomodationRequest(data);
+      const responseData = await createAccommodationRequest(data);
       setResult({
         success: true,
         message: 'Заявка на проживание успешно отправлена!',
