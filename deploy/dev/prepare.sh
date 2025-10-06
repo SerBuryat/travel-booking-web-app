@@ -36,9 +36,9 @@ if [ -z "$CLOUD_RU_KEY_ID" ] || [ -z "$CLOUD_RU_KEY_SECRET" ]; then
 fi
 
 # Опционально: адрес реестра Cloud.ru
-if [ -z "$CLOUD_RU_REGISTRY" ]; then
-    echo "⚠️  Предупреждение: CLOUD_RU_REGISTRY не задан. По умолчанию будет использован docker.io (это может быть неверно)"
-    CLOUD_RU_REGISTRY="https://registry-1.docker.io/v2/"
+if [ -z "ARTIFACT_REGISTRY_URI" ]; then
+    echo "⚠️  Предупреждение: ARTIFACT_REGISTRY_URI не задан. По умолчанию будет использован docker.io (это может быть неверно)"
+    ARTIFACT_REGISTRY_URI="https://registry-1.docker.io/v2/"
 fi
 
 # Режим отладки: покажем, что именно подставляем (без утечек секрета)
@@ -48,7 +48,7 @@ if [ "${DEBUG:-0}" = "1" ]; then
     echo "🔎 DEBUG: CLOUD_RU_KEY_ID=[$CLOUD_RU_KEY_ID]"
     echo "🔎 DEBUG: CLOUD_RU_KEY_SECRET_LEN=[$secret_len]"
     echo "🔎 DEBUG: CLOUD_RU_KEY_SECRET_MASKED=[$secret_masked]"
-    echo "🔎 DEBUG: CLOUD_RU_REGISTRY=[$CLOUD_RU_REGISTRY]"
+    echo "🔎 DEBUG: ARTIFACT_REGISTRY_URI=[$ARTIFACT_REGISTRY_URI]"
 fi
 
 echo "📦 Устанавливаем Docker..."
@@ -56,33 +56,33 @@ echo "📦 Устанавливаем Docker..."
 # Устанавливаем Docker, если не установлен
 if ! command -v docker &> /dev/null; then
     echo "Docker не найден, устанавливаем..."
-    
+
     # Обновляем пакеты
     sudo apt-get update
-    
+
     # Устанавливаем зависимости
     sudo apt-get install -y \
         ca-certificates \
         curl \
         gnupg \
         lsb-release
-    
+
     # Добавляем официальный GPG ключ Docker
     sudo mkdir -p /etc/apt/keyrings
     curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-    
+
     # Настраиваем репозиторий
     echo \
         "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    
+
     # Устанавливаем Docker
     sudo apt-get update
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    
+
     # Добавляем текущего пользователя в группу docker
     sudo usermod -aG docker $USER
-    
+
     echo "✅ Docker установлен успешно"
     echo "⚠️  ВНИМАНИЕ: Для применения изменений группы перелогиньтесь или выполните 'newgrp docker'"
 else
@@ -94,13 +94,13 @@ echo "📦 Устанавливаем Docker Compose..."
 # Устанавливаем Docker Compose, если не установлен
 if ! command -v docker-compose &> /dev/null; then
     echo "Docker Compose не найден, устанавливаем..."
-    
+
     # Скачиваем последнюю версию Docker Compose
     sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    
+
     # Делаем исполняемым
     sudo chmod +x /usr/local/bin/docker-compose
-    
+
     echo "✅ Docker Compose установлен успешно"
 else
     echo "✅ Docker Compose уже установлен"
@@ -110,7 +110,7 @@ echo "🔐 Настраиваем авторизацию в Cloud.ru Registry...
 
 # Логинимся в Cloud.ru Artifact Registry
 echo "Авторизуемся в Cloud.ru Registry..."
-echo "$CLOUD_RU_KEY_SECRET" | docker login "$CLOUD_RU_REGISTRY" -u "$CLOUD_RU_KEY_ID" --password-stdin
+echo "$CLOUD_RU_KEY_SECRET" | docker login "$ARTIFACT_REGISTRY_URI" -u "$CLOUD_RU_KEY_ID" --password-stdin
 
 if [ $? -eq 0 ]; then
     echo "✅ Успешная авторизация в Cloud.ru Registry"

@@ -25,6 +25,8 @@ services:
       # Prisma Logging Configuration
       - PRISMA_LOG_LEVELS=${PRISMA_LOG_LEVELS}
       # Cloud.ru artifact registry
+      - ARTIFACT_REGISTRY_URI=${ARTIFACT_REGISTRY_URI}
+      - ARTIFACT_REGISTRY_NAME=${ARTIFACT_REGISTRY_NAME}
       - CLOUD_RU_KEY_ID=${CLOUD_RU_KEY_ID}
       - CLOUD_RU_KEY_SECRET=${CLOUD_RU_KEY_SECRET}
     env_file:
