@@ -1,15 +1,34 @@
-name: tg-bot-notifier-server docker image build and push
+name: PROD travel-booking-web-app docker image build, push and deploy
 
 on:
   push:
     branches:
       - master
-env:
-  CLOUD_RU_ARTIFACT_REGISTRY_URI: travel-booking-web-app.cr.cloud.ru
 
 jobs:
-  build-and-push-docker-image:
+  build-nextjs-app:
     runs-on: ubuntu-latest
+    environment: master
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build Next.js application
+        run: npm run build
+
+  build-and-push-docker-image:
+    needs: build-nextjs-app
+    runs-on: ubuntu-latest
+    environment: master
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -20,7 +39,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: ${{ env.CLOUD_RU_ARTIFACT_REGISTRY_URI }}
+          registry: ${{ secrets.ARTIFACT_REGISTRY_URI }}
           username: ${{ secrets.CLOUD_RU_KEY_ID }}
           password: ${{ secrets.CLOUD_RU_KEY_SECRET }}
 
@@ -29,8 +48,13 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ env.CLOUD_RU_ARTIFACT_REGISTRY_URI }}/travel-booking-web-app:latest
+          tags: ${{ secrets.ARTIFACT_REGISTRY_URI }}/${{ secrets.ARTIFACT_REGISTRY_NAME }}:latest
 
+  deploy-to-vps:
+    runs-on: ubuntu-latest
+    needs: [build-nextjs-app, build-and-push-docker-image]
+    environment: master
+    steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -39,10 +63,10 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
           script: |
-            cd /home/admin/travel-app/deploy
+            cd ${{ vars.DEPLOY_DIRECTORY_PATH }}
             
             # Запускаем prepare.sh (если нужно)
-            if [ ! -f ".env" ] || [ ! -f "docker-compose-prod.yml" ]; then
+            if [ ! -f ".env" ] || [ ! -f "${{ vars.DOCKER_COMPOSE_FILE_NAME }}" ]; then
               echo "⚠️  prepare.sh не выполнен или файлы не найдены"
               echo "Запускаем prepare.sh..."
               chmod +x prepare.sh
