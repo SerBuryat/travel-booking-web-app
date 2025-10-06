@@ -48,7 +48,7 @@ rollback() {
     docker-compose -f docker-compose-prod.yml down || true
     
     # Запускаем предыдущую версию (если есть)
-    if docker images | grep -q "travel-booking-web-app"; then
+    if docker images | grep -q "baikal-travel-app"; then
         echo "Запускаем предыдущую версию образа..."
         docker-compose -f docker-compose-prod.yml up -d
     else

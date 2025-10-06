@@ -2,13 +2,14 @@ version: '3.8'
 
 services:
   app:
-    image: travel-booking-web-app-dev:latest
-    container_name: travel-booking-web-app-dev
+    image: baikal-travel-app.cr.cloud.ru/baikal-travel-app
+    container_name: travel-booking-web-app
+    network_mode: "host"
     environment:
-      # Database Configuration (через SSH tunnel)
+      # Database Configuration (подключение к PostgreSQL на хосте)
       - DATABASE_URL=${DATABASE_URL}
       - DB_HOST=localhost
-      - DB_PORT=5432
+      - DB_PORT=${DB_PORT}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=${DB_NAME}
@@ -23,8 +24,11 @@ services:
       - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
       # Prisma Logging Configuration
       - PRISMA_LOG_LEVELS=${PRISMA_LOG_LEVELS}
-    ports:
-      - "3000:3000"
+      # Cloud.ru artifact registry
+      - ARTIFACT_REGISTRY_URI=${ARTIFACT_REGISTRY_URI}
+      - ARTIFACT_REGISTRY_NAME=${ARTIFACT_REGISTRY_NAME}
+      - CLOUD_RU_KEY_ID=${CLOUD_RU_KEY_ID}
+      - CLOUD_RU_KEY_SECRET=${CLOUD_RU_KEY_SECRET}
     env_file:
       - .env
     restart: unless-stopped
