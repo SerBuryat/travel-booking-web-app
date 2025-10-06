@@ -1,14 +1,14 @@
-name: travel-booking-web-app docker image build, push and deploy
+name: DEV travel-booking-web-app docker image build, push and deploy
 
 on:
   push:
     branches:
-      - master
       - dev
 
 jobs:
   build-nextjs-app:
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -28,6 +28,7 @@ jobs:
   build-and-push-docker-image:
     needs: build-nextjs-app
     runs-on: ubuntu-latest
+    environment: dev
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -52,6 +53,7 @@ jobs:
   deploy-to-vps:
     runs-on: ubuntu-latest
     needs: [build-nextjs-app, build-and-push-docker-image]
+    environment: dev
     steps:
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.3
