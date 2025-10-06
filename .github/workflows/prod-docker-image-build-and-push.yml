@@ -39,7 +39,7 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
         with:
-          registry: ${{ vars.ARTIFACT_REGISTRY_URI }}
+          registry: ${{ secrets.ARTIFACT_REGISTRY_URI }}
           username: ${{ secrets.CLOUD_RU_KEY_ID }}
           password: ${{ secrets.CLOUD_RU_KEY_SECRET }}
 
@@ -48,7 +48,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ vars.ARTIFACT_REGISTRY_URI }}/${{ vars.ARTIFACT_NAME }}:latest
+          tags: ${{ secrets.ARTIFACT_REGISTRY_URI }}/${{ secrets.ARTIFACT_REGISTRY_NAME }}:latest
 
   deploy-to-vps:
     runs-on: ubuntu-latest
