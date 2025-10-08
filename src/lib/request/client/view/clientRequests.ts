@@ -2,7 +2,7 @@
 
 import { prisma } from "@/lib/db/prisma";
 import { formatDateToDDMMYYHHmm } from "@/utils/date";
-import { RequestView } from "@/lib/request/view/types";
+import { RequestView } from "@/lib/request/client/view/types";
 
 /**
  * Returns bids of a client, newest first, with area/category names.

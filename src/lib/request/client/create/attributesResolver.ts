@@ -1,3 +1,5 @@
+import {RequestType} from "@/lib/request/requestType";
+
 type AttributesInclude = {
   tbids_accomodation_attrs?: boolean;
   tbids_transport_attrs?: boolean;
@@ -6,12 +8,12 @@ type AttributesInclude = {
 
 type AttributesMappingFunction<T> = (data: any) => T;
 
-export function resolveAttributesInclude(sysname: string): {
+export function resolveAttributesInclude(requestType: RequestType): {
   include: AttributesInclude;
   mapAttributes: AttributesMappingFunction<any>;
 } {
-  switch (sysname) {
-    case 'accomodation':
+  switch (requestType) {
+    case RequestType.ACCOMMODATION:
       return {
         include: { tbids_accomodation_attrs: true },
         mapAttributes: (attrs: any) => ({
@@ -21,7 +23,7 @@ export function resolveAttributesInclude(sysname: string): {
           kidsQty: attrs.kids_qty ?? undefined,
         }),
       };
-    case 'transport':
+    case RequestType.TRANSPORT:
       return {
         include: { tbids_transport_attrs: true },
         mapAttributes: (attrs: any) => ({
@@ -30,7 +32,7 @@ export function resolveAttributesInclude(sysname: string): {
           kidsQty: attrs.kids_qty ?? undefined,
         }),
       };
-    case 'entertainment':
+    case RequestType.ENTERTAINMENT:
       return {
         include: { tbids_entertainment_attrs: true },
         mapAttributes: (attrs: any) => ({

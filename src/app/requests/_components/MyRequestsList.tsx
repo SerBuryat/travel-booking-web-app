@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { RequestView } from "@/lib/request/view/types";
+import { RequestView } from "@/lib/request/client/view/types";
 
 type Props = {
   items: RequestView[];

@@ -5,8 +5,8 @@ import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {ClientService} from "@/service/ClientService";
 import {ClientWithAuthType} from "@/model/ClientType";
-import { clientRequests } from "@/lib/request/view/clientRequests";
-import { RequestView } from "@/lib/request/view/types";
+import { clientRequests } from "@/lib/request/client/view/clientRequests";
+import { RequestView } from "@/lib/request/client/view/types";
 import MyRequestsList from "./_components/MyRequestsList";
 
 export default async function RequestsPage() {

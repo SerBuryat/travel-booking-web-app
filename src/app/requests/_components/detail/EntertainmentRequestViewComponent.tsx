@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { EntertainmentRequestView } from "@/lib/request/view/types";
+import { EntertainmentRequestView } from "@/lib/request/client/view/types";
 
 type Props = {
   data: EntertainmentRequestView;

@@ -20,6 +20,7 @@ interface AuthContextType {
   checkAuth: () => Promise<void>;
   loginViaTelegram: (telegramUserInitData: TelegramUserInitData) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
 // Создание контекста
@@ -104,13 +105,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
   
+  // Функция обновления данных пользователя (для переключения ролей)
+  const refreshUser = async () => {
+    if (!isAuthenticated) return;
+    
+    setIsLoading(true);
+    try {
+      const user = await ApiService.getUserAuth();
+      setUser(user);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Ошибка обновления пользователя:', error);
+      // При ошибке не сбрасываем состояние, так как пользователь все еще аутентифицирован
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   // Проверка токена при загрузке
   useEffect(() => {
     checkAuth();
   }, []);
   
   const value: AuthContextType = {
-    isAuthenticated, user, isLoading, checkAuth, loginViaTelegram, logout,
+    isAuthenticated, user, isLoading, checkAuth, loginViaTelegram, logout, refreshUser,
   };
   
   return (

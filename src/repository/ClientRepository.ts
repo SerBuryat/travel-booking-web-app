@@ -120,6 +120,7 @@ export class ClientRepository {
           is_active: false,
           refresh_token: null,
           token_expires_at: null,
+          role: 'user'
         },
       });
       return true;
