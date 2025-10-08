@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { AccomodationRequestView } from "@/lib/request/view/types";
+import { AccomodationRequestView } from "@/lib/request/client/view/types";
 
 type Props = {
   data: AccomodationRequestView;

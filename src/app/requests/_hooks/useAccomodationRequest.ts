@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AccomodationRequestData, accomodationRequestSchema } from '@/schemas/requests/create';
-import {createAccommodationRequest} from "@/lib/request/create/createRequest";
+import {createAccommodationRequest} from "@/lib/request/client/create/createRequest";
 
 export interface RequestSubmissionResult {
   success: boolean;

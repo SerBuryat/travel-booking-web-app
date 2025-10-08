@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EntertainmentRequestData, entertainmentRequestSchema } from '@/schemas/requests/create';
-import {createEntertainmentRequest} from "@/lib/request/create/createRequest";
+import {createEntertainmentRequest} from "@/lib/request/client/create/createRequest";
 
 export interface RequestSubmissionResult {
   success: boolean;

@@ -1,11 +1,12 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
-import { requestById } from '@/lib/request/view/requestById';
-import { AnyRequestView } from '@/lib/request/view/types';
+import { requestById } from '@/lib/request/client/view/requestById';
+import { AnyRequestView } from '@/lib/request/client/view/types';
 import AccomodationRequestViewComponent from '../_components/detail/AccomodationRequestViewComponent';
 import TransportRequestViewComponent from '../_components/detail/TransportRequestViewComponent';
 import EntertainmentRequestViewComponent from '../_components/detail/EntertainmentRequestViewComponent';
+import {RequestType} from "@/lib/request/requestType";
 
 type Props = {
   params: { requestId: string };
@@ -31,11 +32,11 @@ export default async function RequestDetailPage({ params }: Props) {
 
   const renderRequestComponent = (request: AnyRequestView) => {
     switch (request.requestType) {
-      case 'accomodation':
+      case RequestType.ACCOMMODATION:
         return <AccomodationRequestViewComponent data={request as any} />;
-      case 'transport':
+      case RequestType.TRANSPORT:
         return <TransportRequestViewComponent data={request as any} />;
-      case 'entertainment':
+      case RequestType.ENTERTAINMENT:
         return <EntertainmentRequestViewComponent data={request as any} />;
       default:
         return <DefaultRequestViewComponent data={request} />;

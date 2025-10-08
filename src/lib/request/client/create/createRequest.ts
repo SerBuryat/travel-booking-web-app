@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { getUserAuthOrThrow } from '@/lib/auth/userAuth';
 import { currentLocation } from '@/lib/location/currentLocation';
-import { createAlert } from '@/lib/request/alert/createAlert';
+import { createAlert } from '@/lib/request/provider/alert/createAlert';
 import { 
   CreateRequestResult, 
   AccomodationFormDto, 

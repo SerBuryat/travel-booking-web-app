@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TransportRequestData, transportRequestSchema } from '@/schemas/requests/create';
-import {createTransportRequest} from "@/lib/request/create/createRequest";
+import {createTransportRequest} from "@/lib/request/client/create/createRequest";
 
 export interface RequestSubmissionResult {
   success: boolean;
