@@ -83,7 +83,7 @@ const ExistingProviderModal: React.FC<{
 
 export const ServiceRegistrationBanner: React.FC = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [isChecking, setIsChecking] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [providerProfile, setProviderProfile] = useState<ProviderProfile | null>(null);
@@ -132,7 +132,8 @@ export const ServiceRegistrationBanner: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Роль успешно изменена, переходим в бизнес-аккаунт
+        // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт
+        await refreshUser();
         setShowModal(false);
         router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {

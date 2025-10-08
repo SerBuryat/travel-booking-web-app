@@ -4,9 +4,11 @@ import React, {useState} from 'react';
 import {useRouter} from 'next/navigation';
 import BaseMenuItem from './BaseMenuItem';
 import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/provider/switchToProvider";
+import {useAuth} from "@/contexts/AuthContext";
 
 export default function BusinessMenuItem() {
   const router = useRouter();
+  const { refreshUser } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [apiResponse, setApiResponse] = useState<ProviderSwitchResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,6 +26,12 @@ export default function BusinessMenuItem() {
     try {
       const data = await switchToProvider();
       setApiResponse(data);
+      
+      // Если переключение успешно, обновляем контекст
+      if (data?.success) {
+        await refreshUser();
+      }
+      
       setIsModalOpen(true);
     } catch (error) {
       console.error('Error switching to provider:', error);
