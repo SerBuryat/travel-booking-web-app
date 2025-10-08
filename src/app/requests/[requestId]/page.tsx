@@ -17,7 +17,7 @@ export default async function RequestDetailPage({ params }: Props) {
   
   const request = await withUserAuth(async ({ userAuth }) => {
     try {
-      return await requestById(Number(requestId), userAuth.userId);
+      return await requestById(Number(requestId), userAuth);
     } catch (error) {
       if (error instanceof Error && error.message === 'NOT_FOUND') {
         return null;

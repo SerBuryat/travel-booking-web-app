@@ -5,8 +5,9 @@ import {formatDateToDDMMYYHHmm} from "@/utils/date";
 import {AnyRequestView} from "./types";
 import {resolveAttributesInclude} from "../create/attributesResolver";
 import {RequestType} from "@/lib/request/requestType";
+import {UserAuth} from "@/lib/auth/userAuth";
 
-export async function requestById(id: number, currentUserId: number): Promise<AnyRequestView> {
+export async function requestById(id: number, user: UserAuth): Promise<AnyRequestView> {
   // First, get the basic bid info with category to determine request type
   const bid = await prisma.tbids.findFirst({
     where: { id },
@@ -20,8 +21,7 @@ export async function requestById(id: number, currentUserId: number): Promise<An
     throw new Error('NOT_FOUND');
   }
 
-  // Check ownership
-  if (bid.tclients_id !== currentUserId) {
+  if (user.role !== 'provider' && bid.tclients_id !== user.userId) {
     throw new Error('NOT_FOUND');
   }
 
