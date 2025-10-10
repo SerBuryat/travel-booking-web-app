@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { AnyRequestView } from '@/lib/request/client/view/types';
 import { RequestType } from '@/lib/request/requestType';
 import { ClientAccommodationRequestViewComponent } from './ClientAccommodationRequestViewComponent';
@@ -22,6 +23,7 @@ interface ClientRequestsListProps {
  */
 export function ClientRequestsList({ requests }: ClientRequestsListProps) {
   const [expandedRequests, setExpandedRequests] = useState<Set<number>>(new Set());
+  const router = useRouter();
 
   const toggleRequest = (requestId: number) => {
     setExpandedRequests(prev => {
@@ -33,6 +35,10 @@ export function ClientRequestsList({ requests }: ClientRequestsListProps) {
       }
       return newSet;
     });
+  };
+
+  const handleProposalClick = (requestId: number) => {
+    router.push(`/provider/requests/${requestId}/proposal`);
   };
 
   if (requests.length === 0) {
@@ -109,6 +115,16 @@ export function ClientRequestsList({ requests }: ClientRequestsListProps) {
               <div className="px-3 pb-3 border-t border-gray-100">
                 <div className="pt-2">
                   {renderRequestComponent(request)}
+                </div>
+                
+                {/* Кнопка отклика */}
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <button
+                    onClick={() => handleProposalClick(request.id)}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                  >
+                    Откликнуться
+                  </button>
                 </div>
               </div>
             )}
