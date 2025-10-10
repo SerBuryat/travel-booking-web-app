@@ -247,6 +247,34 @@ function buildWhereForCategories(
 }
 
 /**
+ * Получение сервисов по массиву ID.
+ * Используется для отображения выбранных сервисов провайдера.
+ *
+ * @param {number[]} serviceIds Массив идентификаторов сервисов
+ * @returns {Promise<ServiceType[]>} Массив сервисов с полем category
+ */
+export async function getServicesByIds(serviceIds: number[]): Promise<ServiceType[]> {
+  if (!Array.isArray(serviceIds) || serviceIds.length === 0) {
+    return [];
+  }
+
+  const services = await prisma.tservices.findMany({
+    where: {
+      id: { in: serviceIds },
+      active: true
+    },
+    include: { tcategories: true },
+    orderBy: { priority: 'desc' }
+  });
+
+  if (services.length === 0) {
+    return [];
+  }
+
+  return services.map(mapToSearchableService);
+}
+
+/**
  * Преобразует результат Prisma (с полем tcategories) в ожидаемую форму
  * с полем category и без поля tcategories.
  *

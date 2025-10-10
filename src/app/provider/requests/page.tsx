@@ -30,7 +30,7 @@ export default async function ProviderRequestsPage() {
   const requests = await getClientRequestsForProvider();
 
   return (
-    <div className="container mx-auto px-3 py-3">
+    <div className="container mx-auto px-3 py-3 bg-white">
       <div className="mb-4">
         <h1 className="text-xl font-bold text-gray-900">
           Заявки от туристов

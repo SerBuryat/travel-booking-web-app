@@ -34,9 +34,9 @@ model talerts {
   tproviders_id Int
   created_at    DateTime   @default(now()) @db.Timestamp(6)
   is_read       Boolean    @default(false)
-  is_seen       Boolean?
   tservices_id  Int?
   variables     String?
+  is_seen       Boolean?
   tservices     tservices? @relation(fields: [tservices_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_talerts_tservices")
   tbids         tbids      @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   tproviders    tproviders @relation(fields: [tproviders_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -67,14 +67,14 @@ model tbids {
   id                        Int                         @id @default(autoincrement())
   tclients_id               Int
   tarea_id                  Int
-  type                      String                      @db.VarChar(20)
-  budget                    Decimal                     @db.Decimal(12, 2)
+  budget                    Decimal?                    @db.Decimal(12, 2)
   status                    String                      @db.VarChar(20)
   comment                   String?
   created_at                DateTime                    @default(now()) @db.Timestamp(6)
-  is_flexible               Boolean?                    @default(false)
   number                    String?                     @db.VarChar(15)
   tcategories_id            Int?
+  is_flexible               Boolean?                    @default(false)
+  type                      String                      @db.VarChar(20)
   talerts                   talerts[]
   tarea                     tarea                       @relation(fields: [tarea_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   tcategories               tcategories?                @relation(fields: [tcategories_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -113,9 +113,9 @@ model tclients {
   tarea_id          Int?
   name              String              @db.VarChar(255)
   email             String?             @unique @db.VarChar(255)
-  photo             String?             @db.VarChar(500)
   additional_info   Json?
   created_at        DateTime            @default(now()) @db.Timestamp(6)
+  photo             String?             @db.VarChar(500)
   tbids             tbids[]
   tarea             tarea?              @relation(fields: [tarea_id], references: [id], onUpdate: NoAction)
   tclients_auth     tclients_auth[]
@@ -133,10 +133,10 @@ model tclients_auth {
   auth_id          String?   @db.VarChar(255)
   last_login       DateTime? @db.Timestamp(6)
   auth_context     Json?
-  refresh_token    String?   @db.VarChar(1000)
-  token_expires_at DateTime? @db.Timestamp(6)
   is_active        Boolean   @default(true)
+  refresh_token    String?   @db.VarChar(1000)
   role             String    @default("user") @db.VarChar(20)
+  token_expires_at DateTime? @db.Timestamp(6)
   tclients         tclients  @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([auth_type, auth_id])
@@ -202,8 +202,8 @@ model tnotifications {
   message      String
   is_read      Boolean   @default(false)
   created_at   DateTime  @default(now()) @db.Timestamp(6)
-  is_sent      Boolean?
   ttemplate_id BigInt
+  is_sent      Boolean?
   ttemplate    ttemplate @relation(fields: [ttemplate_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tnotifications_ttemplate")
 
   @@index([user_id, user_role], map: "idx_notifications_user")
@@ -238,6 +238,7 @@ model tproposals {
   created_at    DateTime   @default(now()) @db.Timestamp(6)
   comment       String?
   status        String     @default("pending") @db.VarChar(20)
+  price         Decimal?   @db.Decimal(10, 2)
   tbids         tbids      @relation(fields: [tbids_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   tproviders    tproviders @relation(fields: [tproviders_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   tservices     tservices  @relation(fields: [tservices_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
