@@ -49,9 +49,9 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
   }
 
   // Получаем подходящие сервисы провайдера
-  const providerServices = await getProviderServicesForRequest(requestId);
+  const providerServicesData = await getProviderServicesForRequest(requestId);
 
-  if (!providerServices || providerServices.length === 0) {
+  if (!providerServicesData || providerServicesData.services.length === 0) {
     return (
       <div className="container mx-auto px-3 py-3">
         <div className="text-center py-12">
@@ -99,7 +99,7 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
           </h2>
           <CreateProposalForm 
             requestId={requestId}
-            services={providerServices}
+            services={providerServicesData.services}
           />
         </div>
       </div>

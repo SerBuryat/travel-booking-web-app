@@ -2,13 +2,13 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ServiceType } from '@/model/ServiceType';
+import { ProposalServiceType } from '@/lib/request/provider/proposal/getProviderServicesForRequest';
 import { HorizontalViewServiceComponent } from '@/components/HorizontalViewServiceComponent';
 import { createProposal } from '@/lib/request/provider/proposal/createProposal';
 
 interface CreateProposalFormProps {
   requestId: number;
-  services: ServiceType[];
+  services: ProposalServiceType[];
 }
 
 /**
@@ -23,7 +23,17 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
   
   const router = useRouter();
 
+  // Проверяем, все ли сервисы использованы
+  const allServicesUsed = services.length > 0 && services.every(service => service.isUsedInProposal);
+  const availableServices = services.filter(service => !service.isUsedInProposal);
+
   const handleServiceToggle = (serviceId: number) => {
+    // Не позволяем выбирать уже использованные сервисы
+    const service = services.find(s => s.id === serviceId);
+    if (service?.isUsedInProposal) {
+      return;
+    }
+
     setSelectedServices(prev => {
       const newSet = new Set(prev);
       if (newSet.has(serviceId)) {
@@ -73,44 +83,84 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <div className={`space-y-6 ${allServicesUsed ? 'opacity-50 pointer-events-none' : ''}`}>
+      {/* Сообщение, если все сервисы использованы */}
+      {allServicesUsed && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <h3 className="text-sm font-medium text-yellow-800">
+                Все сервисы уже использованы
+              </h3>
+              <div className="mt-2 text-sm text-yellow-700">
+                <p>
+                  Вы уже создали предложения для всех подходящих сервисов по этой заявке. 
+                  Новые предложения создать невозможно.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
       {/* Список сервисов для выбора */}
       <div>
         <h3 className="text-sm font-medium text-gray-700 mb-3">
-          Выберите подходящие сервисы ({selectedServices.size} выбрано)
+          {allServicesUsed 
+            ? `Все сервисы использованы (${services.length} из ${services.length})`
+            : `Выберите подходящие сервисы (${selectedServices.size} выбрано из ${availableServices.length} доступных)`
+          }
         </h3>
         <div className="space-y-2">
-          {services.map((service) => (
-            <div key={service.id} className="relative">
-              <div
-                className={`cursor-pointer transition-all ${
-                  selectedServices.has(service.id)
-                    ? 'ring-2 ring-blue-500 ring-opacity-50'
-                    : 'hover:shadow-md'
-                }`}
-                onClick={() => handleServiceToggle(service.id)}
-              >
-                <HorizontalViewServiceComponent service={service} onClick={() => {}} />
-              </div>
-              
-              {/* Чекбокс */}
-              <div className="absolute top-2 right-2">
+          {services.map((service) => {
+            const isSelected = selectedServices.has(service.id);
+            
+            return (
+              <div key={service.id} className="relative">
                 <div
-                  className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
-                    selectedServices.has(service.id)
-                      ? 'bg-blue-600 border-blue-600'
-                      : 'bg-white border-gray-300'
+                  className={`cursor-pointer transition-all ${
+                    service.isUsedInProposal
+                      ? 'opacity-50 cursor-not-allowed'
+                      : isSelected
+                      ? 'ring-2 ring-blue-500 ring-opacity-50'
+                      : 'hover:shadow-md'
                   }`}
+                  onClick={() => handleServiceToggle(service.id)}
                 >
-                  {selectedServices.has(service.id) && (
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
+                  <HorizontalViewServiceComponent service={service} onClick={() => {}} />
+                </div>
+                
+                {/* Чекбокс или статус */}
+                <div className="absolute top-2 right-2">
+                  {service.isUsedInProposal ? (
+                    <div className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
+                      Использован
+                    </div>
+                  ) : (
+                    <div
+                      className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
+                        isSelected
+                          ? 'bg-blue-600 border-blue-600'
+                          : 'bg-white border-gray-300'
+                      }`}
+                    >
+                      {isSelected && (
+                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -166,12 +216,13 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
         </button>
         <button
           type="submit"
-          disabled={isSubmitting || selectedServices.size === 0}
+          disabled={isSubmitting || selectedServices.size === 0 || allServicesUsed}
           className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors"
         >
-          {isSubmitting ? 'Создание...' : 'Отправить отклик'}
+          {isSubmitting ? 'Создание...' : allServicesUsed ? 'Нет доступных сервисов' : 'Отправить отклик'}
         </button>
       </div>
     </form>
+    </div>
   );
 }

@@ -5,6 +5,14 @@ import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { ServiceType } from '@/model/ServiceType';
 import { CategoryEntity } from '@/entity/CategoryEntity';
 
+export interface ProposalServiceType extends ServiceType {
+  isUsedInProposal: boolean;
+}
+
+export interface ProviderServicesForRequest {
+  services: ProposalServiceType[];
+}
+
 /**
  * Получает сервисы провайдера, подходящие для конкретной заявки клиента.
  * 
@@ -16,11 +24,11 @@ import { CategoryEntity } from '@/entity/CategoryEntity';
  * 5. Получает детали сервисов
  * 
  * @param {number} requestId ID заявки клиента (tbids.id)
- * @returns Promise<ServiceType[]> - массив подходящих сервисов провайдера
+ * @returns Promise<ProviderServicesForRequest | null> - объект с сервисами и флагом использования
  * @returns null - если пользователь не аутентифицирован или не провайдер
  */
-export async function getProviderServicesForRequest(requestId: number): Promise<ServiceType[] | null> {
-  return withUserAuth(async ({ userAuth }) => {
+export async function getProviderServicesForRequest(requestId: number): Promise<ProviderServicesForRequest | null> {
+  const result = await withUserAuth(async ({ userAuth }) => {
     // Проверяем, что пользователь - провайдер
     if (userAuth.role !== 'provider') {
       return null;
@@ -29,13 +37,13 @@ export async function getProviderServicesForRequest(requestId: number): Promise<
     // Получаем tproviders запись пользователя
     const provider = await getProviderByUserId(userAuth.userId);
     if (!provider) {
-      return [];
+      return { services: [] };
     }
 
     // Получаем алерты для данной заявки и провайдера
     const alerts = await getAlertsForRequestAndProvider(requestId, provider.id);
     if (alerts.length === 0) {
-      return [];
+      return { services: [] };
     }
 
     // Извлекаем ID сервисов
@@ -44,8 +52,21 @@ export async function getProviderServicesForRequest(requestId: number): Promise<
     // Получаем детали сервисов
     const services = await getServicesByIds(serviceIds);
 
-    return services;
+    // Получаем уже использованные сервисы для этой заявки
+    const usedServiceIds = await getUsedServiceIds(requestId, provider.id);
+
+    // Добавляем флаг isUsedInProposal к каждому сервису
+    const servicesWithUsageFlag = services.map(service => ({
+      ...service,
+      isUsedInProposal: usedServiceIds.includes(service.id)
+    }));
+
+    return {
+      services: servicesWithUsageFlag
+    };
   });
+
+  return result || null;
 }
 
 /**
@@ -69,6 +90,21 @@ async function getAlertsForRequestAndProvider(requestId: number, providerId: num
     },
     select: { tservices_id: true }
   });
+}
+
+/**
+ * Получает ID сервисов, уже использованных для данной заявки данным провайдером
+ */
+async function getUsedServiceIds(requestId: number, providerId: number): Promise<number[]> {
+  const proposals = await prisma.tproposals.findMany({
+    where: {
+      tbids_id: requestId,
+      tproviders_id: providerId
+    },
+    select: { tservices_id: true }
+  });
+
+  return proposals.map(proposal => proposal.tservices_id);
 }
 
 /**
