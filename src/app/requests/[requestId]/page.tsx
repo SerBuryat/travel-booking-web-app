@@ -7,6 +7,8 @@ import AccomodationRequestViewComponent from '../_components/detail/Accomodation
 import TransportRequestViewComponent from '../_components/detail/TransportRequestViewComponent';
 import EntertainmentRequestViewComponent from '../_components/detail/EntertainmentRequestViewComponent';
 import {RequestType} from "@/lib/request/requestType";
+import { getRequestProposals } from '@/lib/request/client/proposal/getRequestProposals';
+import ProposalsListComponent from './_components/ProposalsListComponent';
 
 type Props = {
   params: { requestId: string };
@@ -15,12 +17,16 @@ type Props = {
 export default async function RequestDetailPage({ params }: Props) {
   const { requestId } = await params;
   
-  const request = await withUserAuth(async ({ userAuth }) => {
+  const [request, proposalsResult] = await withUserAuth(async ({ userAuth }) => {
     try {
-      return await requestById(Number(requestId), userAuth);
+      const [requestData, proposalsData] = await Promise.all([
+        requestById(Number(requestId), userAuth),
+        getRequestProposals(Number(requestId))
+      ]);
+      return [requestData, proposalsData];
     } catch (error) {
       if (error instanceof Error && error.message === 'NOT_FOUND') {
-        return null;
+        return [null, null];
       }
       throw error;
     }
@@ -50,6 +56,14 @@ export default async function RequestDetailPage({ params }: Props) {
       <div className="grid grid-cols-2 gap-3">
         {renderRequestComponent(request)}
       </div>
+      
+      {/* Отображение предложений */}
+      {proposalsResult && (
+        <ProposalsListComponent 
+          proposals={proposalsResult.proposals} 
+          count={proposalsResult.count} 
+        />
+      )}
     </div>
   );
 }
