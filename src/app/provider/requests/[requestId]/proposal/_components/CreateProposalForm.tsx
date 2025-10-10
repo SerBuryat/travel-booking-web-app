@@ -54,10 +54,14 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
       return;
     }
 
-    const priceValue = parseFloat(price);
-    if (isNaN(priceValue) || priceValue <= 0) {
-      setError('Введите корректную цену');
-      return;
+    // Цена теперь опциональна
+    let priceValue: number | undefined;
+    if (price.trim()) {
+      priceValue = parseFloat(price);
+      if (isNaN(priceValue) || priceValue <= 0) {
+        setError('Введите корректную цену');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -167,7 +171,7 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-            Цена за все <span className="text-red-500">*</span>
+            Цена за все (опционально)
           </label>
           <input
             type="number"
@@ -177,7 +181,6 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
             placeholder="0.00"
             step="0.01"
             min="0"
-            required
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           />
         </div>

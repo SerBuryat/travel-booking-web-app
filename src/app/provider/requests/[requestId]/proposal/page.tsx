@@ -21,7 +21,8 @@ interface ProposalPageProps {
  * - Форма для создания предложения
  */
 export default async function ProposalPage({ params }: ProposalPageProps) {
-  const requestId = parseInt(params.requestId);
+  const { requestId: requestIdString } = await params;
+  const requestId = parseInt(requestIdString);
   
   if (isNaN(requestId)) {
     redirect('/provider/requests');

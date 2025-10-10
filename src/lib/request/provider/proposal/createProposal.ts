@@ -102,7 +102,7 @@ async function createProposalRecords(data: CreateProposalData, providerId: numbe
     tbids_id: data.requestId,
     tproviders_id: providerId,
     tservices_id: serviceId,
-    price: data.price,
+    price: data.price || 0, // Если цена не указана, используем 0
     comment: data.comment || null,
     status: 'pending' as const,
     created_at: new Date()
