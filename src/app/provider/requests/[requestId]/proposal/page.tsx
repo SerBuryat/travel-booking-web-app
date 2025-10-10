@@ -2,8 +2,8 @@ import { redirect } from 'next/navigation';
 import { getUserAuthOrThrow } from '@/lib/auth/userAuth';
 import { requestById } from '@/lib/request/client/view/requestById';
 import { getProviderServicesForRequest } from '@/lib/request/provider/proposal/getProviderServicesForRequest';
-import { CreateProposalForm } from './_components/CreateProposalForm';
-import { RequestDetails } from './_components/RequestDetails';
+import { CreateProposalForm } from '@/app/provider/requests/[requestId]/proposal/_components/CreateProposalForm';
+import { RequestDetails } from '@/app/provider/requests/[requestId]/proposal/_components/RequestDetails';
 
 interface ProposalPageProps {
   params: {
@@ -76,19 +76,16 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
     <div className="container mx-auto px-3 py-3">
       <div className="mb-4">
         <h1 className="text-xl font-bold text-gray-900">
-          Создание предложения
+          Отклик на заявку №{requestDetails.number || requestDetails.id}
         </h1>
         <p className="mt-0.5 text-xs text-gray-600">
-          Заявка №{requestDetails.number || requestDetails.id}
+          Выберите подходящие сервисы и создайте предложение
         </p>
       </div>
 
       <div className="space-y-6">
         {/* Детали заявки клиента */}
         <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">
-            Детали заявки
-          </h2>
           <RequestDetails request={requestDetails} />
         </div>
 

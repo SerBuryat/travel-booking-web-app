@@ -117,47 +117,46 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
             : `Выберите подходящие сервисы (${selectedServices.size} выбрано из ${availableServices.length} доступных)`
           }
         </h3>
-        <div className="space-y-2">
+        <div className="space-y-3">
           {services.map((service) => {
             const isSelected = selectedServices.has(service.id);
             
             return (
               <div key={service.id} className="relative">
                 <div
-                  className={`cursor-pointer transition-all ${
-                    service.isUsedInProposal
-                      ? 'opacity-50 cursor-not-allowed'
-                      : isSelected
-                      ? 'ring-2 ring-blue-500 ring-opacity-50'
-                      : 'hover:shadow-md'
+                  className={`cursor-pointer transition-all duration-200 rounded-lg ${
+                    service.isUsedInProposal 
+                        ? 'opacity-50 cursor-not-allowed'
+                        : ''
                   }`}
                   onClick={() => handleServiceToggle(service.id)}
                 >
                   <HorizontalViewServiceComponent service={service} onClick={() => {}} />
                 </div>
                 
-                {/* Чекбокс или статус */}
-                <div className="absolute top-2 right-2">
-                  {service.isUsedInProposal ? (
-                    <div className="px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded">
-                      Использован
-                    </div>
-                  ) : (
-                    <div
-                      className={`w-6 h-6 rounded border-2 flex items-center justify-center ${
-                        isSelected
-                          ? 'bg-blue-600 border-blue-600'
-                          : 'bg-white border-gray-300'
-                      }`}
-                    >
-                      {isSelected && (
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                {/* Минималистичный индикатор */}
+                {!service.isUsedInProposal && (
+                  <div className="absolute top-3 right-3">
+                    {isSelected ? (
+                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                         </svg>
-                      )}
+                      </div>
+                    ) : (
+                      <div className="w-5 h-5 border-2 border-gray-300 rounded-full bg-white"></div>
+                    )}
+                  </div>
+                )}
+                
+                {/* Статус для использованных сервисов */}
+                {service.isUsedInProposal && (
+                  <div className="absolute top-3 right-3">
+                    <div className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded-full">
+                      Использован
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             );
           })}
