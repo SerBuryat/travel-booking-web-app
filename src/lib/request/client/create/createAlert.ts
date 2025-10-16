@@ -1,6 +1,7 @@
 "use server";
 
 import {prisma} from '@/lib/db/prisma';
+import { createNewBidNotificationForProviders } from '@/lib/notifications/createNewBidNotificationForProviders';
 
 /**
  * Interface for bid data needed for alert creation
@@ -43,11 +44,12 @@ async function getBidData(bidId: number): Promise<BidData> {
 /**
  * Get providers in the specified area
  */
-async function getProvidersInArea(areaId: number): Promise<number[]> {
+async function getActiveProvidersInArea(areaId: number): Promise<number[]> {
   const providers = await prisma.tproviders.findMany({
     where: {
+      status: 'active',
       tclients: {
-        tarea_id: areaId,
+        tarea_id: areaId
       },
     },
     select: {
@@ -133,7 +135,7 @@ export async function createAlert(bidId: number): Promise<void> {
     }
 
     // Get providers in the bid's area
-    const providerIds = await getProvidersInArea(bidData.tarea_id);
+    const providerIds = await getActiveProvidersInArea(bidData.tarea_id);
 
     console.log(`Получены поставщики в области: ${providerIds}`);
 
@@ -152,6 +154,14 @@ export async function createAlert(bidId: number): Promise<void> {
 
     // Create alert records
     await createAlertRecords(bidId, services);
+
+    // todo - пока так сделал неблокирующий вызов, чтобы не мешала созданию заявки и алерта
+    // Create notifications for providers (non-blocking)
+    Promise.resolve().then(() => {
+      createNewBidNotificationForProviders(providerIds).catch(error => {
+        console.error('Error in async notification creation:', error);
+      });
+    });
   } catch (error) {
     console.error('Error creating alerts for bid:', bidId, error);
     throw error;
