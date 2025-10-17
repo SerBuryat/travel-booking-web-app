@@ -158,6 +158,7 @@ export async function createAlert(bidId: number): Promise<void> {
     // todo - пока так сделал неблокирующий вызов, чтобы не мешала созданию заявки и алерта
     // Create notifications for providers (non-blocking)
     Promise.resolve().then(() => {
+      // todo - скорей всего, лучше передавать или id созданного алерта, либо созданной заявки
       createNewBidNotificationForProviders(providerIds).catch(error => {
         console.error('Error in async notification creation:', error);
       });
