@@ -1,6 +1,7 @@
 "use server";
 
 import {prisma} from '@/lib/db/prisma';
+import { createNewAlertNotificationForProviders } from '@/lib/notifications/createNewAlertNotificationForProviders';
 
 /**
  * Interface for bid data needed for alert creation
@@ -43,11 +44,12 @@ async function getBidData(bidId: number): Promise<BidData> {
 /**
  * Get providers in the specified area
  */
-async function getProvidersInArea(areaId: number): Promise<number[]> {
+async function getActiveProvidersInArea(areaId: number): Promise<number[]> {
   const providers = await prisma.tproviders.findMany({
     where: {
+      status: 'active',
       tclients: {
-        tarea_id: areaId,
+        tarea_id: areaId
       },
     },
     select: {
@@ -97,9 +99,9 @@ async function getServicesByCategoryAndProviders(
 /**
  * Create alert records in talerts table
  */
-async function createAlertRecords(bidId: number, services: ServiceData[]): Promise<void> {
+async function createAlertRecords(bidId: number, services: ServiceData[]): Promise<number[]> {
   if (services.length === 0) {
-    return;
+    return [];
   }
 
   const alertData = services.map(service => ({
@@ -111,9 +113,20 @@ async function createAlertRecords(bidId: number, services: ServiceData[]): Promi
     variables: null,
   }));
 
-  await prisma.talerts.createMany({
-    data: alertData,
-  });
+  // Create alerts and get their IDs
+  const createdAlerts = await Promise.all(
+    alertData.map(alert => 
+      prisma.talerts.create({
+        data: alert,
+        select: { id: true }
+      })
+    )
+  );
+
+  const alertIds = createdAlerts.map(alert => alert.id);
+  console.log(`Created ${alertIds.length} alerts with IDs: ${alertIds}`);
+
+  return alertIds;
 }
 
 /**
@@ -133,7 +146,7 @@ export async function createAlert(bidId: number): Promise<void> {
     }
 
     // Get providers in the bid's area
-    const providerIds = await getProvidersInArea(bidData.tarea_id);
+    const providerIds = await getActiveProvidersInArea(bidData.tarea_id);
 
     console.log(`Получены поставщики в области: ${providerIds}`);
 
@@ -150,8 +163,17 @@ export async function createAlert(bidId: number): Promise<void> {
 
     console.log(`Получены услуги: ${JSON.stringify(services)}`);
 
-    // Create alert records
-    await createAlertRecords(bidId, services);
+    // Create alert records and get their IDs
+    const alertIds = await createAlertRecords(bidId, services);
+
+    // Create notifications for providers (non-blocking)
+    if (alertIds.length > 0) {
+      Promise.resolve().then(() => {
+        createNewAlertNotificationForProviders(alertIds).catch(error => {
+          console.error('Error in async notification creation:', error);
+        });
+      });
+    }
   } catch (error) {
     console.error('Error creating alerts for bid:', bidId, error);
     throw error;

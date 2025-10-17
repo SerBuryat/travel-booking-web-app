@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { createProposalSchema, CreateProposalData } from '@/schemas/proposal/createProposalSchema';
+import { createNewProposalNotificationForClient } from '@/lib/notifications/createNewProposalNotificationForClient';
 
 /**
  * Создает предложение провайдера на заявку клиента.
@@ -41,11 +42,20 @@ export async function createProposal(proposalData: CreateProposalData): Promise<
       }
 
       // Создаем предложения для каждого выбранного сервиса
-      const proposals = await createProposalRecords(validatedData, provider.id);
+      const proposalIds = await createProposalRecords(validatedData, provider.id);
+
+      // Создаем уведомления для клиента о новых откликах (неблокирующий)
+      if (proposalIds.length > 0) {
+        Promise.resolve().then(() => {
+          createNewProposalNotificationForClient(proposalIds).catch(error => {
+            console.error('Error creating proposal notifications for client:', error);
+          });
+        });
+      }
 
       return { 
         success: true, 
-        message: `Предложение успешно создано. Создано ${proposals.count} предложений.` 
+        message: `Предложение успешно создано. Создано ${proposalIds.length} предложений.` 
       };
     });
 
@@ -97,7 +107,7 @@ async function validateServicesOwnership(serviceIds: number[], providerId: numbe
 /**
  * Создает записи предложений в tproposals
  */
-async function createProposalRecords(data: CreateProposalData, providerId: number) {
+async function createProposalRecords(data: CreateProposalData, providerId: number): Promise<number[]> {
   const proposals = data.serviceIds.map(serviceId => ({
     tbids_id: data.requestId,
     tproviders_id: providerId,
@@ -108,7 +118,15 @@ async function createProposalRecords(data: CreateProposalData, providerId: numbe
     created_at: new Date()
   }));
 
-  return prisma.tproposals.createMany({
-    data: proposals
-  });
+  // Создаем предложения и получаем их ID
+  const createdProposals = await Promise.all(
+    proposals.map(proposal => 
+      prisma.tproposals.create({
+        data: proposal,
+        select: { id: true }
+      })
+    )
+  );
+
+  return createdProposals.map(proposal => proposal.id);
 }
