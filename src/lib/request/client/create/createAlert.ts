@@ -1,7 +1,7 @@
 "use server";
 
 import {prisma} from '@/lib/db/prisma';
-import { createNewBidNotificationForProviders } from '@/lib/notifications/createNewBidNotificationForProviders';
+import { createNewAlertNotificationForProviders } from '@/lib/notifications/createNewAlertNotificationForProviders';
 
 /**
  * Interface for bid data needed for alert creation
@@ -99,9 +99,9 @@ async function getServicesByCategoryAndProviders(
 /**
  * Create alert records in talerts table
  */
-async function createAlertRecords(bidId: number, services: ServiceData[]): Promise<void> {
+async function createAlertRecords(bidId: number, services: ServiceData[]): Promise<number[]> {
   if (services.length === 0) {
-    return;
+    return [];
   }
 
   const alertData = services.map(service => ({
@@ -113,9 +113,20 @@ async function createAlertRecords(bidId: number, services: ServiceData[]): Promi
     variables: null,
   }));
 
-  await prisma.talerts.createMany({
-    data: alertData,
-  });
+  // Create alerts and get their IDs
+  const createdAlerts = await Promise.all(
+    alertData.map(alert => 
+      prisma.talerts.create({
+        data: alert,
+        select: { id: true }
+      })
+    )
+  );
+
+  const alertIds = createdAlerts.map(alert => alert.id);
+  console.log(`Created ${alertIds.length} alerts with IDs: ${alertIds}`);
+
+  return alertIds;
 }
 
 /**
@@ -152,17 +163,17 @@ export async function createAlert(bidId: number): Promise<void> {
 
     console.log(`Получены услуги: ${JSON.stringify(services)}`);
 
-    // Create alert records
-    await createAlertRecords(bidId, services);
+    // Create alert records and get their IDs
+    const alertIds = await createAlertRecords(bidId, services);
 
-    // todo - пока так сделал неблокирующий вызов, чтобы не мешала созданию заявки и алерта
     // Create notifications for providers (non-blocking)
-    Promise.resolve().then(() => {
-      // todo - скорей всего, лучше передавать или id созданного алерта, либо созданной заявки
-      createNewBidNotificationForProviders(providerIds).catch(error => {
-        console.error('Error in async notification creation:', error);
+    if (alertIds.length > 0) {
+      Promise.resolve().then(() => {
+        createNewAlertNotificationForProviders(alertIds).catch(error => {
+          console.error('Error in async notification creation:', error);
+        });
       });
-    });
+    }
   } catch (error) {
     console.error('Error creating alerts for bid:', bidId, error);
     throw error;

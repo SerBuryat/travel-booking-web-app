@@ -25,47 +25,51 @@ async function getTemplateByActionName(actionName: string): Promise<TemplateData
 }
 
 /**
- * Get provider's client ID by provider ID
+ * Get alerts with provider client IDs
  */
-async function getProviderClientId(providerId: number): Promise<number | null> {
-  const provider = await prisma.tproviders.findUnique({
-    where: { id: providerId },
-    select: { tclients_id: true },
+async function getAlertsWithProviderClients(alertIds: number[]): Promise<{alertId: number, clientId: number}[]> {
+  const alerts = await prisma.talerts.findMany({
+    where: {
+      id: {
+        in: alertIds
+      }
+    },
+    select: {
+      id: true,
+      tproviders: {
+        select: {
+          tclients_id: true
+        }
+      }
+    }
   });
 
-  return provider?.tclients_id || null;
+  return alerts
+    .filter(alert => alert.tproviders.tclients_id !== null)
+    .map(alert => ({
+      alertId: alert.id,
+      clientId: alert.tproviders.tclients_id!
+    }));
 }
 
 /**
  * Create notification records for providers
  */
-async function createNotificationRecords(providerIds: number[], template: TemplateData): Promise<number[]> {
-  if (providerIds.length === 0) {
+async function createNotificationRecords(alertData: {alertId: number, clientId: number}[], template: TemplateData): Promise<number[]> {
+  if (alertData.length === 0) {
     return [];
   }
 
-  // Get all provider client IDs
-  const providerClientIds = await Promise.all(
-    providerIds.map(providerId => getProviderClientId(providerId))
-  );
-
-  // Filter out null values and create notification data
-  const notificationData = providerClientIds
-    .filter((clientId): clientId is number => clientId !== null)
-    .map(clientId => ({
-      user_id: clientId,
-      user_role: 'provider' as const,
-      message: template.text,
-      is_read: false,
-      created_at: new Date(),
-      ttemplate_id: template.id,
-      is_sent: false,
-    }));
-
-  if (notificationData.length === 0) {
-    console.log('No valid provider client IDs found for notifications');
-    return [];
-  }
+  // Create notification data for each alert
+  const notificationData = alertData.map(alert => ({
+    user_id: alert.clientId,
+    user_role: 'provider' as const,
+    message: template.text,
+    is_read: false,
+    created_at: new Date(),
+    ttemplate_id: template.id,
+    is_sent: false,
+  }));
 
   // Create notifications and get their IDs
   const createdNotifications = await Promise.all(
@@ -86,9 +90,9 @@ async function createNotificationRecords(providerIds: number[], template: Templa
 /**
  * Main function to create notifications for providers about new bid
  */
-export async function createNewBidNotificationForProviders(providerIds: number[]): Promise<void> {
+export async function createNewAlertNotificationForProviders(alertIds: number[]): Promise<void> {
   try {
-    console.log(`Creating notifications for providers: ${providerIds}`);
+    console.log(`Creating notifications for providers from alerts: ${alertIds}`);
 
     // Get template for bid notification
     const template = await getTemplateByActionName('send_bid_to_provider');
@@ -98,8 +102,18 @@ export async function createNewBidNotificationForProviders(providerIds: number[]
       return;
     }
 
+    // Get alerts with provider client IDs
+    const alertData = await getAlertsWithProviderClients(alertIds);
+
+    if (alertData.length === 0) {
+      console.log('No valid alerts found for notifications');
+      return;
+    }
+
+    console.log(`Found ${alertData.length} alerts with provider clients`);
+
     // Create notification records and get their IDs
-    const notificationIds = await createNotificationRecords(providerIds, template);
+    const notificationIds = await createNotificationRecords(alertData, template);
 
     if (notificationIds.length > 0) {
       // Send notifications via Telegram bot (non-blocking)
