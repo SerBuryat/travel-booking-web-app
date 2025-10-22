@@ -25,7 +25,7 @@ export const PrivatePolicyButton: React.FC = () => {
           fontFamily: 'Inter, sans-serif'
         }}
       >
-        Private policy
+        Политика конфиденциальности
       </button>
 
       {/* Модальное окно */}

@@ -45,7 +45,7 @@ export default function Loading() {
           {/* Сетка сервисов */}
           <div className="grid grid-cols-2 gap-4">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="bg-white rounded-[24px] border p-3 animate-pulse">
+              <div key={index} className="bg-white rounded-[24px] p-3 animate-pulse">
                 {/* Фото сервиса */}
                 <div className="h-32 w-full bg-gray-200 rounded mb-3"></div>
                 

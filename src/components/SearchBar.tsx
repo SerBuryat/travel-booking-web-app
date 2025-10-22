@@ -70,7 +70,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           onKeyDown={handleKeyDown}
-          className={`w-full px-10 py-3 rounded-[10px] text-[17px] font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border border-red-500' : ''}`}
+          className={`w-full px-8 py-1.5 rounded-[10px] text-[17px] font-normal text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 ${error ? 'border border-red-500' : ''}`}
           style={{
             backgroundColor: '#7676801F',
             fontFamily: 'Inter, sans-serif',
@@ -103,7 +103,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
                 strokeLinejoin="round"
               />
             </svg>
-            <span className="text-[17px] font-normal text-gray-500">Search</span>
+            <span className="text-[17px] font-normal text-gray-500">Поиск</span>
           </div>
         )}
         {/* Error/hint */}

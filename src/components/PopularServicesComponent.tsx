@@ -3,6 +3,7 @@
 import React from 'react';
 import {ShortViewServiceComponent} from './ShortViewServiceComponent';
 import {ServiceType} from '@/model/ServiceType';
+import {PAGE_ROUTES} from '@/utils/routes';
 
 interface PopularServicesComponentProps {
   services: ServiceType[];
@@ -12,9 +13,9 @@ export const PopularServicesComponent: React.FC<PopularServicesComponentProps> =
   services
 }) => {
   return (
-    <div className="px-4 py-6">
-      {/* Заголовок */}
-      <div className="mb-4">
+    <div className="px-4 py-4">
+      {/* Заголовок с кнопкой "Все" */}
+      <div className="mb-4 flex justify-between items-center">
         <span 
           className="text-[#707579]"
           style={{ 
@@ -24,8 +25,15 @@ export const PopularServicesComponent: React.FC<PopularServicesComponentProps> =
             textTransform: 'uppercase'
           }}
         >
-          Popular
+          Популярное
         </span>
+        <a 
+          href={PAGE_ROUTES.CATALOG.POPULAR}
+          className="text-blue-500 text-sm font-medium hover:text-blue-600 transition-colors"
+          style={{ fontFamily: 'Inter, sans-serif' }}
+        >
+          Все
+        </a>
       </div>
 
       {/* Список популярных сервисов в 2 колонки */}

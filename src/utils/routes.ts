@@ -8,10 +8,11 @@ export const PAGE_ROUTES = {
   TELEGRAM_AUTH: '/login/telegram',
   
   // Main pages
-  HOME: '/',
+  HOME: '/home',
   PROFILE: '/profile',
   REQUESTS: '/requests',
   MAP: '/map',
+  ERROR: '/error',
   
   // Service routes
   SERVICES: {
@@ -28,7 +29,8 @@ export const PAGE_ROUTES = {
   // Catalog routes
   CATALOG: {
     ROOT: '/catalog',
-    RESULT: '/catalog/result'
+    RESULT: '/catalog/result',
+    POPULAR: '/catalog/popular'
   },
   
   // Profile sub-routes
