@@ -7,6 +7,7 @@ import { TelegramService } from '@/service/TelegramService';
 import { UserAuth } from '@/lib/auth/userAuth';
 import { AuthRole } from '@/model/ClientType';
 import {tarea, tclients_auth} from "@prisma/client";
+import { SELECTABLE_AREA_TIER } from '@/lib/location/constants';
 
 const TELEGRAM_AUTH_TYPE = 'telegram';
 const AUTH_ROLE = 'user';
@@ -112,8 +113,11 @@ async function updateExistUser(existsAuth: tclients_auth, telegramData: Telegram
 async function createNewUser(telegramData: TelegramUserData, authAuthId: string): Promise<UserAuth> {
   const authData = createClientAuthData(authAuthId, TELEGRAM_AUTH_TYPE, telegramData);
 
+  const defaultAreaId = await getDefaultAreaId();
+
   const createdClient = await prisma.tclients.create({
     data: {
+      tarea_id: defaultAreaId,
       name: buildFullName(telegramData),
       photo: telegramData.photo_url,
       additional_info: telegramData as any,
@@ -211,10 +215,10 @@ async function getDefaultAreaId(): Promise<number> {
       }
     });
   } catch (error) {
-    console.error('Error finding default area. Trying to find first by tier.', error);
+    console.error(`Error finding default area: ${DEFAULT_AREA_SYSNAME}. Trying to find first by tier.`, error);
     defaultArea = await prisma.tarea.findFirst({
       where: {
-        tier: 3
+        tier: SELECTABLE_AREA_TIER
       }
     });
   }
