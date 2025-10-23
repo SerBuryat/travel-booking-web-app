@@ -30,7 +30,9 @@ export const PAGE_ROUTES = {
   CATALOG: {
     ROOT: '/catalog',
     RESULT: '/catalog/result',
-    POPULAR: '/catalog/popular'
+    POPULAR: '/catalog/popular',
+    CATEGORY: '/catalog/[categoryId]',
+    CATEGORY_SERVICES: '/catalog/[categoryId]/services'
   },
   
   // Profile sub-routes

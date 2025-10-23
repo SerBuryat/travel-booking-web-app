@@ -6,6 +6,7 @@ import {ServiceType} from "@/model/ServiceType";
 import {CategoryEntity} from "@/entity/CategoryEntity";
 
 const DEFAULT_TAKE_SERVICES = 10;
+const CATEGORY_SERVICES_LIMIT = 10;
 
 interface SearchServiceOptions {
   categoryIds?: number[];

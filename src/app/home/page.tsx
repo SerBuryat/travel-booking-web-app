@@ -2,11 +2,12 @@ import React from 'react';
 import {Header} from '@/components/Header';
 import {SearchBarWrapper} from '@/components/SearchBarWrapper';
 import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
-import {PopularServicesComponent} from '@/components/PopularServicesComponent';
+import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
 import {RegistryServiceButton} from '@/components/RegistryServiceButton';
 import {PrivatePolicyButton} from '@/components/PrivatePolicyButton';
 import {CategoryService} from '@/service/CategoryService';
 import {popularServices} from "@/lib/service/searchServices";
+import {PAGE_ROUTES} from "@/utils/routes";
 
 export default async function HomePage() {
   const categoryService = new CategoryService();
@@ -28,7 +29,14 @@ export default async function HomePage() {
 
         {/* Популярные сервисы */}
         <div>
-          <PopularServicesComponent services={services} />
+          <VerticalServicesViewComponent 
+            services={services} 
+            title="Популярное"
+            moveToAllButton={{
+              text: "Все",
+              href: PAGE_ROUTES.CATALOG.POPULAR
+            }}
+          />
         </div>
 
         {/* Кнопки Registry service и Private policy */}

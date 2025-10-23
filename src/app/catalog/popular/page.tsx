@@ -2,7 +2,7 @@ import React from 'react';
 import { redirect } from 'next/navigation';
 import { Header } from '@/components/Header';
 import { SearchBarWrapper } from '@/components/SearchBarWrapper';
-import { PopularServicesComponent } from '@/components/PopularServicesComponent';
+import { VerticalServicesViewComponent } from '@/components/VerticalServicesViewComponent';
 import { popularServices } from '@/lib/service/searchServices';
 import { currentLocation } from '@/lib/location/currentLocation';
 import { PAGE_ROUTES } from '@/utils/routes';
@@ -40,7 +40,7 @@ export default async function PopularServicesPage() {
 
           {/* Список популярных сервисов */}
           <div>
-            <PopularServicesComponent services={services} />
+            <VerticalServicesViewComponent services={services} />
           </div>
         </div>
       </div>

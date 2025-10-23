@@ -1,8 +1,10 @@
 import React from 'react';
 import {GeneralCategoriesListComponent} from '@/components/GeneralCategoriesListComponent';
-import {PopularServicesComponent} from '@/components/PopularServicesComponent';
+import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
 import {ServiceRegistrationBanner} from '@/components/ServiceRegistrationBanner';
 import {popularServices} from "@/lib/service/searchServices";
+import {PrivatePolicyButton} from "@/components/PrivatePolicyButton";
+import {PAGE_ROUTES} from "@/utils/routes";
 
 export default async function Catalog() {
   const services = await popularServices({take: 6});
@@ -10,8 +12,19 @@ export default async function Catalog() {
   return (
     <>
       <GeneralCategoriesListComponent />
-      <PopularServicesComponent services={services} />
+      <VerticalServicesViewComponent 
+        services={services} 
+        title="Популярное"
+        moveToAllButton={{
+          text: "Все",
+          href: PAGE_ROUTES.CATALOG.POPULAR
+        }}
+      />
       <ServiceRegistrationBanner />
+      {/* Кнопки Registry service и Private policy */}
+      <div className="flex flex-col items-center space-y-3">
+        <PrivatePolicyButton />
+      </div>
     </>
   );
 } 

@@ -24,7 +24,7 @@ export const CategoryItem: React.FC<CategoryItemProps> = ({ category, generalCat
 
   return (
     <div
-      className="flex items-center py-3 cursor-pointer hover:bg-gray-100 transition group relative"
+      className="flex items-center py-1 cursor-pointer hover:bg-gray-100 transition group relative"
       onClick={handleCategoryClick}
       style={{ fontFamily: 'Inter, sans-serif' }}
     >

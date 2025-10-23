@@ -7,6 +7,7 @@ import {SearchBar} from '@/components/SearchBar';
 import {ServiceType} from '@/model/ServiceType';
 import {CategoryEntity} from '@/entity/CategoryEntity';
 import {ChildCategoryButton} from '@/components/ChildCategoryButton';
+import {PAGE_ROUTES} from '@/utils/routes';
 
 interface ServicesClientProps {
   category: CategoryEntity;
@@ -15,7 +16,7 @@ interface ServicesClientProps {
   selectedChildIds?: number[];
 }
 
-export default function ServicesClient({childCategories, initialServices, selectedChildIds: initialSelectedChildIds = [] }: ServicesClientProps) {
+export default function ServicesClient({category, childCategories, initialServices, selectedChildIds: initialSelectedChildIds = [] }: ServicesClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   // Use the selectedChildIds from props, not local state
@@ -66,9 +67,20 @@ export default function ServicesClient({childCategories, initialServices, select
       </div>
       {/* Title - changes based on selection */}
       <div className="px-4 pb-3 pl-6">
-        <h2 className="text-[13px] font-normal" style={{ fontFamily: 'Inter, sans-serif', color: '#707579' }}>
-          {hasSelectedChildCategories ? `Found: ${initialServices.length}` : 'For you'}
-        </h2>
+        <div className="flex justify-between items-center">
+          <h2 className="text-[13px] font-normal" style={{ fontFamily: 'Inter, sans-serif', color: '#707579' }}>
+            {hasSelectedChildCategories ? `Found: ${initialServices.length}` : 'ДЛЯ ВАС'}
+          </h2>
+          {!hasSelectedChildCategories && (
+            <a 
+              href={`/catalog/${category.id}`}
+              className="text-blue-500 text-sm font-medium hover:text-blue-600 transition-colors"
+              style={{ fontFamily: 'Inter, sans-serif' }}
+            >
+              Все
+            </a>
+          )}
+        </div>
       </div>
       {/* Services - different layout based on selection */}
       <div className="px-4 pb-32">

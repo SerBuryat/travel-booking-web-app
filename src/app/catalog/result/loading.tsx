@@ -13,7 +13,7 @@ export default function Loading() {
           {/* Loading skeleton for services */}
           <div className="space-y-4">
             {[...Array(6)].map((_, index) => (
-              <div key={index} className="bg-white rounded-lg border p-4 animate-pulse">
+              <div key={index} className="bg-white rounded-lg p-4 animate-pulse">
                 <div className="flex items-start space-x-4">
                   {/* Service photo skeleton */}
                   <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0"></div>
