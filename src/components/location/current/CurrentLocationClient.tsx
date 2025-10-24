@@ -12,7 +12,7 @@ export const CurrentLocationClient: React.FC<CurrentLocationClientProps> = ({ lo
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="mb-6 flex justify-center">
+    <div className="flex justify-center bg-white">
       <button
         type="button"
         className="font-medium text-blue-600 hover:underline"

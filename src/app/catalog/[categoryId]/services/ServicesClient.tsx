@@ -7,7 +7,6 @@ import {SearchBar} from '@/components/SearchBar';
 import {ServiceType} from '@/model/ServiceType';
 import {CategoryEntity} from '@/entity/CategoryEntity';
 import {ChildCategoryButton} from '@/components/ChildCategoryButton';
-import {PAGE_ROUTES} from '@/utils/routes';
 
 interface ServicesClientProps {
   category: CategoryEntity;
@@ -69,7 +68,7 @@ export default function ServicesClient({category, childCategories, initialServic
       <div className="px-4 pb-3 pl-6">
         <div className="flex justify-between items-center">
           <h2 className="text-[13px] font-normal" style={{ fontFamily: 'Inter, sans-serif', color: '#707579' }}>
-            {hasSelectedChildCategories ? `Found: ${initialServices.length}` : 'ДЛЯ ВАС'}
+            {hasSelectedChildCategories ? `НАЙДЕНО: ${initialServices.length}` : 'ДЛЯ ВАС'}
           </h2>
           {!hasSelectedChildCategories && (
             <a 

@@ -117,7 +117,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({ searchValue = '', showCanc
           className="px-4 py-2 text-blue-600 font-semibold rounded hover:underline whitespace-nowrap"
           onClick={handleCancel}
         >
-          Cancel
+          Отменить
         </button>
       )}
     </div>

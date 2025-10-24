@@ -2,11 +2,11 @@
 
 import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
-import {ServiceType} from "@/model/ServiceType";
+import {ServiceType, ServiceTypeFull} from "@/model/ServiceType";
 import {CategoryEntity} from "@/entity/CategoryEntity";
+import { ContactsType } from '@/model/ContactsType';
 
 const DEFAULT_TAKE_SERVICES = 10;
-const CATEGORY_SERVICES_LIMIT = 10;
 
 interface SearchServiceOptions {
   categoryIds?: number[];
@@ -146,7 +146,7 @@ async function fetchServices(where: any, take: number): Promise<ServiceType[]> {
     where,              // Фильтры по имени, категории и локации
     orderBy: { priority: 'desc' },            // Сортировка по «популярности»
     take,               // Лимит записей
-    include: { tcategories: true }, // Присоединяем полную категорию
+    include: { tcategories: true, tlocations: true }, // Присоединяем категорию и адрес
   });
 
   if (services.length === 0) {
@@ -248,6 +248,24 @@ function buildWhereForCategories(
 }
 
 /**
+ * Получение сервиса по ID.
+ *
+ * @param {number} serviceId Идентификатор сервиса
+ * @returns {Promise<ServiceType | null>} Сервис с полем category
+ */
+export async function getServiceById(serviceId: number): Promise<ServiceTypeFull | null> {
+  const service = await prisma.tservices.findUnique({
+    where: { id: serviceId },
+    include: { tcategories: true, tlocations: true, tcontacts: true },
+  });
+  
+  const result = mapToSearchableService(service);
+
+  return { ...result, contacts: service?.tcontacts ?? [] };
+}
+
+
+/**
  * Получение сервисов по массиву ID.
  * Используется для отображения выбранных сервисов провайдера.
  *
@@ -283,7 +301,8 @@ export async function getServicesByIds(serviceIds: number[]): Promise<ServiceTyp
  * @returns {ServiceType} Сервис с полем category
  */
 function mapToSearchableService(service: any): ServiceType {
-  const { tcategories: category, ...rest } = service;
+  const { tcategories: category, tlocations: location, ...rest } = service;
+
   const mappedCategory: CategoryEntity = {
     id: category.id,
     code: category.code,
@@ -304,8 +323,10 @@ function mapToSearchableService(service: any): ServiceType {
     created_at: rest.created_at,
     priority: rest.priority,
     category: mappedCategory,
-    rating: rest.rating ? Number(rest.rating) : undefined,
-    view_count: rest.view_count
+    rating: rest.rating.toString(),
+    view_count: rest.view_count,
+    options: rest.service_options,
+    address: location[0].address,
   };
 }
 

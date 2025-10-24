@@ -21,6 +21,7 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   async function handleContactClick() {
+    // todo -  переделать на server action
     try {
       const res = await fetch(`/api/services/${service.id}/click`, { method: 'POST' });
       if (res.status === 401) {
@@ -54,7 +55,7 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
           className="text-gray-500 mb-6 text-center"
           style={{ fontSize: '15px', color: '#AAAAAA', fontWeight: 400 }}
         >
-          123 Main Street, Downtown District, City Center, 12345
+          {service.address}
         </p>
         {/* Description Section */}
         <div className="bg-gray-100 rounded-lg p-4">
@@ -62,7 +63,7 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
             className="text-gray-600 mb-3"
             style={{ fontSize: '15px', color: '#707579' }}
           >
-            Description
+            Описание
           </h2>
           <p 
             className="text-black leading-relaxed"
@@ -74,29 +75,29 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
         {/* Additional Service Info */}
         <div className="mt-6 space-y-4">
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">Price:</span>
+            <span className="text-gray-600">Цена:</span>
             <span className="text-2xl font-bold text-blue-600">
-              ${service.price}
+              {service.price} ₽
             </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">Status:</span>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-              service.status === 'active' 
-                ? 'bg-green-100 text-green-800' 
-                : 'bg-gray-100 text-gray-800'
-            }`}>
-              {service.status}
+            <span className="text-gray-600">Рейтинг:</span>
+            <span className="text-xl font-bold text-blue-600">
+              {
+                service.rating && service.view_count > 0
+                    ? `${service.rating}/5`
+                    : 'Нет оценок'
+              }
             </span>
           </div>
         </div>
         {/* Action Buttons */}
-        <div className="h-28" />
+        <div className="h-28"/>
       </div>
 
       {/* Sticky Contact Button */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
-        <button
+      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{zIndex: 60}}>
+      <button
           onClick={handleContactClick}
           className="max-w-sm text-black pt-2 pb-2 pr-4 pl-4"
           style={{ backgroundColor: '#95E59D', borderRadius: 30, fontSize: 17, fontWeight: 400 }}

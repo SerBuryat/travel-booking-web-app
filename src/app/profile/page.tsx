@@ -6,7 +6,6 @@ import ProfileMenu from "@/app/profile/_components/ProfileMenu";
 import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
 import {ClientWithAuthType} from "@/model/ClientType";
-import {CurrentLocation} from "@/components/location/current/CurrentLocation";
 
 // Принудительно делаем страницу динамической
 export const dynamic = 'force-dynamic';
@@ -20,9 +19,6 @@ export default async function ProfilePage() {
 
   return (
       <div className="min-h-screen bg-gray-50 pt-2">
-        <div className="">
-          <CurrentLocation/>
-        </div>
         <ProfileHeader user={user} />
         <div className="max-w-md mx-auto pt-6 px-4">
           <ProfileMenu/>
