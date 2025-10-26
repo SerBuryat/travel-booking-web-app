@@ -27,7 +27,6 @@ export default async function ProfilePage() {
   );
 } 
 
-// todo - такой логики на страницах быть не должно
 async function getUser(): Promise<ClientWithAuthType | null> {
   try {
     const userAuth = await getUserAuthOrThrow();

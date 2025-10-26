@@ -8,6 +8,7 @@ import {ApiService} from "@/service/ApiService";
 import {UserAuth} from "@/lib/auth/userAuth";
 import {authWithTelegram} from "@/lib/auth/telegram/telegramAuth";
 import {mockTelegramAuth} from "@/lib/auth/telegram/mockTelegramAuth";
+import {currentLocation, CurrentLocationType} from "@/lib/location/currentLocation";
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
@@ -15,6 +16,9 @@ interface AuthContextType {
   isAuthenticated: boolean;
   user: UserAuth | null;
   isLoading: boolean;
+
+  // Локация
+  location: CurrentLocationType;
   
   // Функции
   checkAuth: () => Promise<void>;
@@ -46,6 +50,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Состояние
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<UserAuth | null>(null);
+  const [location, setLocation]  = useState<CurrentLocationType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   // Функция проверки аутентификации
@@ -53,6 +58,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsLoading(true);
     try {
       const user = await ApiService.getUserAuth();
+      const location = await currentLocation();
+      setLocation(location);
       setUser(user);
       setIsAuthenticated(true);
     } catch (error) {
@@ -63,6 +70,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         try {
           const authUser = await mockTelegramAuth();
           setUser(authUser);
+          const location = await currentLocation();
+          setLocation(location);
           setIsAuthenticated(true);
         } catch (mockError) {
           console.info('Мок авторизация Telegram не выполнена', mockError);
@@ -82,8 +91,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const loginViaTelegram = async (telegramUserInitData: TelegramUserInitData) => {
     try {
       setIsLoading(true);
+
       const authUser = await authWithTelegram(telegramUserInitData);
       setUser(authUser);
+
+      const location = await currentLocation();
+      setLocation(location);
+
       setIsAuthenticated(true);
     } finally {
       setIsLoading(false);
@@ -105,7 +119,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
   
-  // Функция обновления данных пользователя (для переключения ролей)
+  // Функция обновления данных пользователя (например, для переключения ролей)
   const refreshUser = async () => {
     if (!isAuthenticated) return;
     
@@ -113,6 +127,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       const user = await ApiService.getUserAuth();
       setUser(user);
+      const location = await currentLocation();
+      setLocation(location);
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Ошибка обновления пользователя:', error);
@@ -128,7 +144,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }, []);
   
   const value: AuthContextType = {
-    isAuthenticated, user, isLoading, checkAuth, loginViaTelegram, logout, refreshUser,
+    isAuthenticated, user, isLoading, location,
+    checkAuth, loginViaTelegram, logout, refreshUser
   };
   
   return (
