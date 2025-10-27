@@ -10,9 +10,9 @@ export interface ServiceCategoryOption {
 }
 
 export const ServiceOptions: Record<string, ServiceCategoryOption> = {
-  PROPERTY: {
-    name: "PROPERTY",
-    description: "Недвижимость",
+  ACCOMMODATION: {
+    name: "accommodation",
+    description: "Проживание",
     options: [
       "wi-fi",
       "бассейн", 
@@ -24,9 +24,9 @@ export const ServiceOptions: Record<string, ServiceCategoryOption> = {
       "детская площадка"
     ]
   },
-  TRANSFER: {
-    name: "TRANSFER",
-    description: "Трансфер",
+  TRANSPORT: {
+    name: "transport",
+    description: "Транспорт",
     options: [
       "встреча в аэропорту",
       "доставка до отеля",
@@ -36,8 +36,8 @@ export const ServiceOptions: Record<string, ServiceCategoryOption> = {
       "багаж включен"
     ]
   },
-  MEAL: {
-    name: "MEAL",
+  FOOD: {
+    name: "food",
     description: "Питание",
     options: [
       "завтрак",

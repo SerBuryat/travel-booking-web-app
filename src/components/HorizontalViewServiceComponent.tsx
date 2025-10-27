@@ -28,16 +28,9 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
   };
 
   // Truncate description if too long
-  const truncateDescription = (text: string, maxLength: number = 120) => {
+  const truncateDescription = (text: string, maxLength: number = 50) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
-  };
-
-  // Mock tags for demonstration
-  const getMockTags = (id: number) => {
-    const allTags = ['Wi-Fi', 'Meal', 'Parking', '24/7', 'Premium'];
-    const numTags = 2 + (id % 3); // 2-4 tags
-    return allTags.slice(0, numTags);
   };
 
   const handleClick = () => {
@@ -49,17 +42,13 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
     }
   };
 
-  const tags = getMockTags(service.id);
-  // Use actual rating from service data
-  const rating = service.rating;
-
   return (
     <div 
-      className="bg-white rounded-[24px] overflow-hidden shadow-sm border cursor-pointer hover:shadow-md transition-shadow mb-3"
+      className="bg-white rounded-[24px] overflow-hidden shadow-lg border cursor-pointer hover:shadow-md transition-shadow mb-3"
       onClick={handleClick}
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
-             <div className="flex h-48">
+      <div className="flex h-52">
         {/* Service photo - 1/4 width */}
         <div 
           className="w-1/4 h-full"
@@ -80,7 +69,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
               className="text-xs"
               style={{ color: '#707579', fontWeight: 400 }}
             >
-              {service.description.split(' ').slice(0, 3).join(' ')} • 2.5 km away
+              {service.address}
             </p>
           </div>
           
@@ -97,7 +86,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
            {/* Tags section - horizontal scrollable */}
            <div className="mb-3 overflow-x-auto">
              <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
-               {tags.map((tag, index) => (
+               {service.options.map((tag, index) => (
                  <span
                    key={index}
                    className="px-3 py-1 rounded-full text-xs whitespace-nowrap"
@@ -120,14 +109,18 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
                  className="text-xs font-semibold"
                  style={{ color: '#007AFF', fontWeight: 600 }}
                >
-                 {rating ? `${rating}/5` : 'N/A'}
+                 {
+                   service.rating && service.view_count > 0
+                       ? `${service.rating}/5`
+                       : 'Нет оценок'
+                 }
                </span>
               {/* Price on the right */}
               <span 
                 className="text-xs font-semibold"
                 style={{ color: '#007AFF', fontWeight: 600 }}
               >
-                ${service.price}
+                {service.price} ₽
               </span>
             </div>
         </div>

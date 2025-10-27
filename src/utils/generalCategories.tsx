@@ -49,7 +49,7 @@ export const DEFAULT_CATEGORY_ICON: React.ReactNode = (
 
 // General categories constants
 export const ACCOMMODATION: GeneralCategory = {
-  code: 'accomodation',
+  code: 'accommodation',
   icon: <AccommodationIcon />
 };
 

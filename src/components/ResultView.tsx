@@ -1,7 +1,7 @@
 "use client";
 import React, {useState} from 'react';
 import {useRouter} from 'next/navigation';
-import {PopularServicesComponent} from './PopularServicesComponent';
+import {VerticalServicesViewComponent} from './VerticalServicesViewComponent';
 import {ServiceType} from '@/model/ServiceType';
 import {CategoryEntity} from '@/entity/CategoryEntity';
 import {ChildCategoryButton} from './ChildCategoryButton';
@@ -55,23 +55,23 @@ export default function ResultView({ searchValue, services, selectedCategoryIds 
       }, []);
 
   return (
-    <div className="w-full max-w-3xl mx-auto pt-4 px-4 bg-white">
-      {/* Categories list */}
-      {uniqueCategories.length > 0 && (
-        <div className="flex flex-wrap">
-          {uniqueCategories.map((cat: CategoryEntity) => (
-            <ChildCategoryButton
-              key={cat.id}
-              category={cat}
-              active={selectedCategories.includes(cat.id)}
-              onClick={() => handleCategoryClick(cat.id)}
-            />
-          ))}
+      <div>
+        <div className="w-full max-w-3xl mx-auto pt-4 px-4 bg-white">
+          {/* Categories list */}
+          {uniqueCategories.length > 0 && (
+              <div className="flex flex-wrap">
+                {uniqueCategories.map((cat: CategoryEntity) => (
+                    <ChildCategoryButton
+                        key={cat.id}
+                        category={cat}
+                        active={selectedCategories.includes(cat.id)}
+                        onClick={() => handleCategoryClick(cat.id)}
+                    />
+                ))}
+              </div>
+          )}
         </div>
-      )}
-      
-      <PopularServicesComponent services={services} />
-
-    </div>
+        <VerticalServicesViewComponent services={services}/>
+      </div>
   );
 } 

@@ -51,7 +51,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   }
 
   return (
-    <div className="relative w-full h-64 overflow-hidden">
+    <div className="relative w-full h-80 overflow-hidden">
       {/* Images */}
       <div 
         className="flex transition-transform duration-500 ease-in-out h-full"

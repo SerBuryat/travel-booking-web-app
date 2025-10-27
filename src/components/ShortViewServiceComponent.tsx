@@ -43,7 +43,7 @@ export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps>
 
   return (
     <div 
-      className="bg-white rounded-[24px] overflow-hidden shadow-sm border cursor-pointer hover:shadow-md transition-shadow w-40"
+      className="bg-white rounded-[24px] overflow-hidden shadow-lg cursor-pointer w-40"
       onClick={handleClick}
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
@@ -56,7 +56,7 @@ export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps>
       {/* Service content */}
       <div className="p-3">
         <h3 
-          className="text-black font-semibold text-sm mb-1 line-clamp-2"
+          className="text-black font-semibold mb-1 line-clamp-2"
           style={{ fontWeight: 600 }}
         >
           {service.name}

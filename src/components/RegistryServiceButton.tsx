@@ -25,7 +25,7 @@ export const RegistryServiceButton: React.FC = () => {
           fontFamily: 'Inter, sans-serif'
         }}
       >
-        Registry service
+        Зарегистрировать объект
       </button>
 
       {/* Модальное окно */}

@@ -12,8 +12,10 @@ export interface ServiceType {
   created_at?: string;
   priority?: string;
   category?: CategoryEntity;
-  rating?: number;
+  rating?: string;
   view_count?: number;
+  options: string[];
+  address: string;
 }
 
 export interface ServiceTypeFull extends ServiceType {
