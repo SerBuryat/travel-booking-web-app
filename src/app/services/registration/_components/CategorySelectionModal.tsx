@@ -56,31 +56,15 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
     setSelectedParentId(null);
   };
 
-  const getSelectedCategoryName = () => {
-    if (!selectedCategory) return 'Выберите категорию';
-    
-    for (const parent of categories) {
-      if (parent.id === selectedCategory) {
-        return parent.name;
-      }
-      for (const child of parent.children) {
-        if (child.id === selectedCategory) {
-          return `${parent.name} → ${child.name}`;
-        }
-      }
-    }
-    return `Категория ${selectedCategory}`;
-  };
-
   const getSelectedCategoryDisplay = () => {
     if (!selectedCategory) return 'Выберите категорию';
-    
+
     for (const parent of categories) {
       if (parent.id === selectedCategory) {
         return (
           <div className="flex items-center space-x-2">
-            <span className="text-blue-600 font-medium">{parent.name}</span>
-            <span className="text-gray-400">(Основная категория)</span>
+            <span className="font-medium">{parent.name}</span>
+            <span>(Основная категория)</span>
           </div>
         );
       }
@@ -88,9 +72,9 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
         if (child.id === selectedCategory) {
           return (
             <div className="flex items-center space-x-2">
-              <span className="text-gray-600">{parent.name}</span>
-              <span className="text-gray-400">→</span>
-              <span className="text-blue-600 font-medium">{child.name}</span>
+              <span>{parent.name}</span>
+              <span>→</span>
+              <span>{child.name}</span>
             </div>
           );
         }
