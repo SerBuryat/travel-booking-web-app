@@ -135,7 +135,7 @@
 - **API Route:** `/api/services/create`
 - **Сервисный слой:** `ServiceRegistrationService`
 - **Репозиторный слой:** `ServiceRepository`
-- **Валидация:** Zod схема `serviceRegistrationSchema`
+- **Валидация:** Zod схема `createServiceSchema`
 - **База данных:** Prisma ORM с использованием `include`
 
 ### Схема данных

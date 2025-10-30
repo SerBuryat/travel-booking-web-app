@@ -25,15 +25,12 @@ export class ProviderService {
    */
   async createOrGetProvider(clientId: number, companyName: string, phone: string, contactPerson: string): Promise<ProviderEntity> {
     try {
-      // Сначала проверяем, есть ли уже провайдер у этого клиента
       const existingProvider = await this.getProviderForClient(clientId);
       
       if (existingProvider) {
-        // Если провайдер уже существует, возвращаем его
         return existingProvider;
       }
-      
-      // Если провайдера нет, создаем нового
+
       return await this.providerRepository.createProvider(clientId, companyName, phone, contactPerson);
     } catch (error) {
       console.error('Error creating or getting provider:', error);

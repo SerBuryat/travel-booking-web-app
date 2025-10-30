@@ -2,10 +2,10 @@
 
 import React from 'react';
 import {FieldError, UseFormRegister} from 'react-hook-form';
-import {ServiceRegistrationFormData} from '@/schemas/serviceRegistrationSchema';
+import {CreateServiceWithProviderData} from '@/schemas/service/createServiceSchema';
 
 interface ServicePriceInputProps {
-  register: UseFormRegister<ServiceRegistrationFormData>;
+  register: UseFormRegister<CreateServiceWithProviderData>;
   error?: FieldError;
 }
 
