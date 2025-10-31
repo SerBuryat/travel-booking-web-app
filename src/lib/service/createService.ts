@@ -1,10 +1,13 @@
 "use server";
 
-import {CreateServiceWithProviderData} from "@/schemas/service/createServiceSchema";
+import {CreateServiceData, CreateServiceWithProviderData} from "@/schemas/service/createServiceSchema";
 import {prisma} from "@/lib/db/prisma";
 
-export interface CreatedServiceWithProviderResponse {
-  serviceId: number,
+export interface CreatedServiceResponse {
+  serviceId: number
+}
+
+export interface CreatedServiceWithProviderResponse extends CreatedServiceResponse {
   providerId: number
 }
 
@@ -74,4 +77,49 @@ export async function createServiceWithProvider(
 
     return {serviceId: createdService.id, providerId: createdProvider.id};
   });
+}
+
+/*
+* Создание сервиса, существующим провайдером.
+*
+**/
+export async function createService(
+    createServiceData: CreateServiceData, providerId: number): Promise<CreatedServiceResponse>
+{
+  if(!providerId) {
+    throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
+  }
+
+  const createdService = await prisma.tservices.create({
+    data: {
+      name: createServiceData.name,
+      description: createServiceData.description,
+      price: parseFloat(createServiceData.price),
+      tcategories_id: createServiceData.tcategories_id,
+      provider_id: providerId,
+      active: true,
+      status: 'published',
+      service_options: createServiceData.serviceOptions || null,
+      tcontacts: {
+        create: {
+          email: 'default@example.com', // Обязательное поле в БД, проставляем мок
+          phone: createServiceData.phone || null,
+          tg_username: createServiceData.tg_username || null,
+        }
+      },
+      tlocations: {
+        create: {
+          address: createServiceData.address,
+          tarea_id: createServiceData.tarea_id,
+        }
+      }
+    },
+    select: {id: true}
+  })
+
+  if(!createdService) {
+    throw new Error('[createServiceWithProvider]: Cant create service!');
+  }
+
+  return {serviceId: createdService.id};
 }
