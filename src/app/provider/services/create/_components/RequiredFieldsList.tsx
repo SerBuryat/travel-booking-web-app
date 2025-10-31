@@ -1,10 +1,10 @@
 import React from 'react';
 import {FieldErrors, UseFormWatch} from 'react-hook-form';
-import {CreateServiceWithProviderData} from '@/schemas/service/createServiceSchema';
+import {CreateServiceData} from '@/schemas/service/createServiceSchema';
 
 interface RequiredFieldsListProps {
-  watch: UseFormWatch<CreateServiceWithProviderData>;
-  errors: FieldErrors<CreateServiceWithProviderData>;
+  watch: UseFormWatch<CreateServiceData>;
+  errors: FieldErrors<CreateServiceData>;
 }
 
 export const RequiredFieldsList: React.FC<RequiredFieldsListProps> = ({ watch, errors }) => {
@@ -18,16 +18,13 @@ export const RequiredFieldsList: React.FC<RequiredFieldsListProps> = ({ watch, e
     { key: 'tcategories_id', label: 'Категория' },
     { key: 'address', label: 'Адрес' },
     { key: 'tarea_id', label: 'Зона' },
-    { key: 'providerCompanyName', label: 'Название компании' },
-    { key: 'providerContactPerson', label: 'Контактное лицо' },
-    { key: 'providerPhone', label: 'Телефон компании' },
     { key: 'phone', label: 'Контактный телефон' },
     { key: 'tg_username', label: 'Телеграм ссылка заведения' }
   ];
 
   // Разделяем поля на заполненные и незаполненные
   const fieldsWithStatus = requiredFields.map(field => {
-    const value = formValues[field.key as keyof CreateServiceWithProviderData];
+    const value = formValues[field.key as keyof CreateServiceData];
     const isEmpty = !value || (typeof value === 'number' && value === 0) || (typeof value === 'string' && value.trim() === '');
     return { ...field, isEmpty };
   });
@@ -59,7 +56,7 @@ export const RequiredFieldsList: React.FC<RequiredFieldsListProps> = ({ watch, e
         {fieldsWithStatus.map((field) => (
           <div 
             key={field.key} 
-            className="px-3 py-1.5 text-xs rounded" 
+            className="px-3 py-1.5 text-xs rounded"
             style={{ 
               backgroundColor: field.isEmpty ? 'white' : '#F3F4F6',
               color: field.isEmpty ? '#707579' : '#9CA3AF',

@@ -1,4 +1,5 @@
 import {ServiceType} from '@/model/ServiceType';
+import {PAGE_ROUTES} from "@/utils/routes";
 
 interface ProviderServicesComponentProps {
   providerId?: number;
@@ -46,7 +47,7 @@ export default function ProviderServicesComponent({ providerId, services }: Prov
             </p>
             <div className="mt-5">
               <a
-                href="/services/registration"
+                href={PAGE_ROUTES.PROVIDER.CREATE_SERVICE}
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
               >
                 Создать сервис
