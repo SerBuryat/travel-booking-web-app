@@ -134,7 +134,7 @@ export async function createService(
         loadServicePhotoToS3Storage(createdService.id, photo.file)
           .then(result => 
 
-            saveServicePhoto(createdService.id, {url: photo.file.name, isPrimary: photo.isPrimary})
+            saveServicePhoto(createdService.id, {fileName: photo.file.name, isPrimary: photo.isPrimary})
               .then(savedPhoto =>
                   console.log('[createService] Фото сохранено в storage и в db:', savedPhoto.id, savedPhoto.url)
               )
