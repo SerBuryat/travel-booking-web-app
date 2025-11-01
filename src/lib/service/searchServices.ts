@@ -256,12 +256,12 @@ function buildWhereForCategories(
 export async function getServiceById(serviceId: number): Promise<ServiceTypeFull | null> {
   const service = await prisma.tservices.findUnique({
     where: { id: serviceId },
-    include: { tcategories: true, tlocations: true, tcontacts: true },
+    include: { tcategories: true, tlocations: true, tcontacts: true, tphotos: true },
   });
   
   const result = mapToSearchableService(service);
 
-  return { ...result, contacts: service?.tcontacts ?? [] };
+  return { ...result, contacts: service?.tcontacts ?? [], photos: service?.tphotos ?? [] };
 }
 
 

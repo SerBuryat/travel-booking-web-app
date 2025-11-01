@@ -18,6 +18,11 @@ export interface ServiceType {
   address: string;
 }
 
+export interface Photos {
+  url: string
+}
+
 export interface ServiceTypeFull extends ServiceType {
   contacts: ContactsType[];
+  photos: Photos[]
 }
