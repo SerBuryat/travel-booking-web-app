@@ -68,7 +68,7 @@ export const useProvideCreateService = () => {
 
   return {
     form,
-    onSubmit: form.handleSubmit(onSubmit),
+    onSubmit: form.handleSubmit(e => onSubmit(e)),
     isSubmitting,
     errors: form.formState.errors,
     result,

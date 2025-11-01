@@ -95,7 +95,7 @@ export default function ProviderServicesComponent({ providerId, services }: Prov
           <div className="flex justify-between items-center">
             <h3 className="text-sm sm:text-base font-medium text-gray-900">Мои сервисы</h3>
             <a
-              href="/services/registration"
+              href={PAGE_ROUTES.PROVIDER.CREATE_SERVICE}
               className="inline-flex items-center px-2 sm:px-3 py-1.5 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
             >
               Добавить сервис
