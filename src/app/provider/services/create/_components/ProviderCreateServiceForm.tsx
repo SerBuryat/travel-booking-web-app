@@ -17,10 +17,23 @@ import {ResultModal} from './ResultModal';
 import {TermsModal} from './TermsModal';
 import {SectionTitle} from './SectionTitle';
 import {ServicePhotoUpload} from './ServicePhotoUpload';
+import { useServicePhotos } from '@/lib/service/hooks/useServicePhotos';
 
 export const ProviderCreateServiceForm: React.FC = () => {
   const { form, onSubmit, isSubmitting, errors, result, resetResult } = useProvideCreateService();
   const [showTermsModal, setShowTermsModal] = useState(false);
+  const { 
+    photos, 
+    addPhotos, 
+    removePhoto, 
+    setPrimaryPhoto, 
+    clearPhotos, 
+    error: photosError 
+  } = useServicePhotos();
+
+  const handleSubmit = (data: any) => {
+    onSubmit(data, photos);
+  };
   
   // Текст условий сотрудничества
   const fullTermsText = `Условия сотрудничества\n\n1. Общие положения\nНастоящие условия определяют порядок сотрудничества между платформой и сервисными провайдерами.\n\n2. Обязанности провайдера\nПровайдер обязуется предоставлять достоверную информацию о своих услугах, поддерживать актуальность данных и соблюдать сроки предоставления услуг.\n\n3. Комиссия\nПлатформа взимает комиссию в размере 10% с каждой успешно завершенной сделки.\n\n4. Ответственность\nКаждая сторона несет ответственность за свои обязательства в соответствии с законодательством.\n\n5. Изменение условий\nПлатформа оставляет за собой право изменять условия сотрудничества с уведомлением провайдеров за 30 дней.\n\n6. Согласие\nПри регистрации сервиса вы автоматически соглашаетесь с настоящими условиями сотрудничества.`;
@@ -48,7 +61,7 @@ export const ProviderCreateServiceForm: React.FC = () => {
       />
 
       {/* Main Form */}
-       <form onSubmit={onSubmit} className="space-y-8 pb-20">
+       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 pb-20">
         {/* Заполните анкету */}
         <SectionTitle>Заполните анкету</SectionTitle>
         
@@ -111,7 +124,14 @@ export const ProviderCreateServiceForm: React.FC = () => {
         {/* Логотип и Фото заведения */}
         <SectionTitle>Логотип и Фото заведения</SectionTitle>
         
-        <ServicePhotoUpload />
+        <ServicePhotoUpload 
+          photos={photos}
+          onAddPhotos={addPhotos}
+          onRemovePhoto={removePhoto}
+          onSetPrimary={setPrimaryPhoto}
+          onClearPhotos={clearPhotos}
+          error={photosError}
+        />
         
         {/* Условия сотрудничества */}
         <SectionTitle>Условия сотрудничества</SectionTitle>

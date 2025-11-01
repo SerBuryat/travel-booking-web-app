@@ -8,6 +8,8 @@ import {
 } from '@/schemas/service/createServiceSchema';
 import {useAuth} from '@/contexts/AuthContext';
 import {createService} from "@/lib/service/createService";
+import { PhotoItem } from '@/lib/service/hooks/useServicePhotos';
+import { saveServicePhoto } from '@/lib/service/media';
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -25,7 +27,7 @@ export const useProvideCreateService = () => {
     resolver: zodResolver(createServiceSchema)
   });
 
-  const onSubmit = async (data: CreateServiceData) => {
+  const onSubmit = async (data: CreateServiceData, photos?: PhotoItem[]) => {
     if (!user) {
       setResult({
         success: false,
@@ -39,7 +41,22 @@ export const useProvideCreateService = () => {
     setResult(null);
 
     try {
+      // Создаем сервис
       const responseData = await createService(data, user.providerId);
+
+      // Сохраняем фото в S3 (если есть)
+      if (photos && photos.length > 0) {
+        try {
+          // Сохраняем все фото параллельно
+          await Promise.all(
+            photos.map(photo => saveServicePhoto(responseData.serviceId, photo.file))
+          );
+          console.log('[useProvideCreateService] Успешно сохранено фото:', photos.length);
+        } catch (photoError) {
+          // Логируем ошибку, но не останавливаем процесс
+          console.error('[useProvideCreateService] Ошибка при сохранении фото:', photoError);
+        }
+      }
 
       setResult({
         success: true,
@@ -68,7 +85,7 @@ export const useProvideCreateService = () => {
 
   return {
     form,
-    onSubmit: form.handleSubmit(e => onSubmit(e)),
+    onSubmit,
     isSubmitting,
     errors: form.formState.errors,
     result,

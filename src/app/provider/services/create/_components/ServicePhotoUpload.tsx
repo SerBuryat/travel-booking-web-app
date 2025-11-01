@@ -1,91 +1,32 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { saveServicePhoto } from '@/lib/service/media';
-
-interface PhotoItem {
-  id: string;
-  file: File;
-  previewUrl: string;
-  isPrimary: boolean;
-}
+import { PhotoItem } from '@/lib/service/hooks/useServicePhotos';
 
 const MAX_PHOTOS = 10;
 
-export const ServicePhotoUpload: React.FC = () => {
-  const [photos, setPhotos] = useState<PhotoItem[]>([]);
-  const [primaryPhotoId, setPrimaryPhotoId] = useState<string | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [uploadSuccess, setUploadSuccess] = useState<Set<string>>(new Set());
-  const [error, setError] = useState<string | null>(null);
+interface ServicePhotoUploadProps {
+  photos: PhotoItem[];
+  onAddPhotos: (files: FileList | null) => void;
+  onRemovePhoto: (id: string) => void;
+  onSetPrimary: (id: string) => void;
+  onClearPhotos: () => void;
+  error?: string | null;
+}
+
+export const ServicePhotoUpload: React.FC<ServicePhotoUploadProps> = ({
+  photos,
+  onAddPhotos,
+  onRemovePhoto,
+  onSetPrimary,
+  onClearPhotos,
+  error: externalError
+}) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Хардкод serviceId для тестирования
-  const SERVICE_ID = 32;
-
-  const handleFileSelect = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
-
-    const newPhotos: PhotoItem[] = [];
-    const remainingSlots = MAX_PHOTOS - photos.length;
-
-    if (remainingSlots <= 0) {
-      setError(`Максимальное количество фото: ${MAX_PHOTOS}`);
-      return;
-    }
-
-    const filesToProcess = Array.from(files).slice(0, remainingSlots);
-    const isFirstUpload = photos.length === 0;
-    let firstValidPhotoId: string | null = null;
-
-    for (const file of filesToProcess) {
-      // Проверяем, что это изображение
-      if (!file.type.startsWith('image/')) {
-        setError(`Файл "${file.name}" не является изображением`);
-        continue;
-      }
-
-      const id = `${Date.now()}-${Math.random()}`;
-      
-      // Если это первое фото и еще нет обложки, запоминаем его ID
-      if (isFirstUpload && firstValidPhotoId === null) {
-        firstValidPhotoId = id;
-      }
-      
-      // Определяем, будет ли это фото обложкой
-      const willBePrimary = isFirstUpload && firstValidPhotoId === id;
-      
-      // Создаем превью
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const previewUrl = reader.result as string;
-        setPhotos(prev => {
-          const existing = prev.find(p => p.id === id);
-          if (existing) {
-            return prev.map(p => p.id === id ? { ...p, previewUrl } : p);
-          }
-          return [...prev, { id, file, previewUrl, isPrimary: willBePrimary }];
-        });
-      };
-      reader.readAsDataURL(file);
-
-      // Временно добавляем без previewUrl
-      newPhotos.push({ id, file, previewUrl: '', isPrimary: willBePrimary });
-    }
-
-    // Устанавливаем обложку на первое загруженное фото (если это первая загрузка)
-    if (isFirstUpload && firstValidPhotoId && primaryPhotoId === null) {
-      setPrimaryPhotoId(firstValidPhotoId);
-    }
-
-    setPhotos(prev => [...prev, ...newPhotos]);
-    setError(null);
-    setUploadSuccess(new Set());
-  };
-
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileSelect(e.target.files);
+    onAddPhotos(e.target.files);
     // Сбрасываем значение input для возможности повторной загрузки того же файла
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -95,7 +36,7 @@ export const ServicePhotoUpload: React.FC = () => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-    handleFileSelect(e.dataTransfer.files);
+    onAddPhotos(e.dataTransfer.files);
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -109,79 +50,17 @@ export const ServicePhotoUpload: React.FC = () => {
   };
 
   const handleRemoveFile = (id: string) => {
-    // Если удаляем primary фото, выбираем первое из оставшихся
-    const wasPrimary = primaryPhotoId === id;
-    
-    setPhotos(prev => {
-      const filtered = prev.filter(p => p.id !== id);
-      
-      // Если удалили обложку, устанавливаем первую оставшуюся как обложку
-      if (wasPrimary && filtered.length > 0) {
-        const newPrimaryId = filtered[0].id;
-        setPrimaryPhotoId(newPrimaryId);
-        return filtered.map(p => ({ ...p, isPrimary: p.id === newPrimaryId }));
-      }
-      
-      return filtered;
-    });
-    
-    if (wasPrimary && photos.filter(p => p.id !== id).length === 0) {
-      setPrimaryPhotoId(null);
-    }
-    
-    setUploadSuccess(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(id);
-      return newSet;
-    });
-    setError(null);
+    onRemovePhoto(id);
   };
 
   const handleSetPrimary = (id: string) => {
-    setPrimaryPhotoId(id);
-    setPhotos(prev => prev.map(p => ({ ...p, isPrimary: p.id === id })));
+    onSetPrimary(id);
   };
 
   const handleClearAll = () => {
-    setPhotos([]);
-    setPrimaryPhotoId(null);
-    setUploadSuccess(new Set());
-    setError(null);
+    onClearPhotos();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
-    }
-  };
-
-  const handleSave = async () => {
-    if (photos.length === 0) {
-      setError('Пожалуйста, выберите хотя бы одно фото для загрузки');
-      return;
-    }
-
-    setIsUploading(true);
-    setError(null);
-    setUploadSuccess(new Set());
-
-    try {
-      // Сохраняем все фото параллельно
-      const uploadPromises = photos.map(async (photo) => {
-        await saveServicePhoto(SERVICE_ID, photo.file);
-        return photo.id;
-      });
-
-      const uploadedIds = await Promise.all(uploadPromises);
-      
-      setUploadSuccess(new Set(uploadedIds));
-      
-      // Скрываем анимации успеха через 3 секунды
-      setTimeout(() => {
-        setUploadSuccess(new Set());
-      }, 3000);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка при загрузке фото');
-      console.error('[ServicePhotoUpload] Error saving photos:', err);
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -198,8 +77,7 @@ export const ServicePhotoUpload: React.FC = () => {
           <button
             type="button"
             onClick={handleClearAll}
-            disabled={isUploading}
-            className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
           >
             Очистить
           </button>
@@ -211,7 +89,6 @@ export const ServicePhotoUpload: React.FC = () => {
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
           {photos.map((photo) => {
             const isPrimary = photo.isPrimary;
-            const isSuccess = uploadSuccess.has(photo.id);
             
             return (
               <div key={photo.id} className="relative group">
@@ -255,7 +132,6 @@ export const ServicePhotoUpload: React.FC = () => {
                           type="button"
                           onClick={() => handleSetPrimary(photo.id)}
                           className="px-3 py-1.5 bg-white text-black rounded-lg text-xs font-medium hover:bg-gray-100 transition-colors"
-                          disabled={isUploading}
                         >
                           Сделать обложкой
                         </button>
@@ -264,7 +140,6 @@ export const ServicePhotoUpload: React.FC = () => {
                         type="button"
                         onClick={() => handleRemoveFile(photo.id)}
                         className="px-3 py-1.5 bg-red-500 text-white rounded-lg text-xs font-medium hover:bg-red-600 transition-colors"
-                        disabled={isUploading}
                       >
                         Удалить
                       </button>
@@ -295,37 +170,9 @@ export const ServicePhotoUpload: React.FC = () => {
                       type="button"
                       onClick={() => handleSetPrimary(photo.id)}
                       className="absolute top-2 left-2 w-6 h-6 bg-gray-400 bg-opacity-50 hover:bg-opacity-70 rounded-full transition-all duration-200 cursor-pointer z-10 border border-gray-300 border-opacity-50"
-                      disabled={isUploading}
                       title="Нажмите, чтобы сделать обложкой"
                     >
                     </button>
-                  )}
-
-                  {/* Анимация успешной загрузки */}
-                  {isSuccess && (
-                    <div
-                      className="absolute inset-0 bg-green-500 bg-opacity-90 flex items-center justify-center"
-                      style={{
-                        animation: 'fadeIn 0.3s ease-in-out',
-                      }}
-                    >
-                      <svg
-                        className="w-12 h-12 text-white"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                        style={{
-                          animation: 'scaleIn 0.4s ease-out',
-                        }}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={3}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    </div>
                   )}
 
                   {/* Кнопка удаления (всегда видимая) */}
@@ -333,7 +180,6 @@ export const ServicePhotoUpload: React.FC = () => {
                     type="button"
                     onClick={() => handleRemoveFile(photo.id)}
                     className="absolute top-2 right-2 p-1.5 bg-red-500 bg-opacity-50 hover:bg-opacity-80 rounded-full transition-all duration-200 z-10"
-                    disabled={isUploading}
                     title="Удалить фото"
                   >
                     <svg
@@ -426,54 +272,10 @@ export const ServicePhotoUpload: React.FC = () => {
         </div>
       )}
 
-      {/* Кнопка сохранения всех фото */}
-      {photos.length > 0 && (
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={isUploading || uploadSuccess.size > 0}
-          className="mt-4 w-full py-3 px-4 rounded-full font-medium text-base transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: '#95E59D',
-            color: '#000000',
-          }}
-        >
-          {isUploading ? (
-            <span className="flex items-center justify-center">
-              <svg
-                className="animate-spin -ml-1 mr-3 h-5 w-5 text-black"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                ></circle>
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Сохранение {photos.length} фото...
-            </span>
-          ) : uploadSuccess.size > 0 ? (
-            `Сохранено ${uploadSuccess.size} из ${photos.length} фото!`
-          ) : (
-            `Сохранить ${photos.length} фото`
-          )}
-        </button>
-      )}
-
       {/* Сообщение об ошибке */}
-      {error && (
+      {externalError && (
         <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-sm text-red-600">{error}</p>
+          <p className="text-sm text-red-600">{externalError}</p>
         </div>
       )}
     </div>
