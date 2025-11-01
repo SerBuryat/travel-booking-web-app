@@ -10,21 +10,9 @@ interface ShortViewServiceComponentProps {
 }
 
 export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps> = ({ 
-  service, 
-  onClick 
+  service, onClick
 }) => {
   const router = useRouter();
-  // Generate a deterministic gradient for service photo based on service ID
-  const getGradientForId = (id: number) => {
-    const gradients = [
-      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-    ];
-    return gradients[id % gradients.length];
-  };
 
   // Truncate description if too long
   const truncateDescription = (text: string, maxLength: number = 80) => {
@@ -50,7 +38,11 @@ export const ShortViewServiceComponent: React.FC<ShortViewServiceComponentProps>
       {/* Service photo header */}
       <div 
         className="h-40 w-full"
-        style={{ background: getGradientForId(service.id) }}
+        style={{
+          backgroundImage: `url(${service.preview_photo_url})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+      }}
       ></div>
       
       {/* Service content */}

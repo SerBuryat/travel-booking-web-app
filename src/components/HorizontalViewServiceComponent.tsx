@@ -10,22 +10,9 @@ interface HorizontalViewServiceComponentProps {
 }
 
 export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceComponentProps> = ({ 
-  service, 
-  onClick 
+  service, onClick
 }) => {
   const router = useRouter();
-  
-  // Generate a deterministic gradient for service photo based on service ID
-  const getGradientForId = (id: number) => {
-    const gradients = [
-      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-    ];
-    return gradients[id % gradients.length];
-  };
 
   // Truncate description if too long
   const truncateDescription = (text: string, maxLength: number = 50) => {
@@ -37,7 +24,6 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
     if (onClick) {
       onClick(service);
     } else {
-      // Navigate to service page
       router.push(`/services/${service.id}`);
     }
   };
@@ -52,7 +38,11 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
         {/* Service photo - 1/4 width */}
         <div 
           className="w-1/4 h-full"
-          style={{ background: getGradientForId(service.id) }}
+          style={{
+            backgroundImage: `url(${service.preview_photo_url})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
         ></div>
         
         {/* Service content - 3/4 width */}
