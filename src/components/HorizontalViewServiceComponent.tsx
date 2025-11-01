@@ -80,8 +80,8 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
                  <span
                    key={index}
                    className="px-3 py-1 rounded-full text-xs whitespace-nowrap"
-                   style={{ 
-                     backgroundColor: '#F5F5F5', 
+                   style={{
+                     backgroundColor: '#F5F5F5',
                      color: '#707579',
                      fontWeight: 400
                    }}
@@ -95,7 +95,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
                        {/* Bottom section: rating and price */}
             <div className="flex items-center justify-between">
               {/* Rating on the left */}
-                             <span 
+              <span
                  className="text-xs font-semibold"
                  style={{ color: '#007AFF', fontWeight: 600 }}
                >

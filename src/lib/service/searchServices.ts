@@ -100,6 +100,20 @@ export async function servicesForCategories(
   return await fetchServices(where, take);
 }
 
+export async function servicesForProvider(providerId: number): Promise<ServiceType[]> {
+  const services = await prisma.tservices.findMany({
+    where: { provider_id: providerId },
+    orderBy: { created_at: 'desc' },
+    include: { tcategories: true, tlocations: true, tphotos: true },
+  });
+
+  if (services.length === 0) {
+    return [];
+  }
+
+  return services.map(mapToSearchableService);
+}
+
 /**
  * Нормализует входное значение поиска.
  * Удаляет пробелы по краям и предотвращает выполнение запроса при пустой строке.
@@ -261,7 +275,16 @@ export async function getServiceById(serviceId: number): Promise<ServiceTypeFull
   
   const result = mapToSearchableService(service);
 
-  return { ...result, contacts: service?.tcontacts ?? [], photos: service?.tphotos ?? [] };
+  let photos = service?.tphotos ?? [];
+
+  photos = photos.sort((photo1, photo2) => {
+    if (photo1.is_primary === photo2.is_primary) {
+      return 0;
+    }
+    return photo1.is_primary ? -1 : 1; // Changed from 1 : -1 to -1 : 1
+  });
+
+  return { ...result, contacts: service?.tcontacts ?? [], photos: photos };
 }
 
 /**

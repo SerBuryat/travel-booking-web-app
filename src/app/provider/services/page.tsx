@@ -1,8 +1,8 @@
 import {redirect} from 'next/navigation';
-import {ServiceService} from '@/service/ServiceService';
 import ProviderServicesComponent from './_components/ProviderServicesComponent';
 import {PAGE_ROUTES} from "@/utils/routes";
 import {getUserAuthOrThrow, UserAuth} from "@/lib/auth/userAuth";
+import {servicesForProvider} from "@/lib/service/searchServices";
 
 export default async function ProviderServicesPage() {
 
@@ -20,26 +20,18 @@ export default async function ProviderServicesPage() {
     redirect(PAGE_ROUTES.HOME);
   }
 
-  // Предзагружаем сервисы провайдера на сервере
-  const serviceService = new ServiceService();
-  const services = await serviceService.getAllServicesByProviderId(userAuth.providerId);
+  const services = await servicesForProvider(userAuth.providerId);
 
   return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="mb-6">
             <h1 className="text-2xl font-bold text-gray-900">
-              Мои сервисы
+              Мои объекты
             </h1>
-            <p className="mt-1 text-sm text-gray-600">
-              Управляйте своими сервисами и отслеживайте их эффективность
-            </p>
           </div>
 
-          <ProviderServicesComponent
-              providerId={userAuth.providerId}
-              services={services}
-          />
+          <ProviderServicesComponent services={services}/>
         </div>
       </div>
   );
