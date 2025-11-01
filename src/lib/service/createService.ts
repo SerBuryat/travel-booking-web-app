@@ -2,6 +2,9 @@
 
 import {CreateServiceData, CreateServiceWithProviderData} from "@/schemas/service/createServiceSchema";
 import {prisma} from "@/lib/db/prisma";
+import { PhotoItem } from "./hooks/useServicePhotos";
+import { loadServicePhotoToS3Storage } from '@/lib/service/media';
+import { saveServicePhoto } from "./photos";
 
 export interface CreatedServiceResponse {
   serviceId: number
@@ -84,7 +87,8 @@ export async function createServiceWithProvider(
 *
 **/
 export async function createService(
-    createServiceData: CreateServiceData, providerId: number): Promise<CreatedServiceResponse>
+    createServiceData: CreateServiceData, providerId: number, photos?: PhotoItem[])
+    : Promise<CreatedServiceResponse>
 {
   if(!providerId) {
     throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
@@ -119,6 +123,33 @@ export async function createService(
 
   if(!createdService) {
     throw new Error('[createServiceWithProvider]: Cant create service!');
+  }
+
+  // Сохраняем фото в storage, потом в БД
+  if (photos && photos.length > 0) {
+    await Promise.all(
+
+      photos.map(photo => 
+
+        loadServicePhotoToS3Storage(createdService.id, photo.file)
+          .then(result => 
+
+            saveServicePhoto(createdService.id, {url: photo.file.name, isPrimary: photo.isPrimary})
+              .then(savedPhoto =>
+                  console.log('[createService] Фото сохранено в storage и в db:', savedPhoto.id, savedPhoto.url)
+              )
+              .catch(photoError =>
+                  console.error('[createService] Ошибка при сохранении фото в db:', photo.file, photoError)
+              )
+              
+          )
+          .catch(photoError =>
+              console.error('[createService] Ошибка при сохранении фото в storage:', photo.file, photoError)
+          )
+
+      )
+
+    );
   }
 
   return {serviceId: createdService.id};

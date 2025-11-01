@@ -10,7 +10,7 @@ import { PutObjectCommandOutput } from "@aws-sdk/client-s3";
  * @param {File} file Файл для загрузки
  * @returns {Promise<PutObjectCommandOutput>} Результат операции загрузки
  */
-export async function saveServicePhoto(
+export async function loadServicePhotoToS3Storage(
   serviceId: number,
   file: File
 ): Promise<PutObjectCommandOutput> {

@@ -9,7 +9,6 @@ import {
 import {useAuth} from '@/contexts/AuthContext';
 import {createService} from "@/lib/service/createService";
 import { PhotoItem } from '@/lib/service/hooks/useServicePhotos';
-import { saveServicePhoto } from '@/lib/service/media';
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -42,21 +41,7 @@ export const useProvideCreateService = () => {
 
     try {
       // Создаем сервис
-      const responseData = await createService(data, user.providerId);
-
-      // Сохраняем фото в S3 (если есть)
-      if (photos && photos.length > 0) {
-        try {
-          // Сохраняем все фото параллельно
-          await Promise.all(
-            photos.map(photo => saveServicePhoto(responseData.serviceId, photo.file))
-          );
-          console.log('[useProvideCreateService] Успешно сохранено фото:', photos.length);
-        } catch (photoError) {
-          // Логируем ошибку, но не останавливаем процесс
-          console.error('[useProvideCreateService] Ошибка при сохранении фото:', photoError);
-        }
-      }
+      const responseData = await createService(data, user.providerId, photos);
 
       setResult({
         success: true,

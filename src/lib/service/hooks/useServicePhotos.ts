@@ -72,6 +72,13 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
   }, []);
 
   /**
+   * Валидация имени файла на дубликаты
+   */
+  const validateFileNameDuplicate = useCallback((fileName: string, existingPhotos: PhotoItem[]): boolean => {
+    return !existingPhotos.some(photo => photo.file.name === fileName);
+  }, []);
+
+  /**
    * Валидация всех загруженных фото
    * Возвращает результат валидации с массивом ошибок
    */
@@ -126,6 +133,7 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
     const isFirstUpload = photos.length === 0;
     let firstValidPhotoId: string | null = null;
     const newPhotos: PhotoItem[] = [];
+    const processedFileNames = new Set<string>();
 
     for (const file of filesToProcess) {
       // Валидация типа файла
@@ -139,6 +147,20 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
         setError(`Файл "${file.name}" превышает максимальный размер ${MAX_FILE_SIZE_MB}MB`);
         continue;
       }
+
+      // Валидация дубликатов: проверка с уже существующими фото
+      if (!validateFileNameDuplicate(file.name, photos)) {
+        setError(`Фото с именем "${file.name}" уже существует`);
+        continue;
+      }
+
+      // Валидация дубликатов: проверка внутри добавляемых файлов
+      if (processedFileNames.has(file.name)) {
+        setError(`Фото с именем "${file.name}" уже выбрано для загрузки`);
+        continue;
+      }
+
+      processedFileNames.add(file.name);
 
       const id = `${Date.now()}-${Math.random()}`;
 
@@ -175,7 +197,7 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
 
     setPhotos(prev => [...prev, ...newPhotos]);
     setError(null);
-  }, [photos, maxPhotos, primaryPhotoId, validateFileType, validateFileSize]);
+  }, [photos, maxPhotos, primaryPhotoId, validateFileType, validateFileSize, validateFileNameDuplicate]);
 
   /**
    * Удаление фото
