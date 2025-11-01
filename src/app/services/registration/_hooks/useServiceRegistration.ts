@@ -8,6 +8,7 @@ import {
 } from '@/schemas/service/createServiceSchema';
 import {useAuth} from '@/contexts/AuthContext';
 import {createServiceWithProvider} from "@/lib/service/createService";
+import {PhotoItem} from "@/lib/service/hooks/useServicePhotos";
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -25,7 +26,7 @@ export const useServiceRegistration = () => {
     resolver: zodResolver(createServiceWithProviderSchema)
   });
 
-  const onSubmit = async (data: CreateServiceWithProviderData) => {
+  const onSubmit = async (data: CreateServiceWithProviderData, photos?: PhotoItem[]) => {
     if (!user) {
       setResult({
         success: false,
@@ -39,7 +40,7 @@ export const useServiceRegistration = () => {
     setResult(null);
 
     try {
-      const responseData = await createServiceWithProvider(data, user.userId);
+      const responseData = await createServiceWithProvider(data, user.userId, photos);
 
       setResult({
         success: true,
@@ -68,7 +69,7 @@ export const useServiceRegistration = () => {
 
   return {
     form,
-    onSubmit: form.handleSubmit(onSubmit),
+    onSubmit,
     isSubmitting,
     errors: form.formState.errors,
     result,

@@ -112,6 +112,18 @@ export const ProviderCreateServiceForm: React.FC = () => {
           register={form.register} 
           error={errors.price} 
         />
+
+         {/* Логотип и Фото заведения */}
+         <SectionTitle>Логотип и Фото заведения</SectionTitle>
+
+         <ServicePhotoUpload
+             photos={photos}
+             onAddPhotos={addPhotos}
+             onRemovePhoto={removePhoto}
+             onSetPrimary={setPrimaryPhoto}
+             onClearPhotos={clearPhotos}
+             error={photosError}
+         />
         
         {/* Дополнительно */}
         <SectionTitle>Дополнительно</SectionTitle>
@@ -119,18 +131,6 @@ export const ProviderCreateServiceForm: React.FC = () => {
         <ServiceOptionsSelection 
           selectedOptions={form.watch('serviceOptions') || []}
           onOptionsChange={(options) => form.setValue('serviceOptions', options)}
-        />
-        
-        {/* Логотип и Фото заведения */}
-        <SectionTitle>Логотип и Фото заведения</SectionTitle>
-        
-        <ServicePhotoUpload 
-          photos={photos}
-          onAddPhotos={addPhotos}
-          onRemovePhoto={removePhoto}
-          onSetPrimary={setPrimaryPhoto}
-          onClearPhotos={clearPhotos}
-          error={photosError}
         />
         
         {/* Условия сотрудничества */}
