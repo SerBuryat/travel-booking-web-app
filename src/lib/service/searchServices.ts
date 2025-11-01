@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import {ServiceType, ServiceTypeFull} from "@/model/ServiceType";
 import {CategoryEntity} from "@/entity/CategoryEntity";
-import { ContactsType } from '@/model/ContactsType';
+import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from "@/utils/constants";
 
 const DEFAULT_TAKE_SERVICES = 10;
 
@@ -100,6 +100,20 @@ export async function servicesForCategories(
   return await fetchServices(where, take);
 }
 
+export async function servicesForProvider(providerId: number): Promise<ServiceType[]> {
+  const services = await prisma.tservices.findMany({
+    where: { provider_id: providerId },
+    orderBy: { created_at: 'desc' },
+    include: { tcategories: true, tlocations: true, tphotos: true },
+  });
+
+  if (services.length === 0) {
+    return [];
+  }
+
+  return services.map(mapToSearchableService);
+}
+
 /**
  * Нормализует входное значение поиска.
  * Удаляет пробелы по краям и предотвращает выполнение запроса при пустой строке.
@@ -143,10 +157,10 @@ async function resolveAreaIdFromUser(): Promise<number | null> {
  */
 async function fetchServices(where: any, take: number): Promise<ServiceType[]> {
   const services = await prisma.tservices.findMany({
-    where,              // Фильтры по имени, категории и локации
-    orderBy: { priority: 'desc' },            // Сортировка по «популярности»
-    take,               // Лимит записей
-    include: { tcategories: true, tlocations: true }, // Присоединяем категорию и адрес
+    where,
+    orderBy: { priority: 'desc' },
+    take,
+    include: { tcategories: true, tlocations: true, tphotos: true },
   });
 
   if (services.length === 0) {
@@ -256,41 +270,21 @@ function buildWhereForCategories(
 export async function getServiceById(serviceId: number): Promise<ServiceTypeFull | null> {
   const service = await prisma.tservices.findUnique({
     where: { id: serviceId },
-    include: { tcategories: true, tlocations: true, tcontacts: true },
+    include: { tcategories: true, tlocations: true, tcontacts: true, tphotos: true },
   });
   
   const result = mapToSearchableService(service);
 
-  return { ...result, contacts: service?.tcontacts ?? [] };
-}
+  let photos = service?.tphotos ?? [];
 
-
-/**
- * Получение сервисов по массиву ID.
- * Используется для отображения выбранных сервисов провайдера.
- *
- * @param {number[]} serviceIds Массив идентификаторов сервисов
- * @returns {Promise<ServiceType[]>} Массив сервисов с полем category
- */
-export async function getServicesByIds(serviceIds: number[]): Promise<ServiceType[]> {
-  if (!Array.isArray(serviceIds) || serviceIds.length === 0) {
-    return [];
-  }
-
-  const services = await prisma.tservices.findMany({
-    where: {
-      id: { in: serviceIds },
-      active: true
-    },
-    include: { tcategories: true },
-    orderBy: { priority: 'desc' }
+  photos = photos.sort((photo1, photo2) => {
+    if (photo1.is_primary === photo2.is_primary) {
+      return 0;
+    }
+    return photo1.is_primary ? -1 : 1; // Changed from 1 : -1 to -1 : 1
   });
 
-  if (services.length === 0) {
-    return [];
-  }
-
-  return services.map(mapToSearchableService);
+  return { ...result, contacts: service?.tcontacts ?? [], photos: photos };
 }
 
 /**
@@ -301,7 +295,7 @@ export async function getServicesByIds(serviceIds: number[]): Promise<ServiceTyp
  * @returns {ServiceType} Сервис с полем category
  */
 function mapToSearchableService(service: any): ServiceType {
-  const { tcategories: category, tlocations: location, ...rest } = service;
+  const { tcategories: category, tlocations: location, tphotos: photos, ...rest } = service;
 
   const mappedCategory: CategoryEntity = {
     id: category.id,
@@ -311,6 +305,8 @@ function mapToSearchableService(service: any): ServiceType {
     photo: category.photo,
     parent_id: category.parent_id,
   };
+
+  const previewPhoto = photos.find(photo => photo.is_primary);
 
   return {
     id: rest.id,
@@ -327,7 +323,6 @@ function mapToSearchableService(service: any): ServiceType {
     view_count: rest.view_count,
     options: rest.service_options,
     address: location[0].address,
+    preview_photo_url: !previewPhoto || !previewPhoto.url ? DEFAULT_SERVICE_IMAGE_3 : previewPhoto.url
   };
 }
-
-

@@ -22,6 +22,7 @@ export const PAGE_ROUTES = {
   // Provider routes
   PROVIDER: {
     SERVICES: '/provider/services',
+    CREATE_SERVICE: '/provider/services/create',
     PROFILE: '/provider/profile',
     REQUESTS: '/provider/requests'
   },

@@ -3,8 +3,12 @@
 import {useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {zodResolver} from '@hookform/resolvers/zod';
-import {ServiceRegistrationFormData, serviceRegistrationSchema} from '@/schemas/serviceRegistrationSchema';
+import {
+  CreateServiceWithProviderData, createServiceWithProviderSchema
+} from '@/schemas/service/createServiceSchema';
 import {useAuth} from '@/contexts/AuthContext';
+import {createServiceWithProvider} from "@/lib/service/createService";
+import {PhotoItem} from "@/lib/service/hooks/useServicePhotos";
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -18,25 +22,11 @@ export const useServiceRegistration = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
 
-  const form = useForm<ServiceRegistrationFormData>({
-    resolver: zodResolver(serviceRegistrationSchema),
-    defaultValues: {
-      name: '',
-      description: '',
-      price: '',
-      tcategories_id: 0,
-      address: '',
-      tarea_id: 0,
-      phone: '',
-      tg_username: '',
-      serviceOptions: [],
-      providerCompanyName: '',
-      providerContactPerson: '',
-      providerPhone: ''
-    }
+  const form = useForm<CreateServiceWithProviderData>({
+    resolver: zodResolver(createServiceWithProviderSchema)
   });
 
-  const onSubmit = async (data: ServiceRegistrationFormData) => {
+  const onSubmit = async (data: CreateServiceWithProviderData, photos?: PhotoItem[]) => {
     if (!user) {
       setResult({
         success: false,
@@ -50,27 +40,12 @@ export const useServiceRegistration = () => {
     setResult(null);
 
     try {
-      const response = await fetch('/api/services/create', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...data,
-          clientId: user.userId
-        }),
-      });
-
-      const responseData = await response.json();
-
-      if (!response.ok) {
-        throw new Error(responseData.error || 'Ошибка при создании сервиса');
-      }
+      const responseData = await createServiceWithProvider(data, user.userId, photos);
 
       setResult({
         success: true,
         message: 'Сервис успешно создан! Теперь вы можете перейти в бизнес-аккаунт.',
-        serviceId: responseData.service.id
+        serviceId: responseData.serviceId
       });
 
       // Сброс формы при успехе
@@ -94,7 +69,7 @@ export const useServiceRegistration = () => {
 
   return {
     form,
-    onSubmit: form.handleSubmit(onSubmit),
+    onSubmit,
     isSubmitting,
     errors: form.formState.errors,
     result,

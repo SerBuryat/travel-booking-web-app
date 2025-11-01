@@ -32,8 +32,8 @@ export default async function HomePage() {
 
         {/* Популярные сервисы */}
         <div>
-          <VerticalServicesViewComponent 
-            services={services} 
+          <VerticalServicesViewComponent
+            services={services}
             title="Популярное"
             moveToAllButton={{
               text: "Все",

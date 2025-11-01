@@ -1,10 +1,10 @@
 import React from 'react';
 import {FieldErrors, UseFormWatch} from 'react-hook-form';
-import {ServiceRegistrationFormData} from '@/schemas/serviceRegistrationSchema';
+import {CreateServiceWithProviderData} from '@/schemas/service/createServiceSchema';
 
 interface RequiredFieldsListProps {
-  watch: UseFormWatch<ServiceRegistrationFormData>;
-  errors: FieldErrors<ServiceRegistrationFormData>;
+  watch: UseFormWatch<CreateServiceWithProviderData>;
+  errors: FieldErrors<CreateServiceWithProviderData>;
 }
 
 export const RequiredFieldsList: React.FC<RequiredFieldsListProps> = ({ watch, errors }) => {
@@ -20,12 +20,14 @@ export const RequiredFieldsList: React.FC<RequiredFieldsListProps> = ({ watch, e
     { key: 'tarea_id', label: 'Зона' },
     { key: 'providerCompanyName', label: 'Название компании' },
     { key: 'providerContactPerson', label: 'Контактное лицо' },
-    { key: 'providerPhone', label: 'Телефон компании' }
+    { key: 'providerPhone', label: 'Телефон компании' },
+    { key: 'phone', label: 'Контактный телефон' },
+    { key: 'tg_username', label: 'Телеграм ссылка заведения' }
   ];
 
   // Разделяем поля на заполненные и незаполненные
   const fieldsWithStatus = requiredFields.map(field => {
-    const value = formValues[field.key as keyof ServiceRegistrationFormData];
+    const value = formValues[field.key as keyof CreateServiceWithProviderData];
     const isEmpty = !value || (typeof value === 'number' && value === 0) || (typeof value === 'string' && value.trim() === '');
     return { ...field, isEmpty };
   });

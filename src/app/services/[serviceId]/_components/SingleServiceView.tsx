@@ -4,16 +4,14 @@ import {ImageCarousel} from '@/components/ImageCarousel';
 import {ServiceTypeFull} from '@/model/ServiceType';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
+import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from '@/utils/constants';
 
 export default function SingleServiceView({ service }: { service: ServiceTypeFull }) {
-  // Mock images for carousel (gradient backgrounds)
-  const mockImages = [
-    'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-    'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-  ];
+
+  const imagesUrls =
+      !service.photos || service.photos.length == 0
+          ? [DEFAULT_SERVICE_IMAGE_2]
+          : service.photos.map(photo => photo.url)
 
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,7 +37,7 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
     <div className="min-h-screen bg-white" style={{ fontFamily: 'Inter, sans-serif' }}>
       {/* Photo Carousel */}
       <div className="w-full">
-        <ImageCarousel images={mockImages} autoPlayInterval={5000} />
+        <ImageCarousel images={imagesUrls} autoPlayInterval={5000} />
       </div>
       {/* Service Content */}
       <div className="px-4 py-6">
