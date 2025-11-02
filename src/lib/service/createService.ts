@@ -64,67 +64,72 @@ export async function createService(
     photos?: PhotoItem[]
 ): Promise<CreatedServiceResponse> {
 
-  if(!providerId) {
-    throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
-  }
+  try {
+    if(!providerId) {
+      throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
+    }
 
-  const createdService = await prisma.tservices.create({
-    data: {
-      name: createServiceData.name,
-      description: createServiceData.description,
-      price: parseFloat(createServiceData.price),
-      tcategories_id: createServiceData.tcategories_id,
-      provider_id: providerId,
-      active: true,
-      status: 'published',
-      service_options: createServiceData.serviceOptions || null,
-      tcontacts: {
-        create: {
-          email: 'default@example.com', // Обязательное поле в БД, проставляем мок
-          phone: createServiceData.phone || null,
-          tg_username: createServiceData.tg_username || null,
+    const createdService = await prisma.tservices.create({
+      data: {
+        name: createServiceData.name,
+        description: createServiceData.description,
+        price: parseFloat(createServiceData.price),
+        tcategories_id: createServiceData.tcategories_id,
+        provider_id: providerId,
+        active: true,
+        status: 'published',
+        service_options: createServiceData.serviceOptions || null,
+        tcontacts: {
+          create: {
+            email: 'default@example.com', // Обязательное поле в БД, проставляем мок
+            phone: createServiceData.phone || null,
+            tg_username: createServiceData.tg_username || null,
+          }
+        },
+        tlocations: {
+          create: {
+            address: createServiceData.address,
+            tarea_id: createServiceData.tarea_id,
+          }
         }
       },
-      tlocations: {
-        create: {
-          address: createServiceData.address,
-          tarea_id: createServiceData.tarea_id,
-        }
-      }
-    },
-    select: {id: true}
-  })
+      select: {id: true}
+    })
 
-  if(!createdService) {
-    throw new Error('[createServiceWithProvider]: Cant create service!');
-  }
+    if(!createdService) {
+      throw new Error('[createService]: Cant create service!');
+    }
 
-  // Сохраняем фото в storage, потом в БД
-  if (photos && photos.length > 0) {
-    await Promise.all(
+    // Сохраняем фото в storage, потом в БД
+    if (photos && photos.length > 0) {
+      await Promise.all(
 
-      photos.map(photo => 
+          photos.map(photo =>
 
-        loadServicePhotoToS3Storage(createdService.id, photo.file)
-          .then(result => 
+              loadServicePhotoToS3Storage(createdService.id, photo.file)
+              .then(result =>
 
-            saveServicePhoto(createdService.id, {fileName: photo.file.name, isPrimary: photo.isPrimary})
-              .then(savedPhoto =>
-                  console.log('[createService] Фото сохранено в storage и в db:', savedPhoto.id, savedPhoto.url)
+                  saveServicePhoto(createdService.id, {fileName: photo.file.name, isPrimary: photo.isPrimary})
+                  .then(savedPhoto =>
+                      console.log('[createService] Фото сохранено в storage и в db:', savedPhoto.id, savedPhoto.url)
+                  )
+                  .catch(photoError =>
+                      console.error('[createService] Ошибка при сохранении фото в db:', photo.file, photoError)
+                  )
+
               )
               .catch(photoError =>
-                  console.error('[createService] Ошибка при сохранении фото в db:', photo.file, photoError)
+                  console.error('[createService] Ошибка при сохранении фото в storage:', photo.file, photoError)
               )
-              
-          )
-          .catch(photoError =>
-              console.error('[createService] Ошибка при сохранении фото в storage:', photo.file, photoError)
+
           )
 
-      )
+      );
+    }
 
-    );
+    return {serviceId: createdService.id};
+  } catch (error) {
+    console.error('[createService] Ошибка при создании сервиса', providerId, error);
+    throw new Error('[createService]: Ошибка при создании сервиса!', error);
   }
-
-  return {serviceId: createdService.id};
 }
