@@ -215,7 +215,7 @@ function createClientAuthData(
     role: string,
     telegramData: TelegramUserData
 ): CreateClientAuthData {
-  // todo - должна быть централизованная установка время истечения токена, т.к. в authUtils.ts есть константа
+  // todo - сейчас для `tclients_auth.token_expires_at` проставляется таким образом без `.env` (цель для рефакторинга)
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 1);
   return {
