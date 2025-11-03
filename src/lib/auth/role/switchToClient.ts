@@ -100,7 +100,7 @@ async function updateClientAuthRole(authId: number, newRole: string) {
 
 async function updateJwt(userAuth: UserAuth) : Promise<AuthTokens | null> {
   try {
-    const tokens = generateTokens(userAuth);
+    const tokens = await generateTokens(userAuth);
 
     await Promise.all([
       setJWTCookieInAction(tokens.jwtToken),

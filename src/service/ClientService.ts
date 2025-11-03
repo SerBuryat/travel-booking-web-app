@@ -9,20 +9,6 @@ export class ClientService {
   }
 
   /**
-   * Обновить refresh token
-   */
-  async updateRefreshToken(authId: number, refreshToken: string, expiresAt: Date): Promise<boolean> {
-    return await this.clientRepository.updateRefreshToken(authId, refreshToken, expiresAt);
-  }
-
-  /**
-   * Деактивировать аутентификацию клиента
-   */
-  async deactivateAuth(authId: number): Promise<boolean> {
-    return await this.clientRepository.deactivateAuth(authId);
-  }
-
-  /**
    * Получить клиента по ID с аутентификацией
    */
   async getByIdWithAuth(id: number): Promise<ClientWithAuthType | null> {

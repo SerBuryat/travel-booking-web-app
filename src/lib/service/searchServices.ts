@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import {ServiceType, ServiceTypeFull} from "@/model/ServiceType";
 import {CategoryEntity} from "@/entity/CategoryEntity";
-import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from "@/utils/constants";
+import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from "@/utils/images";
 
 const DEFAULT_TAKE_SERVICES = 10;
 

@@ -5,7 +5,6 @@ import { generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction } f
 import { TelegramUserInitData, TelegramUserData } from '@/types/telegram';
 import { TelegramService } from '@/service/TelegramService';
 import { UserAuth } from '@/lib/auth/getUserAuth';
-import { AuthRole } from '@/model/ClientType';
 import {tarea, tclients_auth} from "@prisma/client";
 import { SELECTABLE_AREA_TIER } from '@/lib/location/constants';
 import {getActiveProviderId} from "@/lib/provider/searchProvider";
@@ -51,7 +50,7 @@ export async function authWithTelegram(telegramUserInitData: TelegramUserInitDat
       : await createNewUser(telegramUserData, authAuthId);
 
   // Работаем с токенами и устанавливаем их в cookies
-  const tokens = generateTokens(userAuth);
+  const tokens = await generateTokens(userAuth);
   await updateRefreshToken(userAuth.authId, tokens.refreshToken);
   await Promise.all([
     setJWTCookieInAction(tokens.jwtToken),
@@ -216,7 +215,7 @@ function createClientAuthData(
     role: string,
     telegramData: TelegramUserData
 ): CreateClientAuthData {
-  // todo - должна быть централизованная установка время истечения токена, т.к. в authUtils.ts есть константа
+  // todo - сейчас для `tclients_auth.token_expires_at` проставляется таким образом без `.env` (цель для рефакторинга)
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 1);
   return {

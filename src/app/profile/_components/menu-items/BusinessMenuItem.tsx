@@ -2,7 +2,7 @@
 
 import React, {useState} from 'react';
 import BaseMenuItem from './BaseMenuItem';
-import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/switchToProvider";
+import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/role/switchToProvider";
 import {useAuth} from "@/contexts/AuthContext";
 
 interface BusinessMenuItemProps {

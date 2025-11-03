@@ -50,38 +50,3 @@ export const ServiceOptions: Record<string, ServiceCategoryOption> = {
     ]
   }
 };
-
-/**
- * Получить все доступные категории опций
- */
-export function getServiceCategories(): string[] {
-  return Object.keys(ServiceOptions);
-}
-
-/**
- * Получить опции для конкретной категории
- */
-export function getOptionsForCategory(category: string): string[] {
-  return ServiceOptions[category]?.options || [];
-}
-
-/**
- * Получить описание категории
- */
-export function getCategoryDescription(category: string): string {
-  return ServiceOptions[category]?.description || "";
-}
-
-/**
- * Проверить, существует ли категория
- */
-export function isValidCategory(category: string): boolean {
-  return category in ServiceOptions;
-}
-
-/**
- * Получить все опции всех категорий (плоский список)
- */
-export function getAllOptions(): string[] {
-  return Object.values(ServiceOptions).flatMap(category => category.options);
-}

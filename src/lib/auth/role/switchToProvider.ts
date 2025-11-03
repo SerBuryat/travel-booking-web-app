@@ -4,7 +4,7 @@ import {withUserAuth} from '@/lib/auth/withUserAuth';
 import {AuthTokens, generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction} from '@/lib/auth/authUtils';
 import {prisma} from '@/lib/db/prisma';
 import {UserAuth} from '@/lib/auth/getUserAuth';
-import { getActiveProviderId } from '../provider/searchProvider';
+import { getActiveProviderId } from '../../provider/searchProvider';
 
 export interface ProviderSwitchResult {
   success: boolean;
@@ -136,7 +136,7 @@ async function updateClientAuthRole(authId: number, newRole: string) {
 async function updateJwt(userAuth: UserAuth)
     : Promise<AuthTokens | null> {
   try {
-    const tokens = generateTokens(userAuth);
+    const tokens = await generateTokens(userAuth);
 
     await Promise.all([
       setJWTCookieInAction(tokens.jwtToken),

@@ -4,7 +4,7 @@ import {ImageCarousel} from '@/components/ImageCarousel';
 import {ServiceTypeFull} from '@/model/ServiceType';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
-import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from '@/utils/constants';
+import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from '@/utils/images';
 
 export default function SingleServiceView({ service }: { service: ServiceTypeFull }) {
 

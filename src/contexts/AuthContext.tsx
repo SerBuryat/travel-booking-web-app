@@ -4,11 +4,11 @@ import React, {createContext, ReactNode, useContext, useEffect, useState} from '
 import {TelegramUserInitData} from '@/types/telegram';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
-import {ApiService} from "@/service/ApiService";
-import {UserAuth} from "@/lib/auth/getUserAuth";
+import {getUserAuthOrThrow, UserAuth} from "@/lib/auth/getUserAuth";
 import {authWithTelegram} from "@/lib/auth/telegram/telegramAuth";
 import {mockTelegramAuth} from "@/lib/auth/telegram/mockTelegramAuth";
 import {currentLocation, CurrentLocationType} from "@/lib/location/currentLocation";
+import {userLogout} from "@/lib/auth/userLogout";
 
 // Интерфейс контекста аутентификации
 interface AuthContextType {
@@ -57,7 +57,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const checkAuth = async () => {
     setIsLoading(true);
     try {
-      const user = await ApiService.getUserAuth();
+      const user = await getUserAuthOrThrow();
       const location = await currentLocation();
       setLocation(location);
       setUser(user);
@@ -108,9 +108,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   // Функция выхода
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', {
-        method: 'POST',
-      });
+      await userLogout();
     } catch (error) {
       console.error('Ошибка выхода:', error);
     } finally {
@@ -126,7 +124,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     
     setIsLoading(true);
     try {
-      const user = await ApiService.getUserAuth();
+      const user = await getUserAuthOrThrow();
       setUser(user);
       const location = await currentLocation();
       setLocation(location);
