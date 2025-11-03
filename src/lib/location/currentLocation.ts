@@ -1,7 +1,7 @@
 'use server';
 
 import { withUserAuth } from '@/lib/auth/withUserAuth';
-import type { UserAuth } from '@/lib/auth/userAuth';
+import type { UserAuth } from '@/lib/auth/getUserAuth';
 import { prisma } from '@/lib/db/prisma';
 
 export type CurrentLocationType = { id: number; name: string } | null;

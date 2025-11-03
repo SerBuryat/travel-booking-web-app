@@ -3,7 +3,7 @@
 import {withUserAuth} from '@/lib/auth/withUserAuth';
 import {AuthTokens, generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction} from '@/lib/auth/authUtils';
 import {prisma} from '@/lib/db/prisma';
-import {UserAuth} from '@/lib/auth/userAuth';
+import {UserAuth} from '@/lib/auth/getUserAuth';
 
 export interface ProviderSwitchResult {
   success: boolean;

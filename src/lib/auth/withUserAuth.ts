@@ -1,7 +1,7 @@
 'use server';
 
-import type { UserAuth } from '@/lib/auth/userAuth';
-import { getUserAuthOrThrow, UserAuthError } from '@/lib/auth/userAuth';
+import type { UserAuth } from '@/lib/auth/getUserAuth';
+import { getUserAuthOrThrow, UserAuthError } from '@/lib/auth/getUserAuth';
 
 /**
  * Executes the provided async function within an authenticated server context.

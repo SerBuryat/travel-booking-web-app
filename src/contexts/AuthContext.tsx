@@ -5,7 +5,7 @@ import {TelegramUserInitData} from '@/types/telegram';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {ApiService} from "@/service/ApiService";
-import {UserAuth} from "@/lib/auth/userAuth";
+import {UserAuth} from "@/lib/auth/getUserAuth";
 import {authWithTelegram} from "@/lib/auth/telegram/telegramAuth";
 import {mockTelegramAuth} from "@/lib/auth/telegram/mockTelegramAuth";
 import {currentLocation, CurrentLocationType} from "@/lib/location/currentLocation";
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       console.info('Ошибка аутентификации. Пользователь не зарегистрирован или не вошел в аккаунт', error);
 
-      // В dev-режиме пробуем выполнить мок-авторизацию Telegram
+      // todo - mock auth, для лоакльного запуска через браузер
       if (process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_MOCK_AUTH === 'true') {
         try {
           const authUser = await mockTelegramAuth();
@@ -82,6 +82,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setUser(null);
         setIsAuthenticated(false);
       }
+
     } finally {
       setIsLoading(false);
     }

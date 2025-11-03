@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getUserAuthOrThrow } from '@/lib/auth/userAuth';
+import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
 import { requestById } from '@/lib/request/client/view/requestById';
 import { getProviderServicesForRequest } from '@/lib/request/provider/proposal/getProviderServicesForRequest';
 import { CreateProposalForm } from '@/app/provider/requests/[requestId]/proposal/_components/CreateProposalForm';
