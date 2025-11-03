@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import {redirect} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
-import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
+import {getUserAuthOrThrow} from "@/lib/auth/getUserAuth";
 import {ClientService} from "@/service/ClientService";
 import {ClientWithAuthType} from "@/model/ClientType";
 import { clientRequests } from "@/lib/request/client/view/clientRequests";

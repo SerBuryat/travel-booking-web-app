@@ -1,5 +1,5 @@
 import {type NextRequest, NextResponse} from 'next/server';
-import {UserAuthError} from '@/lib/auth/userAuth';
+import {UserAuthError} from '@/lib/auth/getUserAuth';
 
 export type RouteHandler<Context = unknown> = (
   request: NextRequest,

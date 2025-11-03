@@ -4,13 +4,14 @@ import { prisma } from '@/lib/db/prisma';
 import { generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction } from '@/lib/auth/authUtils';
 import { TelegramUserInitData, TelegramUserData } from '@/types/telegram';
 import { TelegramService } from '@/service/TelegramService';
-import { UserAuth } from '@/lib/auth/userAuth';
+import { UserAuth } from '@/lib/auth/getUserAuth';
 import { AuthRole } from '@/model/ClientType';
 import {tarea, tclients_auth} from "@prisma/client";
 import { SELECTABLE_AREA_TIER } from '@/lib/location/constants';
+import {getActiveProviderId} from "@/lib/provider/searchProvider";
 
 const TELEGRAM_AUTH_TYPE = 'telegram';
-const AUTH_ROLE = 'user';
+const DEFAULT_AUTH_ROLE = 'user';
 const DEFAULT_AREA_SYSNAME = 'Olkhon';
 
 /**
@@ -38,7 +39,6 @@ export async function authWithTelegram(telegramUserInitData: TelegramUserInitDat
   const telegramUserData = telegramUserInitData.user;
   const authAuthId = `${TELEGRAM_AUTH_TYPE}_${telegramUserData.id}`;
 
-  // Проверяем, существует ли пользователь с таким auth_id и auth_type
   const existsAuth = await prisma.tclients_auth.findFirst({
     where: {
       auth_id: authAuthId,
@@ -46,17 +46,16 @@ export async function authWithTelegram(telegramUserInitData: TelegramUserInitDat
     }
   });
 
-  // Если пользователь существует, обновляем его, иначе создаем нового и возврашаем данные аутентифицированного пользователя
-  let userAuth: UserAuth;
-  if (existsAuth) {
-    userAuth = await updateExistUser(existsAuth, telegramUserData);
-  } else {
-    userAuth = await createNewUser(telegramUserData, authAuthId);
-  }
+  const userAuth: UserAuth = existsAuth
+      ? await updateExistUser(existsAuth, telegramUserData)
+      : await createNewUser(telegramUserData, authAuthId);
 
   // Работаем с токенами и устанавливаем их в cookies
-  const tokens = generateTokens(userAuth.userId, (userAuth.role as AuthRole) || AUTH_ROLE, userAuth.authId);
+  const tokens =
+      generateTokens(userAuth.userId, (userAuth.role as AuthRole) || DEFAULT_AUTH_ROLE, userAuth.authId);
+
   await updateRefreshToken(userAuth.authId, tokens.refreshToken);
+
   await Promise.all([
     setJWTCookieInAction(tokens.jwtToken),
     setRefreshTokenCookieInAction(tokens.refreshToken)
@@ -72,10 +71,11 @@ export async function authWithTelegram(telegramUserInitData: TelegramUserInitDat
  * @param {TelegramUserData} telegramData - Данные пользователя из Telegram
  * @returns {Promise<UserAuth>} Данные аутентифицированного пользователя
  */
-async function updateExistUser(existsAuth: tclients_auth, telegramData: TelegramUserData): Promise<UserAuth> {
-  const authData = createClientAuthData(existsAuth.auth_id!, TELEGRAM_AUTH_TYPE, telegramData);
+export async function updateExistUser(existsAuth: tclients_auth, telegramData: TelegramUserData): Promise<UserAuth> {
+  const authData =
+      createClientAuthData(existsAuth.auth_id!, TELEGRAM_AUTH_TYPE, existsAuth.role, telegramData);
 
-  const result = await prisma.tclients.update({
+  const updatedClient = await prisma.tclients.update({
     where: { id: existsAuth.tclients_id },
     data: {
       name: buildFullName(telegramData),
@@ -96,8 +96,26 @@ async function updateExistUser(existsAuth: tclients_auth, telegramData: Telegram
     }
   });
 
+  if(authData.role === 'provider') {
+    const provider = await getActiveProviderId(updatedClient.id);
+
+    if(!provider) {
+      console.error(
+          '[updateExistUser] Пользователь с ролью `provider` отсутствует в `tproviders`. Переключаем роль на `user`.'
+      );
+      // todo - переключить `tclients_auth.role` пользователя на `user`
+    }
+
+    return {
+      userId: updatedClient.id,
+      authId: existsAuth.id,
+      role: existsAuth.role,
+      providerId: provider.id
+    };
+  }
+
   return {
-    userId: result.id,
+    userId: updatedClient.id,
     authId: existsAuth.id,
     role: existsAuth.role
   };
@@ -111,7 +129,8 @@ async function updateExistUser(existsAuth: tclients_auth, telegramData: Telegram
  * @returns {Promise<UserAuth>} Данные аутентифицированного пользователя
  */
 async function createNewUser(telegramData: TelegramUserData, authAuthId: string): Promise<UserAuth> {
-  const authData = createClientAuthData(authAuthId, TELEGRAM_AUTH_TYPE, telegramData);
+  const authData =
+      createClientAuthData(authAuthId, TELEGRAM_AUTH_TYPE, DEFAULT_AUTH_ROLE, telegramData);
 
   const defaultAreaId = await getDefaultAreaId();
 
@@ -167,14 +186,16 @@ function buildFullName(telegramData: TelegramUserData): string {
 /**
  * Создает данные для аутентификации пользователя
  *
- * @param {string} authAuthId - auth_id пользователя
- * @param {string} authType - auth_type пользователя
+ * @param {string} authAuthId - tclients_auth.auth_id пользователя
+ * @param {string} authType - tclients_auth.auth_type пользователя
+ * @param {string} role - tclients_auth.role пользователя
  * @param {TelegramUserData} telegramData - Данные пользователя из Telegram
- * @returns {Object} Данные для аутентификации пользователя
+ * @returns {CreateClientAuthData} Данные для аутентификации пользователя
  */
 function createClientAuthData(
     authAuthId: string,
     authType: string,
+    role: string,
     telegramData: TelegramUserData
 ): CreateClientAuthData {
   // todo - должна быть централизованная установка время истечения токена, т.к. в authUtils.ts есть константа
@@ -185,7 +206,7 @@ function createClientAuthData(
     auth_id: authAuthId,
     auth_context: telegramData as any,
     token_expires_at: expiresAt,
-    role: AUTH_ROLE,
+    role: role,
     last_login: new Date(),
     is_active: true
   };
@@ -207,7 +228,7 @@ interface CreateClientAuthData {
  * @throws {Error} Если default area не найдена
  */
 async function getDefaultAreaId(): Promise<number> {
-  let defaultArea: tarea | null = null;
+  let defaultArea: tarea | null;
   try {
     defaultArea = await prisma.tarea.findFirst({
       where: {

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { getUserAuthOrThrow } from '@/lib/auth/userAuth';
+import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
 import { getClientRequestsForProvider } from '@/lib/request/provider/clientRequestsForProvider';
 import { ClientRequestsList } from './_components/ClientRequestsList';
 

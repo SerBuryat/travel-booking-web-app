@@ -5,7 +5,7 @@ import {formatDateToDDMMYYHHmm} from "@/utils/date";
 import {AnyRequestView} from "./types";
 import {resolveAttributesInclude} from "../create/attributesResolver";
 import {RequestType} from "@/lib/request/requestType";
-import {UserAuth} from "@/lib/auth/userAuth";
+import {UserAuth} from "@/lib/auth/getUserAuth";
 
 export async function requestById(id: number, user: UserAuth): Promise<AnyRequestView> {
   // First, get the basic bid info with category to determine request type

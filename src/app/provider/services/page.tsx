@@ -1,7 +1,7 @@
 import {redirect} from 'next/navigation';
 import ProviderServicesComponent from './_components/ProviderServicesComponent';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {getUserAuthOrThrow, UserAuth} from "@/lib/auth/userAuth";
+import {getUserAuthOrThrow, UserAuth} from "@/lib/auth/getUserAuth";
 import {servicesForProvider} from "@/lib/service/searchServices";
 
 export default async function ProviderServicesPage() {
@@ -15,8 +15,11 @@ export default async function ProviderServicesPage() {
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
   }
 
-  // Проверяем роль и права доступа после успешной аутентификации
   if (userAuth.role !== 'provider' || !userAuth.providerId) {
+    console.log(
+        '[ProviderServicesPage] Невозможно отобразить сервисы провайдера для пользователя. ' +
+        'Отстутствует роль или `providerId`', userAuth
+    )
     redirect(PAGE_ROUTES.HOME);
   }
 

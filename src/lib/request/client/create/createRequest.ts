@@ -1,7 +1,7 @@
 "use server";
 
 import { prisma } from '@/lib/db/prisma';
-import { getUserAuthOrThrow } from '@/lib/auth/userAuth';
+import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
 import { currentLocation } from '@/lib/location/currentLocation';
 import { createAlert } from '@/lib/request/client/create/createAlert';
 import { 

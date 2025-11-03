@@ -4,7 +4,7 @@ import {ClientService} from '@/service/ClientService';
 import ProfileHeader from "@/app/profile/_components/ProfileHeader";
 import ProfileMenu from "@/app/profile/_components/ProfileMenu";
 import {PAGE_ROUTES} from '@/utils/routes';
-import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
+import {getUserAuthOrThrow} from "@/lib/auth/getUserAuth";
 import {ClientWithAuthType} from "@/model/ClientType";
 
 // Принудительно делаем страницу динамической
