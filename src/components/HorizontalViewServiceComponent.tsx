@@ -24,6 +24,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
     if (onClick) {
       onClick(service);
     } else {
+      // todo - заменить на `PAGE_ROUTES`
       router.push(`/services/${service.id}`);
     }
   };
@@ -76,7 +77,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
            {/* Tags section - horizontal scrollable */}
            <div className="mb-3 overflow-x-auto">
              <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
-               {service.options.map((tag, index) => (
+               {service.options?.map((tag, index) => (
                  <span
                    key={index}
                    className="px-3 py-1 rounded-full text-xs whitespace-nowrap"

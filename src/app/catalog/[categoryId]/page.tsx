@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import {notFound, redirect} from 'next/navigation';
 import { Header } from '@/components/Header';
 import { SearchBarWrapper } from '@/components/SearchBarWrapper';
 import { VerticalServicesViewComponent } from '@/components/VerticalServicesViewComponent';
@@ -14,9 +14,10 @@ interface PageProps {
 export default async function CategoryPage({ params }: PageProps) {
   const { categoryId } = await params;
   const categoryIdNum = Number(categoryId);
-  
+
+  // todo - перевести прямые редиректы на `PAGE_ROUTES`
   if (isNaN(categoryIdNum)) {
-    return notFound();
+    redirect("/error");
   }
 
   try {

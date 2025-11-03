@@ -1,5 +1,5 @@
 import React from 'react';
-import { notFound } from 'next/navigation';
+import {notFound, redirect} from 'next/navigation';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { requestById } from '@/lib/request/client/view/requestById';
 import { AnyRequestView } from '@/lib/request/client/view/types';
@@ -16,12 +16,19 @@ type Props = {
 
 export default async function RequestDetailPage({ params }: Props) {
   const { requestId } = await params;
+  const requestIdNum = Number(requestId);
+
+  if(!requestIdNum) {
+    // todo - можно сделать `/error` с параметрами с какой страницы и по какой причине ошибка,
+    //  чтобы показать информативную ошибку пользователю
+    redirect("/error");
+  }
   
   const [request, proposalsResult] = await withUserAuth(async ({ userAuth }) => {
     try {
       const [requestData, proposalsData] = await Promise.all([
-        requestById(Number(requestId), userAuth),
-        getRequestProposals(Number(requestId))
+        requestById(requestIdNum, userAuth),
+        getRequestProposals(requestIdNum)
       ]);
       return [requestData, proposalsData];
     } catch (error) {

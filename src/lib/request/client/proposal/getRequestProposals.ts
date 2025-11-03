@@ -99,6 +99,7 @@ export async function getRequestProposals(requestId: number): Promise<RequestPro
       category: mappedCategory,
       rating: service.rating ? Number(service.rating) : undefined,
       view_count: service.view_count,
+      service_options: service.service_options
     };
 
     // Создаем элемент сервиса в предложении

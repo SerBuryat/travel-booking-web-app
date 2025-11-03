@@ -23,9 +23,10 @@ interface ProposalPageProps {
 export default async function ProposalPage({ params }: ProposalPageProps) {
   const { requestId: requestIdString } = await params;
   const requestId = parseInt(requestIdString);
-  
+
+  // todo - разобраться с редиректами
   if (isNaN(requestId)) {
-    redirect('/provider/requests');
+    redirect('/error');
   }
 
   // Проверяем аутентификацию и роль пользователя
