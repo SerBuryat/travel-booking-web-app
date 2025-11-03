@@ -4,6 +4,7 @@ import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { prisma } from '@/lib/db/prisma';
 import { requestById } from '@/lib/request/client/view/requestById';
 import { AnyRequestView } from '@/lib/request/client/view/types';
+import {getActiveProviderId} from "@/lib/provider/searchProvider";
 
 /**
  * Получает список заявок клиентов, подходящих для текущего провайдера.
@@ -20,13 +21,11 @@ import { AnyRequestView } from '@/lib/request/client/view/types';
  */
 export async function getClientRequestsForProvider(): Promise<AnyRequestView[] | null> {
   return withUserAuth(async ({ userAuth }) => {
-    // Проверяем, что пользователь - провайдер
     if (userAuth.role !== 'provider') {
       return null;
     }
 
-    // Получаем tproviders запись пользователя
-    const provider = await getProviderByUserId(userAuth.userId);
+    const provider = await getActiveProviderId(userAuth.userId);
     if (!provider) {
       return [];
     }
@@ -47,16 +46,6 @@ export async function getClientRequestsForProvider(): Promise<AnyRequestView[] |
 
     // Фильтруем успешно полученные заявки
     return requests.filter((request): request is AnyRequestView => request !== null);
-  });
-}
-
-/**
- * Получает tproviders запись по userId
- */
-async function getProviderByUserId(userId: number) {
-  return prisma.tproviders.findFirst({
-    where: { tclients_id: userId },
-    select: { id: true }
   });
 }
 

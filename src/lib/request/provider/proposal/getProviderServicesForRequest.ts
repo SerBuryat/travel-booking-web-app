@@ -4,6 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { ServiceType } from '@/model/ServiceType';
 import { CategoryEntity } from '@/entity/CategoryEntity';
+import {getActiveProviderId} from "@/lib/provider/searchProvider";
 
 export interface ProposalServiceType extends ServiceType {
   isUsedInProposal: boolean;
@@ -29,13 +30,11 @@ export interface ProviderServicesForRequest {
  */
 export async function getProviderServicesForRequest(requestId: number): Promise<ProviderServicesForRequest | null> {
   const result = await withUserAuth(async ({ userAuth }) => {
-    // Проверяем, что пользователь - провайдер
     if (userAuth.role !== 'provider') {
       return null;
     }
 
-    // Получаем tproviders запись пользователя
-    const provider = await getProviderByUserId(userAuth.userId);
+    const provider = await getActiveProviderId(userAuth.userId);
     if (!provider) {
       return { services: [] };
     }
@@ -67,16 +66,6 @@ export async function getProviderServicesForRequest(requestId: number): Promise<
   });
 
   return result || null;
-}
-
-/**
- * Получает tproviders запись по userId
- */
-async function getProviderByUserId(userId: number) {
-  return prisma.tproviders.findFirst({
-    where: { tclients_id: userId },
-    select: { id: true }
-  });
 }
 
 /**

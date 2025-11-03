@@ -30,7 +30,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
 
   return (
     <div 
-      className="bg-white rounded-[24px] overflow-hidden shadow-lg border cursor-pointer hover:shadow-md transition-shadow mb-3"
+      className="bg-white rounded-[24px] overflow-hidden shadow-xl cursor-pointer hover:shadow-md transition-shadow mb-3"
       onClick={handleClick}
       style={{ fontFamily: 'Inter, sans-serif' }}
     >

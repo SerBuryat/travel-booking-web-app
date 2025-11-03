@@ -4,7 +4,7 @@ import React from 'react';
 import {useRouter} from 'next/navigation';
 import {ServiceCreationResult} from '../_hooks/useServiceRegistration';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {switchToProvider} from "@/lib/auth/provider/switchToProvider";
+import {switchToProvider} from "@/lib/auth/switchToProvider";
 import {useAuth} from "@/contexts/AuthContext";
 
 interface ResultModalProps {
