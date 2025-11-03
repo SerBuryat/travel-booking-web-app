@@ -20,21 +20,4 @@ export class ProviderService {
     }
   }
 
-  /**
-   * Создать нового провайдера или получить существующего
-   */
-  async createOrGetProvider(clientId: number, companyName: string, phone: string, contactPerson: string): Promise<ProviderEntity> {
-    try {
-      const existingProvider = await this.getProviderForClient(clientId);
-      
-      if (existingProvider) {
-        return existingProvider;
-      }
-
-      return await this.providerRepository.createProvider(clientId, companyName, phone, contactPerson);
-    } catch (error) {
-      console.error('Error creating or getting provider:', error);
-      throw error;
-    }
-  }
 }
