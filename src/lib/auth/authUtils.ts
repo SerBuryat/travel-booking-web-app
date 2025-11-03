@@ -3,6 +3,7 @@ import {cookies} from 'next/headers';
 import jwt, {Secret} from 'jsonwebtoken';
 import type {StringValue} from 'ms';
 import type {JWTPayload, RefreshTokenPayload} from '@/types/jwt';
+import {UserAuth} from "@/lib/auth/getUserAuth";
 
 // Cookies
 export const JWT_COOKIE_NAME = 'auth_token';
@@ -83,7 +84,9 @@ function generateRandomBytes(length: number): string {
   return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
 }
 
-export function generateJWT(userId: number, role: string, authId: number, providerId?: number): string {
+export function generateJWT(userAuth: UserAuth): string {
+  const {userId, authId, role, providerId} = userAuth;
+
   const payload: JWTPayload = {
     userId, role, authId, ...(providerId && { providerId }),
   };
@@ -129,13 +132,13 @@ export interface AuthTokens {
 /**
  * Генерация JWT токенов
  */
-export function generateTokens(userId: number, role: string, authId: number, providerId?: number): AuthTokens {
+export function generateTokens(userAuth: UserAuth): AuthTokens {
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + 1);
 
   return {
-    jwtToken: generateJWT(userId, role, authId, providerId),
-    refreshToken: generateRefreshToken(userId, authId),
+    jwtToken: generateJWT(userAuth),
+    refreshToken: generateRefreshToken(userAuth.userId, userAuth.authId),
     expiresAt
   };
 }

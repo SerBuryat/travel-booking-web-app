@@ -51,11 +51,8 @@ export async function authWithTelegram(telegramUserInitData: TelegramUserInitDat
       : await createNewUser(telegramUserData, authAuthId);
 
   // Работаем с токенами и устанавливаем их в cookies
-  const tokens =
-      generateTokens(userAuth.userId, (userAuth.role as AuthRole) || DEFAULT_AUTH_ROLE, userAuth.authId);
-
+  const tokens = generateTokens(userAuth);
   await updateRefreshToken(userAuth.authId, tokens.refreshToken);
-
   await Promise.all([
     setJWTCookieInAction(tokens.jwtToken),
     setRefreshTokenCookieInAction(tokens.refreshToken)
@@ -97,27 +94,48 @@ export async function updateExistUser(existsAuth: tclients_auth, telegramData: T
   });
 
   if(authData.role === 'provider') {
-    const provider = await getActiveProviderId(updatedClient.id);
-
-    if(!provider) {
-      console.error(
-          '[updateExistUser] Пользователь с ролью `provider` отсутствует в `tproviders`. Переключаем роль на `user`.'
-      );
-      // todo - переключить `tclients_auth.role` пользователя на `user`
-    }
-
-    return {
-      userId: updatedClient.id,
-      authId: existsAuth.id,
-      role: existsAuth.role,
-      providerId: provider.id
-    };
+    return await getProviderUserAuth(updatedClient.id, existsAuth.id);
   }
 
   return {
     userId: updatedClient.id,
     authId: existsAuth.id,
     role: existsAuth.role
+  };
+}
+
+async function getProviderUserAuth(clientId: number, authId: number) {
+  const provider = await getActiveProviderId(clientId);
+
+  if(!provider) {
+    console.error(
+        '[updateExistUser] Пользователь с ролью `provider` отсутствует в `tproviders`. Переключаем роль на `user`.'
+    );
+
+    const switchToClientAuth = await prisma.tclients_auth.update({
+      where: {
+        id: authId
+      },
+      data: {
+        role: 'user'
+      },
+      select: {
+        id: true
+      }
+    });
+
+    return {
+      userId: clientId,
+      authId: switchToClientAuth.id,
+      role: 'user'
+    };
+  }
+
+  return {
+    userId: clientId,
+    authId: authId,
+    role: 'provider',
+    providerId: provider.id
   };
 }
 

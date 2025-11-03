@@ -39,12 +39,7 @@ export async function mockTelegramAuth(): Promise<UserAuth> {
 
   const userAuth = await updateExistUser(existsAuth, MOCK_TELEGRAM_USER_DATA);
 
-  const tokens = generateTokens(
-      userAuth.userId,
-      (userAuth.role as AuthRole) || 'user',
-      userAuth.authId,
-      userAuth.providerId
-  );
+  const tokens = generateTokens(userAuth);
 
   await updateRefreshToken(userAuth.authId, tokens.refreshToken);
   await Promise.all([

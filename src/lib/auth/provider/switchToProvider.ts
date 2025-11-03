@@ -87,7 +87,7 @@ async function updateUserRole(userAuth: UserAuth, role: string) : Promise<void> 
     throw new Error('Failed to update user role');
   }
 
-  const tokens = await updateJwt(userAuth.userId, role, userAuth.authId, userAuth.providerId);
+  const tokens = await updateJwt(userAuth);
   if (!tokens) {
     throw new Error('Failed to generate or set auth tokens');
   }
@@ -139,16 +139,13 @@ async function updateClientAuthRole(authId: number, newRole: string) {
 /**
  * Генерирует и устанавливает новые JWT токены в cookies.
  *
- * @param {number} userId - ID пользователя
- * @param {string} role - Роль пользователя
- * @param {string} authId - ID аутентификации
- * @param {number} [providerId] - ID провайдера (опционально)
  * @returns {Promise<AuthTokens | null>} Сгенерированные токены или null при ошибке
+ * @param userAuth
  */
-async function updateJwt(userId: number, role: string, authId: number, providerId?: number)
+async function updateJwt(userAuth: UserAuth)
     : Promise<AuthTokens | null> {
   try {
-    const tokens = generateTokens(userId, role, authId, providerId);
+    const tokens = generateTokens(userAuth);
 
     await Promise.all([
       setJWTCookieInAction(tokens.jwtToken),
