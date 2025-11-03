@@ -4,7 +4,7 @@ import React from 'react';
 import {useRouter} from 'next/navigation';
 import {ServiceCreationResult} from '../_hooks/useProvideCreateService';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {switchToProvider} from "@/lib/auth/provider/switchToProvider";
+import {switchToProvider} from "@/lib/auth/switchToProvider";
 import {useAuth} from "@/contexts/AuthContext";
 
 interface ResultModalProps {
@@ -25,7 +25,7 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
 
   const handleGoToBusinessAccount = async () => {
     try {
-      const data = await switchToProvider()!;
+      const data = await switchToProvider();
 
       if (data!.success) {
         // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт

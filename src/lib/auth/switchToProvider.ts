@@ -4,6 +4,7 @@ import {withUserAuth} from '@/lib/auth/withUserAuth';
 import {AuthTokens, generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction} from '@/lib/auth/authUtils';
 import {prisma} from '@/lib/db/prisma';
 import {UserAuth} from '@/lib/auth/getUserAuth';
+import { getActiveProviderId } from '../provider/searchProvider';
 
 export interface ProviderSwitchResult {
   success: boolean;
@@ -99,16 +100,6 @@ async function existsByClientId(clientId: number): Promise<boolean> {
     select: { id: true }
   });
   return !!client;
-}
-
-async function getActiveProviderId(clientId: number): Promise<{id: number}> {
-  return  await prisma.tproviders.findFirst({
-    where: {
-      tclients_id: clientId,
-      status: 'active'
-    },
-    select: { id: true }
-  });
 }
 
 async function getClientAuthById(authId: number) {
