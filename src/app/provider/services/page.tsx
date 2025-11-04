@@ -6,6 +6,7 @@ import {servicesForProvider} from "@/lib/service/searchServices";
 import Link from 'next/link';
 import { parentCategories } from '@/lib/category/searchCategories';
 import { CategoryEntity } from '@/entity/CategoryEntity';
+import { ToastProvider, ToastContainer } from '@/components/Toast';
 
 export default async function ProviderServicesPage() {
 
@@ -39,35 +40,38 @@ export default async function ProviderServicesPage() {
   }
 
   return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900">
-              Мои объекты
-            </h1>
-          </div>
+      <ToastProvider>
+        <div className="min-h-screen bg-gray-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div className="mb-6">
+              <h1 className="text-2xl font-bold text-gray-900">
+                Мои объекты
+              </h1>
+            </div>
 
-          <ProviderServicesComponent parents={parents as CategoryEntity[]} parentToServices={parentToServices} />
+            <ProviderServicesComponent parents={parents as CategoryEntity[]} parentToServices={parentToServices} />
 
-          {/* Sticky Add Service Button */}
-          <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
-            <Link
-              href={PAGE_ROUTES.PROVIDER.CREATE_SERVICE}
-              className="text-black"
-              style={{
-                backgroundColor: '#95E59D',
-                borderRadius: 30,
-                fontSize: 17,
-                fontWeight: 400,
-                padding: '7px 20px',
-                cursor: 'pointer',
-                opacity: 1
-              }}
-            >
-              добавить новый объект
-            </Link>
+            {/* Sticky Add Service Button */}
+            <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
+              <Link
+                href={PAGE_ROUTES.PROVIDER.CREATE_SERVICE}
+                className="text-black"
+                style={{
+                  backgroundColor: '#95E59D',
+                  borderRadius: 30,
+                  fontSize: 17,
+                  fontWeight: 400,
+                  padding: '7px 20px',
+                  cursor: 'pointer',
+                  opacity: 1
+                }}
+              >
+                добавить новый объект
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+        <ToastContainer />
+      </ToastProvider>
   );
 }

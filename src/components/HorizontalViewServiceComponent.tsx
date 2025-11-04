@@ -35,7 +35,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
       onClick={handleClick}
       style={{ fontFamily: 'Inter, sans-serif' }}
     >
-      <div className="flex h-52">
+      <div className="flex h-60">
         {/* Service photo - 1/4 width */}
         <div 
           className="w-1/4 h-full"
@@ -51,16 +51,16 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
           {/* Top section: name and address */}
           <div className="mb-2">
             <div className="overflow-x-auto mb-1" style={{ WebkitOverflowScrolling: 'touch' }}>
-              <h3 
-                className="text-black font-semibold whitespace-nowrap"
-                style={{ fontWeight: 600, fontSize: '17px' }}
+              <h3
+                  className="text-black font-semibold mb-1 line-clamp-1"
+                  style={{fontWeight: 600, fontSize: '17px'}}
               >
                 {service.name}
               </h3>
             </div>
-            <p 
-              className="text-xs"
-              style={{ color: '#707579', fontWeight: 400 }}
+            <p
+                className="text-xs"
+                style={{color: '#707579', fontWeight: 400}}
             >
               {truncateText(service.address, 50)}
             </p>
@@ -77,7 +77,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
           </div>
            
           {/* Tags section - horizontal scrollable */}
-          <div className="mb-3 overflow-x-auto">
+          <div className="mb-3 overflow-x-auto scrollbar-hide">
             <div className="flex gap-2 " style={{ minWidth: 'max-content' }}>
               {service.options?.map((tag, index) => (
                 <span

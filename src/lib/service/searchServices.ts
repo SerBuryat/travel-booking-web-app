@@ -102,7 +102,11 @@ export async function servicesForCategories(
 
 export async function servicesForProvider(providerId: number): Promise<ServiceType[]> {
   const services = await prisma.tservices.findMany({
-    where: { provider_id: providerId },
+    where: { 
+      provider_id: providerId,
+      active: true,
+      status: { not: 'archived' }
+    },
     orderBy: { created_at: 'desc' },
     include: { tcategories: true, tlocations: true, tphotos: true },
   });
