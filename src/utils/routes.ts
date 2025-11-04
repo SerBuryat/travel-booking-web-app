@@ -12,6 +12,8 @@ export const PAGE_ROUTES = {
   PROFILE: '/profile',
   REQUESTS: '/requests',
   MAP: '/map',
+  // todo - можно сделать `/error` с параметрами с какой страницы и по какой причине ошибка,
+  //  чтобы показать информативную ошибку пользователю
   ERROR: '/error',
   
   // Service routes

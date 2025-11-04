@@ -2,7 +2,7 @@
 
 import { prisma } from '@/lib/db/prisma';
 import { ServiceType } from '@/model/ServiceType';
-import { CategoryEntity } from '@/entity/CategoryEntity';
+import { getServiceById } from '@/lib/service/searchServices';
 
 // Типы для предложений
 export interface ProposalServiceItem {
@@ -39,17 +39,9 @@ export async function getRequestProposals(requestId: number): Promise<RequestPro
     },
     include: {
       tservices: {
-        include: {
-          tcategories: {
-            select: {
-              id: true,
-              code: true,
-              sysname: true,
-              name: true,
-              photo: true,
-              parent_id: true,
-            },
-          },
+        select: {
+          id: true,
+          price: true,
         },
       },
       tproviders: {
@@ -65,42 +57,34 @@ export async function getRequestProposals(requestId: number): Promise<RequestPro
     },
   });
 
+  // Получаем уникальные ID сервисов
+  const uniqueServiceIds = [...new Set(proposals.map(p => p.tservices.id))];
+  
+  // Параллельно загружаем все сервисы через getServiceById
+  const servicesMap = new Map<number, ServiceType>();
+  await Promise.all(
+    uniqueServiceIds.map(async (serviceId) => {
+      const service = await getServiceById(serviceId);
+      if (service) {
+        servicesMap.set(serviceId, service);
+      }
+    })
+  );
+
   // Группируем предложения по провайдеру и дате
   const groupedProposals = new Map<string, ProposalView>();
 
   proposals.forEach(proposal => {
     const { tservices: service, tproviders: provider } = proposal;
-    const { tcategories: category } = service;
+    const mappedService = servicesMap.get(service.id);
+
+    // Пропускаем, если сервис не найден
+    if (!mappedService) {
+      return;
+    }
 
     // Создаем ключ для группировки (провайдер + дата)
     const groupKey = `${provider.id}_${proposal.created_at.toISOString()}`;
-
-    // Маппинг категории
-    const mappedCategory: CategoryEntity = {
-      id: category.id,
-      code: category.code,
-      sysname: category.sysname,
-      name: category.name,
-      photo: category.photo,
-      parent_id: category.parent_id,
-    };
-
-    // Маппинг сервиса
-    const mappedService: ServiceType = {
-      id: service.id,
-      name: service.name,
-      description: service.description ?? '',
-      price: String(service.price), // оригинальная цена сервиса
-      tcategories_id: service.tcategories_id,
-      provider_id: service.provider_id,
-      status: service.status,
-      created_at: service.created_at instanceof Date ? service.created_at.toISOString() : String(service.created_at),
-      priority: String(service.priority),
-      category: mappedCategory,
-      rating: service.rating ? Number(service.rating) : undefined,
-      view_count: service.view_count,
-      service_options: service.service_options
-    };
 
     // Создаем элемент сервиса в предложении
     const serviceItem: ProposalServiceItem = {
