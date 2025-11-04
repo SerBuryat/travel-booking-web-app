@@ -1,15 +1,42 @@
+'use client';
+
 import {ServiceType} from '@/model/ServiceType';
-import {PAGE_ROUTES} from "@/utils/routes";
-import React from "react";
+import React, {useMemo} from "react";
 import {HorizontalViewServiceComponent} from "@/components/HorizontalViewServiceComponent";
+import {useRouter, useSearchParams} from 'next/navigation';
+import {PAGE_ROUTES} from "@/utils/routes";
+import { CategoryEntity } from '@/entity/CategoryEntity';
 
 interface ProviderServicesComponentProps {
-  providerId?: number;
-  services: ServiceType[];
+  parents: CategoryEntity[];
+  parentToServices: Record<number, ServiceType[]>;
 }
 
-export default function ProviderServicesComponent({ services }: ProviderServicesComponentProps) {
-  if (!services) {
+export default function ProviderServicesComponent({ parents, parentToServices }: ProviderServicesComponentProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const selectedCategoryParam = searchParams.get('categoryId');
+  const selectedParentCategoryId = selectedCategoryParam ? Number(selectedCategoryParam) : undefined;
+
+  const visibleParents = useMemo(() => {
+    return parents.filter((p) => (parentToServices[p.id]?.length ?? 0) > 0);
+  }, [parents, parentToServices]);
+
+  const handleSelectCategory = (categoryId: number) => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    // set primary correct key; also clear the typo key for consistency
+    newParams.set('categoryId', String(categoryId));
+    const path = PAGE_ROUTES.PROVIDER.SERVICES;
+    router.push(`${path}?${newParams.toString()}`);
+  };
+  const totalServices = useMemo(() =>
+      Object.values(parentToServices)
+          .reduce((acc, arr) => acc + arr.length, 0)
+      , [parentToServices]
+  );
+
+  if (totalServices === 0) {
     return (
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
         <div className="flex">
@@ -33,59 +60,51 @@ export default function ProviderServicesComponent({ services }: ProviderServices
     );
   }
 
-  if (services.length === 0) {
-    return (
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200">
-        <div className="px-4 sm:px-6 py-6 sm:py-8">
-          <div className="text-center">
-            <svg className="mx-auto h-8 w-8 sm:h-10 sm:w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-            </svg>
-            <h3 className="mt-3 text-sm font-medium text-gray-900">
-              У вас пока нет сервисов
-            </h3>
-            <p className="mt-1 text-sm text-gray-500">
-              Создайте свой первый сервис, чтобы начать работу
-            </p>
-            <div className="mt-5">
-              <a
-                href={PAGE_ROUTES.PROVIDER.CREATE_SERVICE}
-                className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
-              >
-                Создать сервис
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const filteredServices: ServiceType[] = useMemo(() => {
+    if (!selectedParentCategoryId) return Object.values(parentToServices).flat();
+    return parentToServices[selectedParentCategoryId] ?? [];
+  }, [parentToServices, selectedParentCategoryId]);
 
   return (
-    <div className="space-y-3 sm:space-y-4">
+    <div className="space-y-3">
+      {/* Filter buttons (reference: child category buttons design) */}
+      <div className="mb-4 overflow-x-auto">
+        <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
+          <button
+            onClick={() => router.push(PAGE_ROUTES.PROVIDER.SERVICES)}
+            className={`px-3 py-1 rounded-full text-xs whitespace-nowrap ${!selectedParentCategoryId ? 'text-white' : ''}`}
+            style={{
+              backgroundColor: !selectedParentCategoryId ? '#B0D5FD' : '#F5F5F5',
+              color: '#000000',
+              fontWeight: 500
+            }}
+          >
+            Все
+          </button>
 
-      {/* Список сервисов */}
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200">
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
-          <div className="flex justify-between items-center">
-            <h3 className="text-sm sm:text-base font-medium text-gray-900">Мои сервисы</h3>
-            <a
-              href={PAGE_ROUTES.PROVIDER.CREATE_SERVICE}
-              className="inline-flex items-center px-2 sm:px-3 py-1.5 border border-transparent text-xs sm:text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
-            >
-              Добавить сервис
-            </a>
-          </div>
-        </div>
-
-        <div className="p-3 sm:p-6 space-y-3 sm:space-y-4">
-          <div className="space-y-3">
-            {services.map((service) => (
-                <HorizontalViewServiceComponent key={service.id} service={service}/>
-            ))}
-          </div>
+          {visibleParents.map((cat) => {
+            const isActive = selectedParentCategoryId === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => handleSelectCategory(cat.id)}
+                className={`px-3 py-1 rounded-full text-xs whitespace-nowrap ${isActive ? 'text-white' : ''}`}
+                style={{
+                  backgroundColor: isActive ? '#B0D5FD' : '#F5F5F5',
+                  color: '#000000',
+                  fontWeight: 500
+                }}
+              >
+                {cat.name}
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {filteredServices.map((service) => (
+        <HorizontalViewServiceComponent key={service.id} service={service} />
+      ))}
     </div>
   );
 }

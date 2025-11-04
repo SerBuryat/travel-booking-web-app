@@ -14,8 +14,8 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
 }) => {
   const router = useRouter();
 
-  // Truncate description if too long
-  const truncateDescription = (text: string, maxLength: number = 50) => {
+  // Truncate name to 30 characters
+  const truncateText = (text: string, maxLength: number = 30) => {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
@@ -50,70 +50,72 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
         <div className="w-3/4 p-4 flex flex-col justify-between">
           {/* Top section: name and address */}
           <div className="mb-2">
-                         <h3 
-               className="text-black font-semibold mb-1 line-clamp-1"
-               style={{ fontWeight: 600, fontSize: '17px' }}
-             >
-               {service.name}
-             </h3>
+            <div className="overflow-x-auto mb-1" style={{ WebkitOverflowScrolling: 'touch' }}>
+              <h3 
+                className="text-black font-semibold whitespace-nowrap"
+                style={{ fontWeight: 600, fontSize: '17px' }}
+              >
+                {service.name}
+              </h3>
+            </div>
             <p 
               className="text-xs"
               style={{ color: '#707579', fontWeight: 400 }}
             >
-              {service.address}
+              {truncateText(service.address, 50)}
             </p>
           </div>
           
-                     {/* Middle section: description */}
-           <div className="mb-3">
-             <p 
-               className="text-xs leading-relaxed"
-               style={{ color: '#333333', fontWeight: 400 }}
-             >
-               {truncateDescription(service.description)}
-             </p>
-           </div>
+          {/* Middle section: description */}
+          <div className="mb-3">
+            <p 
+              className="text-xs leading-relaxed"
+              style={{ color: '#333333', fontWeight: 400 }}
+            >
+              {truncateText(service.description, 75)}
+            </p>
+          </div>
            
-           {/* Tags section - horizontal scrollable */}
-           <div className="mb-3 overflow-x-auto">
-             <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
-               {service.options?.map((tag, index) => (
-                 <span
-                   key={index}
-                   className="px-3 py-1 rounded-full text-xs whitespace-nowrap"
-                   style={{
-                     backgroundColor: '#F5F5F5',
-                     color: '#707579',
-                     fontWeight: 400
-                   }}
-                 >
-                   {tag}
-                 </span>
-               ))}
-             </div>
-           </div>
-           
-                       {/* Bottom section: rating and price */}
-            <div className="flex items-center justify-between">
-              {/* Rating on the left */}
-              <span
-                 className="text-xs font-semibold"
-                 style={{ color: '#007AFF', fontWeight: 600 }}
-               >
-                 {
-                   service.rating && service.view_count > 0
-                       ? `${service.rating}/5`
-                       : 'Нет оценок'
-                 }
-               </span>
-              {/* Price on the right */}
-              <span 
-                className="text-xs font-semibold"
-                style={{ color: '#007AFF', fontWeight: 600 }}
-              >
-                {service.price} ₽
-              </span>
+          {/* Tags section - horizontal scrollable */}
+          <div className="mb-3 overflow-x-auto">
+            <div className="flex gap-2 " style={{ minWidth: 'max-content' }}>
+              {service.options?.map((tag, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full text-xs whitespace-nowrap"
+                  style={{
+                    backgroundColor: '#F5F5F5',
+                    color: '#707579',
+                    fontWeight: 400
+                  }}
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
+          </div>
+           
+          {/* Bottom section: rating and price */}
+          <div className="flex items-center justify-between">
+            {/* Rating on the left */}
+            <span
+              className="text-xs font-semibold"
+              style={{ color: '#007AFF', fontWeight: 600 }}
+            >
+              {
+                service.rating && service.view_count > 0
+                    ? `${service.rating}/5`
+                    : 'Нет оценок'
+              }
+            </span>
+            {/* Price on the right */}
+            <span 
+              className="text-xs font-semibold"
+              style={{ color: '#007AFF', fontWeight: 600 }}
+            >
+              {service.price} ₽
+            </span>
+          </div>
         </div>
       </div>
     </div>

@@ -3,13 +3,15 @@ import ProviderServicesComponent from './_components/ProviderServicesComponent';
 import {PAGE_ROUTES} from "@/utils/routes";
 import {getUserAuthOrThrow, UserAuth} from "@/lib/auth/getUserAuth";
 import {servicesForProvider} from "@/lib/service/searchServices";
+import Link from 'next/link';
+import { parentCategories } from '@/lib/category/searchCategories';
+import { CategoryEntity } from '@/entity/CategoryEntity';
 
 export default async function ProviderServicesPage() {
 
   let userAuth: UserAuth;
   try {
     userAuth = await getUserAuthOrThrow();
-    console.log('userAuth', userAuth);
   } catch (error) {
     console.log('Error in ProviderServicesPage - server side', error);
     redirect(PAGE_ROUTES.TELEGRAM_AUTH);
@@ -24,6 +26,17 @@ export default async function ProviderServicesPage() {
   }
 
   const services = await servicesForProvider(userAuth.providerId);
+  const parents = await parentCategories();
+
+  // Build mapping parentId -> services[]
+  const parentToServices: Record<number, typeof services> = {} as Record<number, typeof services>;
+  (parents as CategoryEntity[]).forEach((p) => { parentToServices[p.id] = []; });
+  for (const s of services) {
+    const parentId = s.category?.parent_id ?? null;
+    if (parentId && parentToServices[parentId]) {
+      parentToServices[parentId].push(s);
+    }
+  }
 
   return (
       <div className="min-h-screen bg-gray-50">
@@ -34,7 +47,26 @@ export default async function ProviderServicesPage() {
             </h1>
           </div>
 
-          <ProviderServicesComponent services={services}/>
+          <ProviderServicesComponent parents={parents as CategoryEntity[]} parentToServices={parentToServices} />
+
+          {/* Sticky Add Service Button */}
+          <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
+            <Link
+              href={PAGE_ROUTES.PROVIDER.CREATE_SERVICE}
+              className="text-black"
+              style={{
+                backgroundColor: '#95E59D',
+                borderRadius: 30,
+                fontSize: 17,
+                fontWeight: 400,
+                padding: '7px 20px',
+                cursor: 'pointer',
+                opacity: 1
+              }}
+            >
+              добавить новый объект
+            </Link>
+          </div>
         </div>
       </div>
   );

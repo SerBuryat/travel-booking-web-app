@@ -27,3 +27,19 @@ export async function getCategoryNameById(id: number): Promise<string> {
     redirect(PAGE_ROUTES.ERROR);
   }
 }
+
+/**
+ * Получение списка родительских категорий (parent_id = null)
+ */
+export async function parentCategories() {
+  try {
+    const categories = await prisma.tcategories.findMany({
+      where: { parent_id: null },
+      select: { id: true, code: true, sysname: true, name: true, photo: true, parent_id: true }
+    });
+    return categories;
+  } catch (error) {
+    console.error('Ошибка при получении родительских категорий:', error);
+    redirect(PAGE_ROUTES.ERROR);
+  }
+}
