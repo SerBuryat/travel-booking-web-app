@@ -122,8 +122,7 @@ export default function ProviderServicesComponent({ parents, parentToServices }:
 
   const handleEditClick = (service: ServiceType, e: React.MouseEvent) => {
     e.stopPropagation();
-    // TODO: Implement edit functionality
-    console.log('Edit service:', service.id);
+    router.push(`/provider/services/${service.id}/edit`);
     handleCloseMenu();
   };
 

@@ -4,9 +4,11 @@ import { useState, useEffect, useCallback } from 'react';
 
 export interface PhotoItem {
   id: string;
-  file: File;
+  file: File | null;  // null для существующих фото из БД
   previewUrl: string;
   isPrimary: boolean;
+  isExisting?: boolean;  // флаг для различия существующих и новых фото
+  dbId?: number;  // ID фото в БД (для существующих)
 }
 
 const MAX_PHOTOS = 10;
@@ -28,6 +30,7 @@ interface UseServicePhotosReturn {
   clearPhotos: () => void;
   getPrimaryPhoto: () => PhotoItem | null;
   validatePhotos: () => { isValid: boolean; errors: string[] };
+  getPhotosForSubmit: () => { existing: Array<{ id: number; fileName: string; isPrimary: boolean }>; new: Array<{ file: File; isPrimary: boolean }> };
 }
 
 /**
@@ -75,7 +78,15 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
    * Валидация имени файла на дубликаты
    */
   const validateFileNameDuplicate = useCallback((fileName: string, existingPhotos: PhotoItem[]): boolean => {
-    return !existingPhotos.some(photo => photo.file.name === fileName);
+    return !existingPhotos.some(photo => photo.file?.name === fileName);
+  }, []);
+
+  /**
+   * Извлечение имени файла из URL (для существующих фото)
+   */
+  const extractFileNameFromUrl = useCallback((url: string): string => {
+    const parts = url.split('/');
+    return parts[parts.length - 1];
   }, []);
 
   /**
@@ -93,19 +104,15 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
       errors.push('Необходимо выбрать обложку');
     }
 
-    // Пример валидации размеров (закомментирован, можно раскомментировать при необходимости)
-    // photos.forEach((photo, index) => {
-    //   if (!validateFileSize(photo.file)) {
-    //     errors.push(`Фото "${photo.file.name}" превышает максимальный размер ${MAX_FILE_SIZE_MB}MB`);
-    //   }
-    // });
-
-    // Пример валидации типов (закомментирован)
-    // photos.forEach((photo, index) => {
-    //   if (!validateFileType(photo.file)) {
-    //     errors.push(`Файл "${photo.file.name}" не является изображением`);
-    //   }
-    // });
+    // Валидация новых фото (не существующих)
+    photos.filter(p => !p.isExisting && p.file).forEach((photo) => {
+      if (photo.file && !validateFileSize(photo.file)) {
+        errors.push(`Фото "${photo.file.name}" превышает максимальный размер ${MAX_FILE_SIZE_MB}MB`);
+      }
+      if (photo.file && !validateFileType(photo.file)) {
+        errors.push(`Файл "${photo.file.name}" не является изображением`);
+      }
+    });
 
     return {
       isValid: errors.length === 0,
@@ -256,6 +263,29 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
     return photos.find(p => p.id === primaryPhotoId) || null;
   }, [photos, primaryPhotoId]);
 
+  /**
+   * Получение данных для отправки (разделение на существующие и новые фото)
+   * Используется при редактировании сервиса
+   */
+  const getPhotosForSubmit = useCallback(() => {
+    const existing = photos
+      .filter(p => p.isExisting && p.dbId)
+      .map(p => ({
+        id: p.dbId!,
+        fileName: extractFileNameFromUrl(p.previewUrl),
+        isPrimary: p.isPrimary
+      }));
+
+    const newPhotos = photos
+      .filter(p => !p.isExisting && p.file)
+      .map(p => ({
+        file: p.file!,
+        isPrimary: p.isPrimary
+      }));
+
+    return { existing, new: newPhotos };
+  }, [photos, extractFileNameFromUrl]);
+
   return {
     photos,
     primaryPhotoId,
@@ -266,7 +296,8 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
     setPrimaryPhoto,
     clearPhotos,
     getPrimaryPhoto,
-    validatePhotos
+    validatePhotos,
+    getPhotosForSubmit
   };
 };
 

@@ -19,6 +19,13 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
 
+  // Загружаем категории при монтировании, если уже есть выбранная категория (режим редактирования)
+  useEffect(() => {
+    if (selectedCategory && categories.length === 0) {
+      loadCategories();
+    }
+  }, [selectedCategory]);
+
   // Загружаем категории при открытии модального окна
   useEffect(() => {
     if (isOpen && categories.length === 0) {
@@ -29,6 +36,7 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
   const loadCategories = async () => {
     setLoading(true);
     try {
+      // todo - заменить на server actions, в `searchCategories` есть функция
       const response = await fetch('/api/categories/parent-with-children');
       if (response.ok) {
         const data = await response.json();
@@ -58,6 +66,11 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
 
   const getSelectedCategoryDisplay = () => {
     if (!selectedCategory) return <span className="text-gray-400"> Выберите категорию </span>;
+
+    // Если категории еще не загружены, показываем индикатор загрузки
+    if (categories.length === 0) {
+      return <span className="text-gray-400">Загрузка...</span>;
+    }
 
     for (const parent of categories) {
       if (parent.id === selectedCategory) {

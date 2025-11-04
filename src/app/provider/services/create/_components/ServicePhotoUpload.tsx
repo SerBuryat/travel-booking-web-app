@@ -200,12 +200,25 @@ export const ServicePhotoUpload: React.FC<ServicePhotoUploadProps> = ({
 
                 {/* Информация о файле */}
                 <div className="mt-1 px-1 space-y-1">
-                  <p className="text-xs text-gray-600 truncate" title={photo.file.name}>
-                    {photo.file.name}
-                  </p>
-                  <p className="text-xs text-gray-400">
-                    {(photo.file.size / 1024 / 1024).toFixed(2)} MB
-                  </p>
+                  {photo.file ? (
+                    // Новое фото - показываем название и размер
+                    <>
+                      <p className="text-xs text-gray-600 truncate" title={photo.file.name}>
+                        {photo.file.name}
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {(photo.file.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </>
+                  ) : (
+                    // Существующее фото - показываем красивый индикатор
+                    <div className="flex items-center gap-1.5 text-xs text-green-600">
+                      <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-medium">Загружено</span>
+                    </div>
+                  )}
                 </div>
               </div>
             );

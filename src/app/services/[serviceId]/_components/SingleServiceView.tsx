@@ -10,7 +10,7 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
 
   const imagesUrls =
       !service.photos || service.photos.length == 0
-          ? [DEFAULT_SERVICE_IMAGE_2]
+          ? [DEFAULT_SERVICE_IMAGE_3]
           : service.photos.map(photo => photo.url)
 
   const router = useRouter();

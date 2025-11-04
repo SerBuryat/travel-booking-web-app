@@ -20,6 +20,13 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
   const [isLoading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // Загружаем зоны при монтировании, если уже есть выбранная зона (режим редактирования)
+  useEffect(() => {
+    if (selectedArea && areas.length === 0) {
+      loadAreas();
+    }
+  }, [selectedArea]);
+
   // Загружаем зоны при открытии модального окна
   useEffect(() => {
     if (isOpen && areas.length === 0) {
@@ -56,8 +63,13 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
 
   const getSelectedAreaDisplay = () => {
     if (!selectedArea) return <span className="text-gray-400"> Выберите зону </span>;
-
+    
     const currentArea = findById(areas, selectedArea);
+    
+    // Если зона еще не загружена, показываем индикатор загрузки
+    if (!currentArea) {
+      return <span className="text-gray-400">Загрузка...</span>;
+    }
 
     return (
         <div className="flex items-center space-x-2">
