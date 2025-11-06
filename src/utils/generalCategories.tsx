@@ -1,5 +1,20 @@
 import React from 'react';
 
+/**
+ * Интерфейс для категории с полной информацией об изображениях
+ */
+export interface CategoryImages {
+  sysname: string;
+  svgIcon: React.ReactNode;
+  pngLarge: string;        // путь к большой PNG картинке (sysname-sq-lg.png)
+  pngSmall: string;        // путь к маленькой PNG картинке (sysname-sq-sm.png)
+  backgroundImage: string; // путь к горизонтальной фоновой картинке (sysname-hr.png)
+}
+
+/**
+ * Старый интерфейс для обратной совместимости
+ * @deprecated Используйте CategoryImages
+ */
 export interface GeneralCategory {
   code: string;
   icon: React.ReactNode;
@@ -38,6 +53,23 @@ const EntertainmentIcon: React.FC = () => (
   </svg>
 );
 
+const HealthIcon: React.FC = () => (
+  <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path
+        d="M4 11.9998H8L9.5 8.99976L11.5 13.9998L13 11.9998H15M12 6.42958C12.4844 5.46436 13.4683 4.72543 14.2187 4.35927C16.1094 3.43671 17.9832 3.91202 19.5355 5.46436C21.4881 7.41698 21.4881 10.5828 19.5355 12.5354L12.7071 19.3639C12.3166 19.7544 11.6834 19.7544 11.2929 19.3639L4.46447 12.5354C2.51184 10.5828 2.51184 7.41698 4.46447 5.46436C6.0168 3.91202 7.89056 3.43671 9.78125 4.35927C10.5317 4.72543 11.5156 5.46436 12 6.42958Z"
+        stroke="#303030" strokeWidth="1.625" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+);
+
+const PackageIcon: React.FC = () => (
+    <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13 2.16667L3.25 7.58333V18.4167L13 23.8333L22.75 18.4167V7.58333L13 2.16667Z"
+            stroke="#303030" strokeWidth="1.625" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M3.25 7.58333L13 13L22.75 7.58333M13 13V23.8333"
+            stroke="#303030" strokeWidth="1.625" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+);
+
 // Default icon for general categories
 export const DEFAULT_CATEGORY_ICON: React.ReactNode = (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -47,41 +79,178 @@ export const DEFAULT_CATEGORY_ICON: React.ReactNode = (
   </svg>
 );
 
-// General categories constants
+// ============================================================================
+// НОВАЯ СТРУКТУРА КАТЕГОРИЙ С ПОЛНОЙ ИНФОРМАЦИЕЙ ОБ ИЗОБРАЖЕНИЯХ
+// ============================================================================
+
+/**
+ * Полная карта категорий с изображениями
+ * Структура для удобного доступа к SVG и PNG картинкам
+ */
+export const CATEGORIES_IMAGES_MAP: Record<string, CategoryImages> = {
+  accommodation: {
+    sysname: 'accommodation',
+    svgIcon: <AccommodationIcon />,
+    pngLarge: '/images/categories/accommodation/accommodation-sq-lg.png',
+    pngSmall: '/images/categories/accommodation/accommodation-sq-sm.png',
+    backgroundImage: '/images/categories/accommodation/accommodation-hr.png',
+  },
+  food: {
+    sysname: 'food',
+    svgIcon: <FoodIcon />,
+    pngLarge: '/images/categories/food/food-sq-lg.png',
+    pngSmall: '/images/categories/food/food-sq-sm.png',
+    backgroundImage: '/images/categories/food/food-hr.png',
+  },
+  transport: {
+    sysname: 'transport',
+    svgIcon: <TransportIcon />,
+    pngLarge: '/images/categories/transport/transport-sq-lg.png',
+    pngSmall: '/images/categories/transport/transport-sq-sm.png',
+    backgroundImage: '/images/categories/transport/transport-hr.png',
+  },
+  entertainment: {
+    sysname: 'entertainment',
+    svgIcon: <EntertainmentIcon />,
+    pngLarge: '/images/categories/entertainment/entertainment-sq-lg.png',
+    pngSmall: '/images/categories/entertainment/entertainment-sq-sm.png',
+    backgroundImage: '/images/categories/entertainment/entertainment-hr.png',
+  },
+  health: {
+    sysname: 'health',
+    svgIcon: <HealthIcon />,
+    pngLarge: '/images/categories/health/health-sq-lg.png',
+    pngSmall: '/images/categories/health/health-sq-sm.png',
+    backgroundImage: '/images/categories/health/health-hr.png',
+  },
+  package: {
+    sysname: 'package',
+    svgIcon: <PackageIcon />,
+    pngLarge: '/images/categories/package/package-sq-lg.png',
+    pngSmall: '/images/categories/package/package-sq-sm.png',
+    backgroundImage: '/images/categories/package/package-hr.png',
+  },
+};
+
+// ============================================================================
+// ФУНКЦИИ ДЛЯ ПОЛУЧЕНИЯ ИЗОБРАЖЕНИЙ
+// ============================================================================
+
+/**
+ * Получить полную информацию о категории по sysname
+ */
+export function getCategoryImages(sysname: string): CategoryImages | null {
+  return CATEGORIES_IMAGES_MAP[sysname] || null;
+}
+
+/**
+ * Получить SVG иконку категории по sysname
+ */
+export function getCategorySvgIcon(sysname: string): React.ReactNode {
+  return CATEGORIES_IMAGES_MAP[sysname]?.svgIcon || DEFAULT_CATEGORY_ICON;
+}
+
+/**
+ * Получить PNG картинку категории по sysname и размеру
+ */
+export function getCategoryPngImage(sysname: string, size: 'large' | 'small'): string | null {
+  const category = CATEGORIES_IMAGES_MAP[sysname];
+  if (!category) return null;
+  return size === 'large' ? category.pngLarge : category.pngSmall;
+}
+
+/**
+ * Получить горизонтальное фоновое изображение категории
+ */
+export function getCategoryBackgroundImage(sysname: string): string | null {
+  const category = CATEGORIES_IMAGES_MAP[sysname];
+  return category?.backgroundImage || null;
+}
+
+/**
+ * Получить все sysname категорий
+ */
+export function getAllCategorySysnames(): string[] {
+  return Object.keys(CATEGORIES_IMAGES_MAP);
+}
+
+// ============================================================================
+// СТАРАЯ СТРУКТУРА ДЛЯ ОБРАТНОЙ СОВМЕСТИМОСТИ
+// ============================================================================
+
+/**
+ * @deprecated Используйте CATEGORIES_IMAGES_MAP
+ */
 export const ACCOMMODATION: GeneralCategory = {
   code: 'accommodation',
   icon: <AccommodationIcon />
 };
 
+/**
+ * @deprecated Используйте CATEGORIES_IMAGES_MAP
+ */
 export const FOOD: GeneralCategory = {
   code: 'food',
   icon: <FoodIcon />
 };
 
+/**
+ * @deprecated Используйте CATEGORIES_IMAGES_MAP
+ */
 export const TRANSPORT: GeneralCategory = {
   code: 'transport',
   icon: <TransportIcon />
 };
 
+/**
+ * @deprecated Используйте CATEGORIES_IMAGES_MAP
+ */
 export const ENTERTAINMENT: GeneralCategory = {
   code: 'entertainment',
   icon: <EntertainmentIcon />
 };
 
-// Map of general categories
+/**
+ * @deprecated Используйте getCategoryImages('health')
+ */
+export const HEALTH: GeneralCategory = {
+  code: 'health',
+  icon: <HealthIcon />
+};
+
+/**
+ * @deprecated Используйте getCategoryImages('package')
+ */
+export const PACKAGE: GeneralCategory = {
+  code: 'package',
+  icon: <PackageIcon />
+};
+
+/**
+ * Map of general categories
+ * @deprecated Используйте CATEGORIES_IMAGES_MAP
+ */
 const generalCategoriesMap = new Map<string, GeneralCategory>([
   [ACCOMMODATION.code, ACCOMMODATION],
   [FOOD.code, FOOD],
   [TRANSPORT.code, TRANSPORT],
   [ENTERTAINMENT.code, ENTERTAINMENT],
+  [HEALTH.code, HEALTH],
+  [PACKAGE.code, PACKAGE],
 ]);
 
-// Function to get general category by code
+/**
+ * Function to get general category by code
+ * @deprecated Используйте getCategoryImages()
+ */
 export function getGeneralCategoryByCode(code: string): GeneralCategory | undefined {
   return generalCategoriesMap.get(code);
 }
 
-// Get all general category codes
+/**
+ * Get all general category codes
+ * @deprecated Используйте getAllCategorySysnames()
+ */
 export function getGeneralCategoryCodes(): string[] {
   return Array.from(generalCategoriesMap.keys());
 } 

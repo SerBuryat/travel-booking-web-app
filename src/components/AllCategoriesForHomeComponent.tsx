@@ -2,11 +2,14 @@
 
 import React from 'react';
 import {useRouter} from 'next/navigation';
+import Image from 'next/image';
+import {getCategoryPngImage} from '@/utils/generalCategories';
 
 interface Category {
   id: number;
   name: string;
   code: string;
+  sysname: string;
   photo: string | null;
 }
 
@@ -32,60 +35,112 @@ export const AllCategoriesForHomeComponent: React.FC<AllCategoriesForHomeCompone
     return gradients[id % gradients.length];
   };
 
-  // Разбиваем категории на 2 ряда
-  // Количество категорий в первом ряду в 1.5 меньше, чем во втором
-  const firstRow = categories.slice(0, Math.floor(categories.length / 2.5));
-  const secondRow = categories.slice(Math.floor(categories.length / 2.5));
+  // Компонент категории с картинкой или градиентом
+  const CategoryItem: React.FC<{ category: Category; size: 'large' | 'small'; stretched?: boolean }> = ({ category, size, stretched = false }) => {
+    const imageSrc = getCategoryPngImage(category.sysname, size);
+    const isLarge = size === 'large';
+    const sizeClass = isLarge ? (stretched ? 'w-full h-24' : 'w-24 h-24') : 'w-16 h-16';
+    const textMaxWidth = stretched ? 'w-full' : (isLarge ? 'max-w-24' : 'max-w-16');
+    
+    return (
+      <div
+        key={category.id}
+        className={`flex flex-col items-center cursor-pointer ${stretched ? 'flex-1' : ''}`}
+        onClick={() => handleCategoryClick(category.id)}
+      >
+        <div 
+          className={`${sizeClass} rounded-[15px] mb-2 overflow-hidden relative flex items-center justify-center`}
+          style={!imageSrc ? { background: getGradientForId(category.id) } : undefined}
+        >
+          {imageSrc ? (
+            <Image
+              src={imageSrc}
+              alt={category.name}
+              fill
+              sizes={isLarge ? "200px" : "64px"}
+              className="object-cover"
+            />
+          ) : null}
+        </div>
+        <span 
+          className={`text-xs text-center text-gray-700 ${textMaxWidth} break-words`}
+          title={category.name}
+        >
+          {category.name}
+        </span>
+      </div>
+    );
+  };
+
+  // Ограничиваем количество категорий до 7
+  const displayCategories = categories.slice(0, 7);
+  const count = displayCategories.length;
+
+  // Логика layout в виде матрицы для наглядности
+  // 1-3 категории: все большие в один ряд
+  // 4 категории: 2 ряда по 2 больших
+  // 5-7 категорий: 2 ряда (верхний - 2 больших, нижний - 3-5 малых)
+  
+  const renderLayout = () => {
+    if (count === 0) return null;
+
+    // 1-3: все большие в один ряд, растянуты по ширине
+    if (count <= 3) {
+      return (
+        <div className="flex gap-4">
+          {displayCategories.map((category) => (
+            <CategoryItem key={category.id} category={category} size="large" stretched />
+          ))}
+        </div>
+      );
+    }
+
+    // 4: 2 ряда по 2 больших, растянуты по ширине
+    if (count === 4) {
+      return (
+        <div className="flex flex-col space-y-4">
+          {/* Ряд 1: 2 больших */}
+          <div className="flex gap-4">
+            {displayCategories.slice(0, 2).map((category) => (
+              <CategoryItem key={category.id} category={category} size="large" stretched />
+            ))}
+          </div>
+          {/* Ряд 2: 2 больших */}
+          <div className="flex gap-4">
+            {displayCategories.slice(2, 4).map((category) => (
+              <CategoryItem key={category.id} category={category} size="large" stretched />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // 5-7: верхний ряд 2 больших (растянуты), нижний ряд 3-5 малых
+    if (count >= 5 && count <= 7) {
+      return (
+        <div className="flex flex-col space-y-4">
+          {/* Ряд 1: 2 больших, растянуты по ширине */}
+          <div className="flex gap-4">
+            {displayCategories.slice(0, 2).map((category) => (
+              <CategoryItem key={category.id} category={category} size="large" stretched />
+            ))}
+          </div>
+          {/* Ряд 2: 3-5 малых, с отступами */}
+          <div className="flex justify-between">
+            {displayCategories.slice(2).map((category) => (
+              <CategoryItem key={category.id} category={category} size="small" />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  };
 
   return (
     <div className="px-4 py-2">
-      {/* Ряд 1 - большие иконки */}
-      <div className="flex space-x-8 mb-4">
-        {firstRow.map((category) => (
-                     <div
-              key={category.id}
-              className="flex flex-col items-center cursor-pointer"
-              onClick={() => handleCategoryClick(category.id)}
-           >
-              <div 
-                className="w-24 h-24 rounded-[15px] mb-2"
-                style={{ background: getGradientForId(category.id) }}
-              />
-               <span 
-                 className="text-xs text-center text-gray-700 max-w-24 break-words"
-                 title={category.name}
-               >
-                 {category.name}
-               </span>
-            </div>
-        ))}
-      </div>
-
-                           {/* Ряд 2 - маленькие иконки */}
-        {secondRow.length > 0 && (
-          <div className="flex space-x-4">
-           {secondRow.map((category) => (
-                                                    <div
-                 key={category.id}
-                 className="flex flex-col items-center cursor-pointer"
-                 onClick={() => handleCategoryClick(category.id)}
-               >
-                 <div 
-                   className="w-16 h-16 rounded-[15px] mb-2"
-                   style={{ background: getGradientForId(category.id) }}
-                 />
-                                <span 
-                     className="text-xs text-center text-gray-700 max-w-16 break-words"
-                     title={category.name}
-                   >
-                     {category.name}
-                   </span>
-               </div>
-           ))}
-           {/* Невидимый элемент для отступа */}
-           <div className="invisible"> 1 </div>
-         </div>
-       )}
+      {renderLayout()}
     </div>
   );
 }; 

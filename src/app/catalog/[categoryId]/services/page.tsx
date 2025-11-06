@@ -1,8 +1,8 @@
-import {CategoryService} from '@/service/CategoryService';
 import {CategoryHeaderComponent} from '@/components/CategoryHeaderComponent';
 import ServicesClient from './ServicesClient';
 import {notFound} from 'next/navigation';
 import {servicesForCategories} from "@/lib/service/searchServices";
+import {getCategoryWithChildren} from "@/lib/category/searchCategories";
 import React from "react";
 
 interface PageProps {
@@ -11,8 +11,7 @@ interface PageProps {
 }
 
 async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { categoryId: number, childCategoryIdsParam?: string }) {
-  const categoryService = new CategoryService();
-  const categoryWithRelations = await categoryService.getById(categoryId);
+  const categoryWithRelations = await getCategoryWithChildren(categoryId);
   if (!categoryWithRelations) return notFound();
   
   const childCategoriesIds = categoryWithRelations.children.map((child) => child.id);
@@ -34,7 +33,7 @@ async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { 
   return (
     <>
       <div className="pt-4 pb-4">
-        <CategoryHeaderComponent name={categoryWithRelations.name} photo={categoryWithRelations.photo} />
+        <CategoryHeaderComponent category={categoryWithRelations} />
       </div>
       <ServicesClient
           category={categoryWithRelations}

@@ -1,12 +1,25 @@
 import React from 'react';
+import {getCategoryBackgroundImage} from '@/utils/generalCategories';
 
-interface CategoryHeaderComponentProps {
+interface Category {
+  id: number;
+  code: string;
+  sysname: string;
   name: string;
-  photo?: string | null;
+  photo: string | null;
+  parent_id: number | null;
+  priority: number | null;
 }
 
-export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = ({ name, photo }) => {
-  // Generate a random gradient if no photo
+interface CategoryHeaderComponentProps {
+  category: Category;
+}
+
+export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = ({ category }) => {
+  // Получаем фоновое изображение из маппинга по sysname
+  const backgroundImage = getCategoryBackgroundImage(category.sysname);
+  
+  // Generate a random gradient as fallback
   const getRandomGradient = () => {
     const gradients = [
       'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -19,23 +32,19 @@ export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = (
   };
 
   const backgroundStyle = 
-    photo 
-      ? { backgroundImage: `url(${photo})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    backgroundImage 
+      ? { backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
       : { backgroundImage: getRandomGradient() };
-
-  // Generate a random gradient for overlay (used only if photo is present)
-  const overlayGradient = getRandomGradient();
 
   return (
     <div 
       className="relative h-32 rounded-lg flex items-center justify-center overflow-hidden"
       style={backgroundStyle}
     >
-      {/* Overlay for better text readability */}
-      {photo && (
+      {/* Overlay for better text readability - только для картинок */}
+      {backgroundImage && (
         <div
-          className="absolute inset-0"
-          style={{ background: overlayGradient, opacity: 0.7 }}
+          className="absolute inset-0 bg-black/20"
         ></div>
       )}
       {/* Category name */}
@@ -43,7 +52,7 @@ export const CategoryHeaderComponent: React.FC<CategoryHeaderComponentProps> = (
         className="relative z-10 text-white font-bold text-2xl text-center px-4 "
         style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700 }}
       >
-        {name}
+        {category.name}
       </h1>
     </div>
   );

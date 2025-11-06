@@ -99,6 +99,7 @@ model tcategories {
   photo             String?               @db.VarChar(255)
   parent_id         Int?
   path              Unsupported("ltree")?
+  priority          Int?                  @db.SmallInt
   tbids             tbids[]
   tcategories       tcategories?          @relation("tcategoriesTotcategories", fields: [parent_id], references: [id], onUpdate: NoAction)
   other_tcategories tcategories[]         @relation("tcategoriesTotcategories")

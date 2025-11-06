@@ -34,13 +34,6 @@ export class CategoryService {
   }
 
   /**
-   * Get all parent categories (categories with no parent)
-   */
-  async getAllParentCategories(): Promise<CategoryEntity[]> {
-    return this.categoryRepository.findAllByParentId(null);
-  }
-
-  /**
    * Get category by ID as CategoryType with hierarchical structure
    */
   async getById(categoryId: number): Promise<CategoryType | null> {

@@ -5,16 +5,15 @@ import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeCo
 import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
 import {RegistryServiceButton} from '@/components/RegistryServiceButton';
 import {PrivatePolicyButton} from '@/components/PrivatePolicyButton';
-import {CategoryService} from '@/service/CategoryService';
 import {popularServices} from "@/lib/service/searchServices";
 import {PAGE_ROUTES} from "@/utils/routes";
+import {parentCategories} from "@/lib/category/searchCategories";
 
 // Принудительно делаем страницу динамической
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const categoryService = new CategoryService();
-  const categories = await categoryService.getAllParentCategories();
+  const categories = await parentCategories();
   const services = await popularServices({take: 6});
 
   return (

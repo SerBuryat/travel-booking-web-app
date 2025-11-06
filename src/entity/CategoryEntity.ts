@@ -5,4 +5,5 @@ export interface CategoryEntity {
   name: string;
   photo: string | null;
   parent_id: number | null;
+  priority: number | null;
 }
