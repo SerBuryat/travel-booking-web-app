@@ -1,12 +1,14 @@
 import {
   CreateBucketCommand,
   DeleteBucketCommand,
+  DeleteObjectCommand,
   GetObjectCommand,
   ListBucketsCommand,
   ListObjectsV2Command,
   PutObjectCommand,
   type CreateBucketCommandOutput,
   type DeleteBucketCommandOutput,
+  type DeleteObjectCommandOutput,
   type GetObjectCommandOutput,
   type ListBucketsCommandOutput,
   type ListObjectsV2CommandOutput,
@@ -87,6 +89,16 @@ export async function deleteBucket(bucketName: string): Promise<DeleteBucketComm
   const command = new DeleteBucketCommand({ Bucket: bucketName });
   const res = await client.send(command);
   console.log("[S3] deleteBucket:done", { status: res.$metadata.httpStatusCode });
+  return res;
+}
+
+// deleteObject(bucketName, fileName)
+export async function deleteObject(bucketName: string, fileName: string): Promise<DeleteObjectCommandOutput> {
+  console.log("[S3] deleteObject:start", { bucket: bucketName, key: fileName });
+  const client = getS3Client();
+  const command = new DeleteObjectCommand({ Bucket: bucketName, Key: fileName });
+  const res = await client.send(command);
+  console.log("[S3] deleteObject:done", { status: res.$metadata.httpStatusCode });
   return res;
 }
 

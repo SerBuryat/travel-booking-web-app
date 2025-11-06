@@ -107,19 +107,19 @@ export async function createService(
           photos.map(photo =>
 
               loadServicePhotoToS3Storage(createdService.id, photo.file)
-              .then(result =>
+              .then(uploadResult =>
 
-                  saveServicePhoto(createdService.id, {fileName: photo.file.name, isPrimary: photo.isPrimary})
+                  saveServicePhoto(createdService.id, {fileName: uploadResult.fileName, isPrimary: photo.isPrimary})
                   .then(savedPhoto =>
-                      console.log('[createService] Фото сохранено в storage и в db:', savedPhoto.id, savedPhoto.url)
+                      console.log('[createService] Фото сохранено в storage и в db:', photo.file.name, '→', uploadResult.fileName, savedPhoto.url)
                   )
                   .catch(photoError =>
-                      console.error('[createService] Ошибка при сохранении фото в db:', photo.file, photoError)
+                      console.error('[createService] Ошибка при сохранении фото в db:', photo.file.name, photoError)
                   )
 
               )
               .catch(photoError =>
-                  console.error('[createService] Ошибка при сохранении фото в storage:', photo.file, photoError)
+                  console.error('[createService] Ошибка при сохранении фото в storage:', photo.file.name, photoError)
               )
 
           )

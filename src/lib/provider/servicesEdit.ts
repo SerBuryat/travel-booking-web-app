@@ -3,8 +3,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
 import { CreateServiceData } from '@/schemas/service/createServiceSchema';
-import { loadServicePhotoToS3Storage } from '@/lib/service/media';
-import { saveServicePhoto } from '@/lib/service/photos';
+import { loadServicePhotoToS3Storage, deleteServicePhotoFromS3Storage } from '@/lib/service/media';
 
 /**
  * Данные сервиса для редактирования
@@ -309,8 +308,18 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
   );
 
   for (const photo of photosToDelete) {
+    // Удаляем запись из БД
     await tx.tphotos.delete({ where: { id: photo.id } });
-    // TODO: Удалить файл из S3 (опционально)
+    
+    // Удаляем файл из S3
+    try {
+      await deleteServicePhotoFromS3Storage(photo.url);
+      console.log('[handlePhotoUpdates] Photo deleted from S3:', photo.url);
+    } catch (error) {
+      console.error('[handlePhotoUpdates] Error deleting photo from S3:', photo.url, error);
+      // Продолжаем выполнение даже если удаление из S3 не удалось
+      // Запись из БД уже удалена, файл в S3 останется (можно очистить позже)
+    }
   }
 
   // 2. Обновляем isPrimary для существующих фото
@@ -327,35 +336,41 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
   // 3. Загружаем новые фото в S3 (вне транзакции, но перед сохранением в БД)
   // Сначала загружаем все новые фото в S3
   if (photos.new.length > 0) {
-    // Загружаем все фото в S3 параллельно
-    await Promise.all(
-      photos.new.map(photo =>
-        loadServicePhotoToS3Storage(serviceId, photo.file)
-          .catch(error => {
-            console.error('[handlePhotoUpdates] Error uploading to S3:', photo.file.name, error);
-            throw error; // Прерываем транзакцию при ошибке загрузки
-          })
-      )
+    const bucketEndpoint = process.env.OBJECT_STORAGE_BUCKET_ENDPOINT;
+    if (!bucketEndpoint) {
+      throw new Error('OBJECT_STORAGE_BUCKET_ENDPOINT is not set');
+    }
+
+    // Загружаем все фото в S3 параллельно и сохраняем результаты
+    const uploadResults = await Promise.all(
+      photos.new.map(async (photo) => {
+        try {
+          const uploadResult = await loadServicePhotoToS3Storage(serviceId, photo.file);
+          return {
+            fileName: uploadResult.fileName,
+            isPrimary: photo.isPrimary,
+            originalName: photo.file.name
+          };
+        } catch (error) {
+          console.error('[handlePhotoUpdates] Error uploading to S3:', photo.file.name, error);
+          throw error; // Прерываем транзакцию при ошибке загрузки
+        }
+      })
     );
 
     // После успешной загрузки в S3 сохраняем записи в БД (внутри транзакции)
-    for (const photo of photos.new) {
-      const bucketEndpoint = process.env.OBJECT_STORAGE_BUCKET_ENDPOINT;
-      if (!bucketEndpoint) {
-        throw new Error('OBJECT_STORAGE_BUCKET_ENDPOINT is not set');
-      }
-
-      const photoUrl = `${bucketEndpoint}/services/${serviceId}/${photo.file.name}`;
+    for (const uploadResult of uploadResults) {
+      const photoUrl = `${bucketEndpoint}/services/${serviceId}/${uploadResult.fileName}`;
       
       await tx.tphotos.create({
         data: {
           tservices_id: serviceId,
           url: photoUrl,
-          is_primary: photo.isPrimary,
+          is_primary: uploadResult.isPrimary,
         },
       });
       
-      console.log('[handlePhotoUpdates] Photo saved:', photo.file.name, photoUrl);
+      console.log('[handlePhotoUpdates] Photo saved:', uploadResult.originalName, '→', uploadResult.fileName, photoUrl);
     }
   }
 }
