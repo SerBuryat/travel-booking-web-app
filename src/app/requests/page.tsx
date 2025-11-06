@@ -18,37 +18,37 @@ export default async function RequestsPage() {
 
   return (
     <div className="max-w-4xl mx-auto pt-2 px-4">
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">Мои запросы</h1>
-      {requests.length === 0 ? (
-        <div className="text-center py-8">
-          <p className="text-gray-600">У вас нет созданных заявок</p>
-          <p className="text-sm text-gray-500 mt-2">
-            Пользователь: {user.name} (ID: {user.id})
-          </p>
-        </div>
-      ) : (
-        <MyRequestsList items={requests} />
-      )}
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">Мои запросы</h1>
+        {requests.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-600">У вас нет созданных заявок</p>
+            <p className="text-sm text-gray-500 mt-2">
+              Пользователь: {user.name} (ID: {user.id})
+            </p>
+          </div>
+        ) : (
+          <MyRequestsList items={requests} />
+        )}
 
-      {/* Sticky Create Request Button */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
-        <Link
-          href="/requests/create"
-          className="text-black"
-          style={{
-            backgroundColor: '#95E59D',
-            borderRadius: 30,
-            fontSize: 17,
-            fontWeight: 400,
-            padding: '8px 16px',
-            cursor: 'pointer',
-            opacity: 1
-          }}
-        >
-          Создать заявку
-        </Link>
+        {/* Sticky Create Request Button */}
+        <div className="fixed bottom-20 left-0 right-0 px-4 pb-4 flex justify-center" style={{ zIndex: 60 }}>
+          <Link
+            href="/requests/create"
+            className="text-black"
+            style={{
+              backgroundColor: '#95E59D',
+              borderRadius: 30,
+              fontSize: 17,
+              fontWeight: 400,
+              padding: '8px 16px',
+              cursor: 'pointer',
+              opacity: 1
+            }}
+          >
+            Создать заявку
+          </Link>
+        </div>
       </div>
-    </div>
   );
 }
 

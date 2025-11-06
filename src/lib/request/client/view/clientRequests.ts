@@ -13,6 +13,7 @@ export async function clientRequests(clientId: number): Promise<RequestView[]> {
     include: {
       tarea: { select: { name: true } },
       tcategories: { select: { name: true, sysname: true } },
+      tproposals: { select: { id: true } },
     },
     orderBy: { created_at: "desc" },
   });
@@ -27,6 +28,7 @@ export async function clientRequests(clientId: number): Promise<RequestView[]> {
     requestType: bid.tcategories?.sysname ?? "",
     budget: bid.budget.toFixed(2),
     comment: bid.comment,
+    proposalsCount: bid.tproposals.length,
   }));
 }
 

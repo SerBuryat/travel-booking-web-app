@@ -8,6 +8,7 @@ export type RequestView = {
   requestType: string;
   budget: string;
   comment: string | null;
+  proposalsCount: number;
 };
 
 export type AccomodationRequestView = RequestView & {
