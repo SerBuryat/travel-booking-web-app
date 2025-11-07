@@ -4,6 +4,9 @@ type AttributesInclude = {
   tbids_accomodation_attrs?: boolean;
   tbids_transport_attrs?: boolean;
   tbids_entertainment_attrs?: boolean;
+  tbids_food_attrs?: boolean;
+  tbids_health_attrs?: boolean;
+  tbids_package_attrs?: boolean;
 };
 
 type AttributesMappingFunction<T> = (data: any) => T;
@@ -38,6 +41,35 @@ export function resolveAttributesInclude(requestType: RequestType): {
         mapAttributes: (attrs: any) => ({
           provisionTime: attrs.provision_time ? formatDateToDDMMYYHHmm(new Date(attrs.provision_time)) : undefined,
           adultsQty: attrs.adults_qty ?? undefined,
+        }),
+      };
+    case RequestType.FOOD:
+      return {
+        include: { tbids_food_attrs: true },
+        mapAttributes: (attrs: any) => ({
+          provisionTime: attrs.provision_time ? formatDateToDDMMYYHHmm(new Date(attrs.provision_time)) : undefined,
+          adultsQty: attrs.adults_qty ?? undefined,
+          kidsQty: attrs.kids_qty ?? undefined,
+        }),
+      };
+    case RequestType.HEALTH:
+      return {
+        include: { tbids_health_attrs: true },
+        mapAttributes: (attrs: any) => ({
+          provisionTime: attrs.provision_time ? formatDateToDDMMYYHHmm(new Date(attrs.provision_time)) : undefined,
+          adultsQty: attrs.adults_qty ?? undefined,
+        }),
+      };
+    case RequestType.PACKAGE:
+      return {
+        include: { tbids_package_attrs: true },
+        mapAttributes: (attrs: any) => ({
+          provisionTime: attrs.provision_time ? formatDateToDDMMYYHHmm(new Date(attrs.provision_time)) : undefined,
+          adultsQty: attrs.adults_qty ?? undefined,
+          kidsQty: attrs.kids_qty ?? undefined,
+          startDate: attrs.start_date ? formatDateToDDMMYY(new Date(attrs.start_date)) : undefined,
+          nightsFrom: attrs.nights_from ?? undefined,
+          nightsTo: attrs.nights_to ?? undefined,
         }),
       };
     default:

@@ -29,7 +29,27 @@ export type EntertainmentRequestView = RequestView & {
   adultsQty?: number;
 };
 
-export type AnyRequestView = AccomodationRequestView | TransportRequestView | EntertainmentRequestView;
+export type FoodRequestView = RequestView & {
+  provisionTime?: string;
+  adultsQty?: number;
+  kidsQty?: number;
+};
+
+export type HealthRequestView = RequestView & {
+  provisionTime?: string;
+  adultsQty?: number;
+};
+
+export type PackageRequestView = RequestView & {
+  provisionTime?: string;
+  adultsQty?: number;
+  kidsQty?: number;
+  startDate?: string;
+  nightsFrom?: number;
+  nightsTo?: number;
+};
+
+export type AnyRequestView = AccomodationRequestView | TransportRequestView | EntertainmentRequestView | FoodRequestView | HealthRequestView | PackageRequestView;
 
 
 

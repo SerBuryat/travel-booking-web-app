@@ -67,6 +67,15 @@ export async function requestById(id: number, user: UserAuth): Promise<AnyReques
       case RequestType.ENTERTAINMENT:
         const entertainmentAttrs = bidWithAttributes.tbids_entertainment_attrs?.[0];
         return entertainmentAttrs ? mapAttributes(entertainmentAttrs) : {};
+      case RequestType.FOOD:
+        const foodAttrs = bidWithAttributes.tbids_food_attrs?.[0];
+        return foodAttrs ? mapAttributes(foodAttrs) : {};
+      case RequestType.HEALTH:
+        const healthAttrs = bidWithAttributes.tbids_health_attrs?.[0];
+        return healthAttrs ? mapAttributes(healthAttrs) : {};
+      case RequestType.PACKAGE:
+        const packageAttrs = bidWithAttributes.tbids_package_attrs?.[0];
+        return packageAttrs ? mapAttributes(packageAttrs) : {};
       default:
         return {};
     }

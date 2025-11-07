@@ -7,4 +7,6 @@ export { default as DatesField } from './DatesField';
 export { default as ProvisionTimeField } from './ProvisionTimeField';
 export { default as CreatedAtField } from './CreatedAtField';
 export { default as StatusField } from './StatusField';
+export { default as StartDateField } from './StartDateField';
+export { default as NightsRangeField } from './NightsRangeField';
 

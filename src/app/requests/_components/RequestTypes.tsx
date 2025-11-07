@@ -25,6 +25,21 @@ export const REQUEST_TYPE_BUTTONS: RequestTypeButton[] = [
     id: RequestType.ENTERTAINMENT,
     name: 'Туры/активности',
     href: '/requests/create/entertainment'
+  },
+  {
+    id: RequestType.FOOD,
+    name: 'Питание',
+    href: '/requests/create/food'
+  },
+  {
+    id: RequestType.HEALTH,
+    name: 'Здоровье',
+    href: '/requests/create/health'
+  },
+  {
+    id: RequestType.PACKAGE,
+    name: 'Комплексный отдых',
+    href: '/requests/create/package'
   }
 ];
 

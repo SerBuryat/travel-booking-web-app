@@ -6,6 +6,9 @@ import { AnyRequestView } from '@/lib/request/client/view/types';
 import AccomodationRequestViewComponent from '../_components/detail/AccomodationRequestViewComponent';
 import TransportRequestViewComponent from '../_components/detail/TransportRequestViewComponent';
 import EntertainmentRequestViewComponent from '../_components/detail/EntertainmentRequestViewComponent';
+import FoodRequestViewComponent from '../_components/detail/FoodRequestViewComponent';
+import HealthRequestViewComponent from '../_components/detail/HealthRequestViewComponent';
+import PackageRequestViewComponent from '../_components/detail/PackageRequestViewComponent';
 import {RequestType} from "@/lib/request/requestType";
 import { getRequestProposals } from '@/lib/request/client/proposal/getRequestProposals';
 import ProposalsListComponent from './_components/ProposalsListComponent';
@@ -58,6 +61,12 @@ export default async function RequestDetailPage({ params }: Props) {
         return <TransportRequestViewComponent data={request as any} />;
       case RequestType.ENTERTAINMENT:
         return <EntertainmentRequestViewComponent data={request as any} />;
+      case RequestType.FOOD:
+        return <FoodRequestViewComponent data={request as any} />;
+      case RequestType.HEALTH:
+        return <HealthRequestViewComponent data={request as any} />;
+      case RequestType.PACKAGE:
+        return <PackageRequestViewComponent data={request as any} />;
       default:
         return <DefaultRequestViewComponent data={request} />;
     }

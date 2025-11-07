@@ -8,7 +8,10 @@ import {
   CreateRequestResult, 
   AccomodationFormDto, 
   TransportFormDto, 
-  EntertainmentFormDto 
+  EntertainmentFormDto,
+  FoodFormDto,
+  HealthFormDto,
+  PackageFormDto
 } from './types';
 
 export async function createAccommodationRequest(dto: AccomodationFormDto): Promise<CreateRequestResult> {
@@ -35,8 +38,32 @@ export async function createEntertainmentRequest(dto: EntertainmentFormDto): Pro
   });
 }
 
+export async function createFoodRequest(dto: FoodFormDto): Promise<CreateRequestResult> {
+  return createRequest(dto, 'food', {
+    tbids_food_attrs: {
+      create: dto.tbids_food_attrs,
+    },
+  });
+}
+
+export async function createHealthRequest(dto: HealthFormDto): Promise<CreateRequestResult> {
+  return createRequest(dto, 'health', {
+    tbids_health_attrs: {
+      create: dto.tbids_health_attrs,
+    },
+  });
+}
+
+export async function createPackageRequest(dto: PackageFormDto): Promise<CreateRequestResult> {
+  return createRequest(dto, 'package', {
+    tbids_package_attrs: {
+      create: dto.tbids_package_attrs,
+    },
+  });
+}
+
 async function createRequest(
-    dto: AccomodationFormDto | TransportFormDto | EntertainmentFormDto,
+    dto: AccomodationFormDto | TransportFormDto | EntertainmentFormDto | FoodFormDto | HealthFormDto | PackageFormDto,
     categorySysname: string,
     specificAttrs: any
 ): Promise<CreateRequestResult> {

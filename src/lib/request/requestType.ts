@@ -1,7 +1,10 @@
 export enum RequestType {
   ACCOMMODATION = 'accommodation',
   TRANSPORT = 'transport',
-  ENTERTAINMENT = 'entertainment'
+  ENTERTAINMENT = 'entertainment',
+  FOOD = 'food',
+  HEALTH = 'health',
+  PACKAGE = 'package'
 }
 
 export namespace RequestType {
