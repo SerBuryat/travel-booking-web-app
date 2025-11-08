@@ -8,6 +8,9 @@ import { ClientAccommodationRequestViewComponent } from './ClientAccommodationRe
 import { ClientTransportRequestViewComponent } from './ClientTransportRequestViewComponent';
 import { ClientEntertainmentRequestViewComponent } from './ClientEntertainmentRequestViewComponent';
 import { ClientDefaultRequestViewComponent } from './ClientDefaultRequestViewComponent';
+import { ClientFoodRequestViewComponent } from './ClientFoodRequestViewComponent';
+import { ClientHealthRequestViewComponent } from './ClientHealthRequestViewComponent';
+import { ClientPackageRequestViewComponent } from './ClientPackageRequestViewComponent';
 import { ProviderClientRequestItem } from '@/lib/request/provider/clientRequestsForProvider';
 import { markAlertsAsRead } from '@/lib/request/provider/alerts';
 
@@ -146,7 +149,7 @@ export function ClientRequestsList({ providerId, requests }: ClientRequestsListP
           </p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="space-y-3">
           {visibleRequests.map(({ request, isAlertForRequestRead }) => {
             const isRequestRead = isAlertForRequestRead;
             const isExpanded = expandedRequests.has(request.id);
@@ -154,71 +157,60 @@ export function ClientRequestsList({ providerId, requests }: ClientRequestsListP
             return (
               <div
                 key={request.id}
-                className="bg-white rounded border border-gray-200 hover:shadow-sm transition-shadow"
+                className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow"
               >
                 {/* Заголовок заявки */}
                 <button
                   onClick={() => toggleRequest(request.id)}
-                  className="w-full px-3 py-2 text-center hover:bg-gray-50 transition-colors"
+                  className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
                 >
-                  {/* Центрированная компоновка */}
-                  <div className="flex flex-col items-center">
-                    {/* Основная строка: номер + категория + бюджет + стрелка */}
-                    <div className="flex items-center justify-center space-x-1.5 sm:space-x-2 flex-wrap gap-1 text-xs">
-                      {!isRequestRead && (
-                        <span className="px-1.5 py-0.5 bg-blue-500 text-white rounded-full uppercase tracking-wide">
-                          Новое
-                        </span>
-                      )}
-                      <div className="px-1.5 py-0.5 bg-blue-100 rounded">
-                        <span className="text-blue-600 font-medium">
-                          №{request.number || request.id}
-                        </span>
-                      </div>
-                      <h3 className="text-sm font-medium text-gray-900 min-w-0 flex-shrink text-xs sm:text-sm">
-                        {request.categoryName}
-                      </h3>
-                      <div className="text-sm font-semibold text-green-600">
-                        {request.budget}₽
-                      </div>
-                      <div className={`transform transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
-                        <svg
-                          className="w-3 h-3 text-gray-400"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M19 9l-7 7-7-7"
-                          />
-                        </svg>
-                      </div>
-                    </div>
-                    
-                    {/* Дополнительная информация */}
-                    <div className="flex items-center justify-center space-x-1 text-xs text-gray-500 mt-1">
-                      <span>{request.areaName}</span>
-                      <span>•</span>
-                      <span>{request.createdAt}</span>
-                    </div>
+                  <div className="flex-1 flex items-center gap-2 text-left">
+                    {!isRequestRead && (
+                      <span className="relative inline-flex h-2.5 w-2.5">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-[#007AFF] opacity-80" />
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-[#005FCC]" />
+                      </span>
+                    )}
+                    <span
+                      className={`text-[16px] font-semibold transition-colors ${
+                        isExpanded ? 'text-[#007AFF]' : 'text-[#131313]'
+                      }`}
+                    >
+                      Заявка {request.number || request.id}
+                    </span>
+                  </div>
+                  <div className={`ml-3 flex items-center transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                    <svg
+                      className="w-4 h-4 text-black"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
                   </div>
                 </button>
 
                 {/* Детали заявки */}
                 {isExpanded && (
-                  <div className="px-3 pb-3 border-t border-gray-100">
-                    <div className="pt-2">
+                  <div className="px-4 pb-4">
+                    <div className="pt-3">
                       {renderRequestComponent(request)}
                     </div>
-                    
+                    <div className="mt-3 text-xs text-gray-400 text-right">
+                      Создано {request.createdAt}
+                    </div>
                     {/* Кнопка отклика */}
-                    <div className="mt-3 pt-3 border-t border-gray-100">
+                    <div className="mt-4">
                       <button
                         onClick={() => handleProposalClick(request.id)}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                        className="w-full text-black transition-transform hover:scale-[1.01]"
+                        style={{ backgroundColor: '#95E59D', borderRadius: 30, fontSize: 17, fontWeight: 400, padding: '10px 16px' }}
                       >
                         Откликнуться
                       </button>
@@ -245,6 +237,12 @@ function renderRequestComponent(request: AnyRequestView) {
       return <ClientTransportRequestViewComponent data={request as any} />;
     case RequestType.ENTERTAINMENT:
       return <ClientEntertainmentRequestViewComponent data={request as any} />;
+    case RequestType.FOOD:
+      return <ClientFoodRequestViewComponent data={request as any} />;
+    case RequestType.HEALTH:
+      return <ClientHealthRequestViewComponent data={request as any} />;
+    case RequestType.PACKAGE:
+      return <ClientPackageRequestViewComponent data={request as any} />;
     default:
       return <ClientDefaultRequestViewComponent data={request} />;
   }

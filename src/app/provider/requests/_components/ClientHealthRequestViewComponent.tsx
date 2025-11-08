@@ -1,16 +1,14 @@
 'use client';
 
-import { EntertainmentRequestView } from '@/lib/request/client/view/types';
+import { HealthRequestView } from '@/lib/request/client/view/types';
 import { RequestDetailItem, RequestDetailsSection } from './RequestDetailsSection';
 import { formatBudget, getRequestStatusText } from '../_utils/requestFormatters';
 
-interface ClientEntertainmentRequestViewComponentProps {
-  data: EntertainmentRequestView;
+interface ClientHealthRequestViewComponentProps {
+  data: HealthRequestView;
 }
 
-export function ClientEntertainmentRequestViewComponent({
-  data,
-}: ClientEntertainmentRequestViewComponentProps) {
+export function ClientHealthRequestViewComponent({ data }: ClientHealthRequestViewComponentProps) {
   const fields: RequestDetailItem[] = [
     { label: 'Время предоставления услуг', value: data.provisionTime },
     { label: 'Регион', value: data.areaName },
