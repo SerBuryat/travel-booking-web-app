@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
 import { getClientRequestsForProvider } from '@/lib/request/provider/clientRequestsForProvider';
+import { getActiveProviderId } from '@/lib/provider/searchProvider';
 import { ClientRequestsList } from './_components/ClientRequestsList';
 
 /**
@@ -18,15 +19,19 @@ export default async function ProviderRequestsPage() {
   try {
     userAuth = await getUserAuthOrThrow();
   } catch (error) {
+    // todo - PAGE_ROUTES
     redirect('/login');
   }
 
   // Проверяем, что пользователь - провайдер
   if (userAuth.role !== 'provider') {
+    // todo - PAGE_ROUTES
     redirect('/profile');
   }
 
   // Получаем заявки для провайдера
+  const provider = await getActiveProviderId(userAuth.userId);
+  const providerId = provider?.id ?? null;
   const requests = await getClientRequestsForProvider();
 
   return (
@@ -35,12 +40,9 @@ export default async function ProviderRequestsPage() {
         <h1 className="text-xl font-bold text-gray-900">
           Заявки от туристов
         </h1>
-        <p className="mt-0.5 text-xs text-gray-600">
-          Заявки клиентов для ваших услуг
-        </p>
       </div>
 
-      <ClientRequestsList requests={requests || []} />
+      <ClientRequestsList providerId={providerId} requests={requests || []} />
     </div>
   );
 }
