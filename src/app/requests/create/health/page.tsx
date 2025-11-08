@@ -16,7 +16,7 @@ export default function HealthRequestPage() {
         <FormField
             {...form.register('tbids_health_attrs.provision_time')}
             name="tbids_health_attrs.provision_time"
-            label="Время предоставления (provision_time)"
+            label="Время предоставления"
             type="datetime-local"
             required
             error={errors.tbids_health_attrs?.provision_time as any}
@@ -24,7 +24,7 @@ export default function HealthRequestPage() {
         <FormField
             {...form.register('tbids_health_attrs.adults_qty', { valueAsNumber: true })}
             name="tbids_health_attrs.adults_qty"
-            label="Взрослые (adults_qty)"
+            label="Количество взрослых"
             type="number"
             required
             error={errors.tbids_health_attrs?.adults_qty as any}
