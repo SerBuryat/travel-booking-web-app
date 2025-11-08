@@ -119,6 +119,28 @@ export async function servicesForProvider(providerId: number): Promise<ServiceTy
 }
 
 /**
+ * Получение сервисов по списку идентификаторов.
+ * - фильтрация по active=true
+ * - исключение архивных записей
+ * - возврат в формате ServiceType с заполненными полями
+ *
+ * @param {number[]} serviceIds - идентификаторы сервисов
+ */
+export async function getServicesByIds(serviceIds: number[]): Promise<ServiceType[]> {
+  if (!Array.isArray(serviceIds) || serviceIds.length === 0) {
+    return [];
+  }
+
+  const where = {
+    id: { in: serviceIds },
+    active: true,
+    status: { not: 'archived' },
+  };
+
+  return fetchServices(where, serviceIds.length);
+}
+
+/**
  * Нормализует входное значение поиска.
  * Удаляет пробелы по краям и предотвращает выполнение запроса при пустой строке.
  *
@@ -308,6 +330,7 @@ function mapToSearchableService(service: any): ServiceType {
     name: category.name,
     photo: category.photo,
     parent_id: category.parent_id,
+    priority: category.priority
   };
 
   const previewPhoto = photos.find(photo => photo.is_primary);

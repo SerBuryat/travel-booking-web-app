@@ -3,8 +3,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { ServiceType } from '@/model/ServiceType';
-import { CategoryEntity } from '@/entity/CategoryEntity';
 import {getActiveProviderId} from "@/lib/provider/searchProvider";
+import { getServicesByIds } from '@/lib/service/searchServices';
 
 export interface ProposalServiceType extends ServiceType {
   isUsedInProposal: boolean;
@@ -94,58 +94,4 @@ async function getUsedServiceIds(requestId: number, providerId: number): Promise
   });
 
   return proposals.map(proposal => proposal.tservices_id);
-}
-
-/**
- * Получение сервисов по массиву ID.
- */
-async function getServicesByIds(serviceIds: number[]): Promise<ServiceType[]> {
-  if (!Array.isArray(serviceIds) || serviceIds.length === 0) {
-    return [];
-  }
-
-  const services = await prisma.tservices.findMany({
-    where: {
-      id: { in: serviceIds },
-      active: true
-    },
-    include: { tcategories: true },
-    orderBy: { priority: 'desc' }
-  });
-
-  if (services.length === 0) {
-    return [];
-  }
-
-  return services.map(mapToServiceType);
-}
-
-/**
- * Преобразует результат Prisma в ServiceType
- */
-function mapToServiceType(service: any): ServiceType {
-  const { tcategories: category, ...rest } = service;
-  const mappedCategory: CategoryEntity = {
-    id: category.id,
-    code: category.code,
-    sysname: category.sysname,
-    name: category.name,
-    photo: category.photo,
-    parent_id: category.parent_id,
-  };
-
-  return {
-    id: rest.id,
-    name: rest.name,
-    description: rest.description,
-    price: String(rest.price),
-    tcategories_id: rest.tcategories_id,
-    provider_id: rest.provider_id,
-    status: rest.status,
-    created_at: rest.created_at,
-    priority: rest.priority,
-    category: mappedCategory,
-    rating: rest.rating ? Number(rest.rating) : undefined,
-    view_count: rest.view_count
-  };
 }

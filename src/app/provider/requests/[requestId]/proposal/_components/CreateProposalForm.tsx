@@ -26,6 +26,7 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
   // Проверяем, все ли сервисы использованы
   const allServicesUsed = services.length > 0 && services.every(service => service.isUsedInProposal);
   const availableServices = services.filter(service => !service.isUsedInProposal);
+  const isSubmitDisabled = isSubmitting || selectedServices.size === 0 || allServicesUsed;
 
   const handleServiceToggle = (serviceId: number) => {
     // Не позволяем выбирать уже использованные сервисы
@@ -87,144 +88,172 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
   };
 
   return (
-    <div className={`space-y-6 ${allServicesUsed ? 'opacity-50 pointer-events-none' : ''}`}>
+    <div className="space-y-6 bg-white">
       {/* Сообщение, если все сервисы использованы */}
       {allServicesUsed && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <div className="flex items-center">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <div className="ml-3">
+        <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
+          <div className="flex items-center gap-3">
+            <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <div className="space-y-1">
               <h3 className="text-sm font-medium text-yellow-800">
-                Все сервисы уже использованы
+                Все объекты уже использованы
               </h3>
-              <div className="mt-2 text-sm text-yellow-700">
-                <p>
-                  Вы уже создали предложения для всех подходящих сервисов по этой заявке. 
-                  Новые предложения создать невозможно.
-                </p>
-              </div>
+              <p className="text-xs text-yellow-700 leading-relaxed">
+                Вы создали предложения для всех подходящих объектов. Добавьте новый объект, чтобы отправить еще одно предложение.
+              </p>
             </div>
           </div>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-      {/* Список сервисов для выбора */}
-      <div>
-        <h3 className="text-sm font-medium text-gray-700 mb-3">
-          {allServicesUsed 
-            ? `Все сервисы использованы (${services.length} из ${services.length})`
-            : `Выберите подходящие сервисы (${selectedServices.size} выбрано из ${availableServices.length} доступных)`
-          }
-        </h3>
+        {/* Список сервисов для выбора */}
         <div className="space-y-3">
-          {services.map((service) => {
-            const isSelected = selectedServices.has(service.id);
-            
-            return (
-              <div key={service.id} className="relative">
-                <div
-                  className={`cursor-pointer transition-all duration-200 rounded-lg ${
-                    service.isUsedInProposal 
-                        ? 'opacity-50 cursor-not-allowed'
-                        : ''
-                  }`}
-                  onClick={() => handleServiceToggle(service.id)}
-                >
-                  <HorizontalViewServiceComponent service={service} onClick={() => {}} />
-                </div>
-                
-                {/* Минималистичный индикатор */}
-                {!service.isUsedInProposal && (
-                  <div className="absolute top-3 right-3">
-                    {isSelected ? (
-                      <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    ) : (
-                      <div className="w-5 h-5 border-2 border-gray-300 rounded-full bg-white"></div>
-                    )}
+          <span className="inline-block text-xs font-medium uppercase tracking-wide" style={{ color: '#707579' }}>
+            {allServicesUsed
+              ? `Объекты недоступны (${services.length} из ${services.length})`
+              : `${selectedServices.size} из ${availableServices.length || services.length} доступных`}
+          </span>
+
+          <div className="space-y-3">
+            {services.map((service) => {
+              const isSelected = selectedServices.has(service.id);
+              
+              return (
+                <div key={service.id} className="relative">
+                  <div
+                    className={`cursor-pointer transition-all duration-200 rounded-[24px] ${
+                      service.isUsedInProposal 
+                          ? 'opacity-50 cursor-not-allowed'
+                          : 'hover:shadow-md'
+                    }`}
+                    onClick={() => handleServiceToggle(service.id)}
+                  >
+                    <HorizontalViewServiceComponent service={service} onClick={() => {}} />
                   </div>
-                )}
-                
-                {/* Статус для использованных сервисов */}
-                {service.isUsedInProposal && (
-                  <div className="absolute top-3 right-3">
-                    <div className="px-2 py-1 bg-gray-200 text-gray-600 text-xs rounded-full">
-                      Использован
+                  
+                  {/* Минималистичный индикатор */}
+                  {!service.isUsedInProposal && (
+                    <div className="absolute top-3 right-3">
+                      {isSelected ? (
+                        <div className="flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: '#95E59D' }}>
+                          <svg className="h-3 w-3 text-black" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <div className="h-5 w-5 rounded-full border-2 border-gray-300 bg-white" />
+                      )}
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  )}
+                  
+                  {/* Статус для использованных сервисов */}
+                  {service.isUsedInProposal && (
+                    <div className="absolute top-3 right-3">
+                      <div className="rounded-full bg-gray-200 px-2 py-1 text-xs text-gray-600">
+                        Использован
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
-      </div>
 
-      {/* Поля ввода */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-            Цена за все (опционально)
-          </label>
-          <input
-            type="number"
-            id="price"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="0.00"
-            step="0.01"
-            min="0"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
+        {/* Поля ввода */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="relative">
+            <label
+              htmlFor="price"
+              className="block text-sm font-medium mb-0 pl-2"
+              style={{
+                color: '#A2ACB0',
+                marginLeft: '8px',
+                marginTop: '4px',
+                marginBottom: '-8px',
+                zIndex: 10,
+                position: 'relative',
+                width: 'fit-content',
+                background: 'white',
+                paddingLeft: '4px',
+                paddingRight: '4px'
+              }}
+            >
+              Цена за все
+            </label>
+            <input
+              type="number"
+              id="price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="0.00"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              className="w-full px-3 py-2 border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-[#A2ACB0] border-gray-300"
+              style={{ borderRadius: '14px' }}
+            />
+          </div>
+          
+          <div className="relative">
+            <label
+              htmlFor="comment"
+              className="block text-sm font-medium mb-0 pl-2"
+              style={{
+                color: '#A2ACB0',
+                marginLeft: '8px',
+                marginTop: '4px',
+                marginBottom: '-8px',
+                zIndex: 10,
+                position: 'relative',
+                width: 'fit-content',
+                background: 'white',
+                paddingLeft: '4px',
+                paddingRight: '4px'
+              }}
+            >
+              Комментарий
+            </label>
+            <textarea
+              id="comment"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              placeholder="Дополнительная информация для клиента..."
+              rows={3}
+              className="w-full resize-none px-3 py-2 border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-[#A2ACB0] border-gray-300"
+              style={{ borderRadius: '14px' }}
+            />
+          </div>
         </div>
-        
-        <div>
-          <label htmlFor="comment" className="block text-sm font-medium text-gray-700 mb-1">
-            Комментарий (опционально)
-          </label>
-          <textarea
-            id="comment"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            placeholder="Дополнительная информация для клиента..."
-            rows={3}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          />
-        </div>
-      </div>
 
-      {/* Ошибка */}
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-          <p className="text-sm text-red-600">{error}</p>
-        </div>
-      )}
+        {/* Ошибка */}
+        {error && (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-3">
+            <p className="text-sm text-red-600">{error}</p>
+          </div>
+        )}
 
-      {/* Кнопки */}
-      <div className="flex space-x-3">
-        <button
-          type="button"
-          onClick={() => router.back()}
-          className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg transition-colors"
-        >
-          Отмена
-        </button>
+        {/* Кнопка */}
         <button
           type="submit"
-          disabled={isSubmitting || selectedServices.size === 0 || allServicesUsed}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-lg transition-colors"
+          disabled={isSubmitDisabled}
+          className="w-full transition-transform duration-200"
+          style={{
+            backgroundColor: isSubmitDisabled ? '#DDEFE0' : '#95E59D',
+            color: '#000000',
+            borderRadius: '128px',
+            fontSize: 17,
+            fontWeight: 400,
+            paddingTop: 12,
+            paddingBottom: 12
+          }}
         >
-          {isSubmitting ? 'Создание...' : allServicesUsed ? 'Нет доступных сервисов' : 'Отправить отклик'}
+          {isSubmitting ? 'Создание...' : allServicesUsed ? 'Нет доступных объектов' : 'Отправить отклик'}
         </button>
-      </div>
-    </form>
+      </form>
     </div>
   );
 }

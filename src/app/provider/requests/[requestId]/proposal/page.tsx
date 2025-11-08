@@ -3,7 +3,6 @@ import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
 import { requestById } from '@/lib/request/client/view/requestById';
 import { getProviderServicesForRequest } from '@/lib/request/provider/proposal/getProviderServicesForRequest';
 import { CreateProposalForm } from '@/app/provider/requests/[requestId]/proposal/_components/CreateProposalForm';
-import { RequestDetails } from '@/app/provider/requests/[requestId]/proposal/_components/RequestDetails';
 
 interface ProposalPageProps {
   params: {
@@ -75,32 +74,32 @@ export default async function ProposalPage({ params }: ProposalPageProps) {
   }
 
   return (
-    <div className="container mx-auto px-3 py-3">
-      <div className="mb-4">
+    <div className="container mx-auto px-3 py-6">
+      <div className="mb-6">
         <h1 className="text-xl font-bold text-gray-900">
-          Отклик на заявку №{requestDetails.number || requestDetails.id}
+          Отклик на заявку {requestDetails.number || requestDetails.id}
         </h1>
-        <p className="mt-0.5 text-xs text-gray-600">
-          Выберите подходящие сервисы и создайте предложение
-        </p>
       </div>
 
-      <div className="space-y-6">
-        {/* Детали заявки клиента */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <RequestDetails request={requestDetails} />
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <h2
+            className="font-semibold"
+            style={{ fontSize: 16, color: '#000000' }}
+          >
+            Объект
+          </h2>
+          <p
+            style={{ fontSize: 15, fontWeight: 400, color: '#707579' }}
+          >
+            Выбрать из зарегистрированных объектов
+          </p>
         </div>
 
-        {/* Форма создания предложения */}
-        <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">
-            Ваши подходящие сервисы
-          </h2>
-          <CreateProposalForm 
-            requestId={requestId}
-            services={providerServicesData.services}
-          />
-        </div>
+        <CreateProposalForm 
+          requestId={requestId}
+          services={providerServicesData.services}
+        />
       </div>
     </div>
   );
