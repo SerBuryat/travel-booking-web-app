@@ -9,6 +9,7 @@ export const PAGE_ROUTES = {
   
   // Main pages
   HOME: '/home',
+  IN_PROGRESS: '/in-progress',
   PROFILE: '/profile',
   REQUESTS: '/requests',
   MAP: '/map',
