@@ -19,6 +19,7 @@
     "@telegram-apps/sdk-react": "^3.3.6",
     "@telegram-apps/types": "^2.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "jose": "^5.9.6",
     "dotenv": "^17.2.0",
     "jsonwebtoken": "^9.0.2",
     "next": "15.5.2",

@@ -12,7 +12,7 @@ import {ClientWithAuthType} from "@/model/ClientType";
 export default async function ProfileOrdersPage() {
   const user = await getUser();
   if (!user) {
-    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
+    redirect(PAGE_ROUTES.NO_AUTH);
   }
 
   const clicksService = new ServicesClicksService();

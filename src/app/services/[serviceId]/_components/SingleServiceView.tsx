@@ -23,7 +23,7 @@ export default function SingleServiceView({ service }: { service: ServiceTypeFul
     try {
       const res = await fetch(`/api/services/${service.id}/click`, { method: 'POST' });
       if (res.status === 401) {
-        router.push(PAGE_ROUTES.TELEGRAM_AUTH);
+        router.push(PAGE_ROUTES.NO_AUTH);
         return;
       }
     } catch (e) {

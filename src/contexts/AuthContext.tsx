@@ -114,7 +114,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } finally {
       setUser(null);
       setIsAuthenticated(false);
-      router.push(PAGE_ROUTES.TELEGRAM_AUTH);
+      router.push(PAGE_ROUTES.NO_AUTH);
     }
   };
   

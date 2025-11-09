@@ -39,7 +39,7 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
     try {
       const res = await fetch(`/api/services/${serviceId}/click`, { method: 'POST' });
       if (res.status === 401) {
-        router.push(PAGE_ROUTES.TELEGRAM_AUTH);
+        router.push(PAGE_ROUTES.NO_AUTH);
         return;
       }
       

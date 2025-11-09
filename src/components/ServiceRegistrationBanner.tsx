@@ -90,8 +90,8 @@ export const ServiceRegistrationBanner: React.FC = () => {
 
   const handleConnectBusiness = async () => {
     if (!user) {
-      // Если пользователь не аутентифицирован, перенаправляем на страницу входа
-      router.push(PAGE_ROUTES.TELEGRAM_AUTH);
+      // Если пользователь не аутентифицирован, перенаправляем на страницу инструкции
+      router.push(PAGE_ROUTES.NO_AUTH);
       return;
     }
 

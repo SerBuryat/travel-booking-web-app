@@ -15,7 +15,7 @@ export default async function ProviderServicesPage() {
     userAuth = await getUserAuthOrThrow();
   } catch (error) {
     console.log('Error in ProviderServicesPage - server side', error);
-    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
+    redirect(PAGE_ROUTES.NO_AUTH);
   }
 
   if (userAuth.role !== 'provider' || !userAuth.providerId) {
