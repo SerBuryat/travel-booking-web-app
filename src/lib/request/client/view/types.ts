@@ -3,7 +3,7 @@ export type RequestView = {
   number: string;
   areaName: string;
   categoryName: string;
-  status: "open" | "client_closed" | "client_cancelled" | "system_cancelled";
+  status: "open" | "closed" | "cancelled";
   createdAt: string;
   requestType: string;
   budget: string;

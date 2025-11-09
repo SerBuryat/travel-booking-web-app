@@ -14,12 +14,14 @@ import { ClientPackageRequestViewComponent } from './ClientPackageRequestViewCom
 import { ProviderClientRequestItem } from '@/lib/request/provider/clientRequestsForProvider';
 import { markAlertsAsRead } from '@/lib/request/provider/alerts';
 
-type FilterOption = 'all' | 'new' | 'read';
+type FilterOption = 'all' | 'new' | 'awaiting' | 'responded' | 'archived';
 
 const FILTER_OPTIONS: { key: FilterOption; label: string }[] = [
   { key: 'all', label: 'Все' },
   { key: 'new', label: 'Новые' },
-  { key: 'read', label: 'Отвеченные' },
+  { key: 'awaiting', label: 'Ожидают ответа' },
+  { key: 'responded', label: 'Отвеченные' },
+  { key: 'archived', label: 'Архив' },
 ];
 
 interface ClientRequestsListProps {
@@ -88,17 +90,23 @@ export function ClientRequestsList({ providerId, requests }: ClientRequestsListP
   };
 
   const visibleRequests = useMemo(() => {
-    return requests.filter(({ request, isAlertForRequestRead }) => {
+    return requests.filter(item => {
+      const { request, isAlertForRequestRead, hasProviderProposal } = item;
       const isRequestRead = isAlertForRequestRead;
-      if (filter === 'new') {
-        return !isRequestRead;
-      }
+      const isArchived = request.status !== 'open';
 
-      if (filter === 'read') {
-        return isRequestRead;
+      switch (filter) {
+        case 'new':
+          return !isRequestRead;
+        case 'awaiting':
+          return request.status === 'open' && !hasProviderProposal;
+        case 'responded':
+          return request.status === 'open' && hasProviderProposal;
+        case 'archived':
+          return isArchived;
+        default:
+          return true;
       }
-
-      return true;
     });
   }, [requests, filter]);
 
@@ -117,7 +125,7 @@ export function ClientRequestsList({ providerId, requests }: ClientRequestsListP
 
   return (
     <div className="space-y-3">
-      <div className="mb-3 overflow-x-auto">
+      <div className="mb-3 overflow-x-auto scrollbar-hide">
         <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
           {FILTER_OPTIONS.map(option => {
             const isActive = filter === option.key;
@@ -153,6 +161,12 @@ export function ClientRequestsList({ providerId, requests }: ClientRequestsListP
           {visibleRequests.map(({ request, isAlertForRequestRead }) => {
             const isRequestRead = isAlertForRequestRead;
             const isExpanded = expandedRequests.has(request.id);
+            const isArchived = request.status !== 'open';
+            const requestTitleColor = isArchived
+              ? 'text-gray-400'
+              : isExpanded
+                ? 'text-[#007AFF]'
+                : 'text-[#131313]';
 
             return (
               <div
@@ -171,13 +185,12 @@ export function ClientRequestsList({ providerId, requests }: ClientRequestsListP
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-[#005FCC]" />
                       </span>
                     )}
-                    <span
-                      className={`text-[16px] font-semibold transition-colors ${
-                        isExpanded ? 'text-[#007AFF]' : 'text-[#131313]'
-                      }`}
-                    >
+                    <span className={`text-[16px] font-semibold transition-colors ${requestTitleColor}`}>
                       Заявка {request.number || request.id}
                     </span>
+                    {isArchived && (
+                      <span className="text-xs text-gray-400">(архив)</span>
+                    )}
                   </div>
                   <div className={`ml-3 flex items-center transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
                     <svg

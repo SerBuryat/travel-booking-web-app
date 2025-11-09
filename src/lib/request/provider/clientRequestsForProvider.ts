@@ -9,6 +9,7 @@ import { getActiveProviderId } from '@/lib/provider/searchProvider';
 export interface ProviderClientRequestItem {
   request: AnyRequestView;
   isAlertForRequestRead: boolean;
+  hasProviderProposal: boolean;
 }
 
 /**
@@ -59,6 +60,11 @@ export async function getClientRequestsForProvider(): Promise<ProviderClientRequ
 
     const bidIds = [...alertMap.keys()];
 
+    const bidIdsWithProposals = await getBidIdsWithProviderProposals({
+      bidIds,
+      providerId: provider.id
+    });
+
     // Получаем детали каждой заявки
     const requests = await Promise.all(
       bidIds.map(async bidId => {
@@ -68,7 +74,8 @@ export async function getClientRequestsForProvider(): Promise<ProviderClientRequ
         }
         return {
           request,
-          isAlertForRequestRead: alertMap.get(bidId) ?? false
+          isAlertForRequestRead: alertMap.get(bidId) ?? false,
+          hasProviderProposal: bidIdsWithProposals.has(bidId)
         };
       })
     );
@@ -78,7 +85,15 @@ export async function getClientRequestsForProvider(): Promise<ProviderClientRequ
       (item): item is ProviderClientRequestItem => item !== null
     );
 
+    // Сначала открытые заявки, затем по статусу прочитанности и дате создания (новые выше)
     validRequests.sort((a, b) => {
+      const statusPriorityA = getStatusPriority(a.request.status);
+      const statusPriorityB = getStatusPriority(b.request.status);
+
+      if (statusPriorityA !== statusPriorityB) {
+        return statusPriorityA - statusPriorityB;
+      }
+
       if (a.isAlertForRequestRead !== b.isAlertForRequestRead) {
         return a.isAlertForRequestRead ? 1 : -1;
       }
@@ -117,6 +132,32 @@ async function getRequestDetails(bidId: number, userAuth: any): Promise<AnyReque
   }
 }
 
+async function getBidIdsWithProviderProposals({
+  bidIds,
+  providerId
+}: {
+  bidIds: number[];
+  providerId: number;
+}) {
+  if (bidIds.length === 0) {
+    return new Set<number>();
+  }
+
+  const proposals = await prisma.tproposals.findMany({
+    where: {
+      tproviders_id: providerId,
+      tbids_id: {
+        in: bidIds
+      }
+    },
+    select: {
+      tbids_id: true
+    }
+  });
+
+  return new Set(proposals.map(({ tbids_id }) => tbids_id));
+}
+
 function getTimestamp(value: string | number | Date | null | undefined): number {
   if (!value) {
     return 0;
@@ -126,4 +167,8 @@ function getTimestamp(value: string | number | Date | null | undefined): number 
   const time = date.getTime();
 
   return Number.isFinite(time) ? time : 0;
+}
+
+function getStatusPriority(status: AnyRequestView['status']): number {
+  return status === 'open' ? 0 : 1;
 }

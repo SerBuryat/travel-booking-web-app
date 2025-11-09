@@ -4,9 +4,8 @@ import { RequestView } from '@/lib/request/client/view/types';
 
 const statusMap: Record<RequestView['status'], string> = {
   open: 'Открыта',
-  client_closed: 'Закрыта клиентом',
-  client_cancelled: 'Отменена клиентом',
-  system_cancelled: 'Отменена системой',
+  closed: 'Закрыта клиентом',
+  cancelled: 'Отменена системой',
 };
 
 export function getRequestStatusText(status: RequestView['status']): string {
