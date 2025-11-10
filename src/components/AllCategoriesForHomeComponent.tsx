@@ -2,7 +2,6 @@
 
 import React from 'react';
 import {useRouter} from 'next/navigation';
-import Image from 'next/image';
 import {getCategoryPngImage} from '@/utils/generalCategories';
 
 interface Category {
@@ -42,6 +41,16 @@ export const AllCategoriesForHomeComponent: React.FC<AllCategoriesForHomeCompone
     const sizeClass = isLarge ? (stretched ? 'w-full h-24' : 'w-24 h-24') : 'w-16 h-16';
     const textMaxWidth = stretched ? 'w-full' : (isLarge ? 'max-w-24' : 'max-w-16');
     
+    const backgroundStyle = imageSrc 
+      ? { 
+          backgroundImage: `url(${imageSrc})`, 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center' 
+        }
+      : { 
+          background: getGradientForId(category.id) 
+        };
+    
     return (
       <div
         key={category.id}
@@ -50,18 +59,8 @@ export const AllCategoriesForHomeComponent: React.FC<AllCategoriesForHomeCompone
       >
         <div 
           className={`${sizeClass} rounded-[15px] mb-2 overflow-hidden relative flex items-center justify-center`}
-          style={!imageSrc ? { background: getGradientForId(category.id) } : undefined}
-        >
-          {imageSrc ? (
-            <Image
-              src={imageSrc}
-              alt={category.name}
-              fill
-              sizes={isLarge ? "200px" : "64px"}
-              className="object-cover"
-            />
-          ) : null}
-        </div>
+          style={backgroundStyle}
+        />
         <span 
           className={`text-xs text-center text-gray-700 ${textMaxWidth} break-words`}
           title={category.name}
