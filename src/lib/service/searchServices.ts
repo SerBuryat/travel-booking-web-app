@@ -2,8 +2,9 @@
 
 import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
-import {ServiceType} from "@/model/ServiceType";
+import {ServiceType, ServiceTypeFull} from "@/model/ServiceType";
 import {CategoryEntity} from "@/entity/CategoryEntity";
+import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from "@/utils/images";
 
 const DEFAULT_TAKE_SERVICES = 10;
 
@@ -99,6 +100,46 @@ export async function servicesForCategories(
   return await fetchServices(where, take);
 }
 
+export async function servicesForProvider(providerId: number): Promise<ServiceType[]> {
+  const services = await prisma.tservices.findMany({
+    where: { 
+      provider_id: providerId,
+      active: true,
+      status: { not: 'archived' }
+    },
+    orderBy: { created_at: 'desc' },
+    include: { tcategories: true, tlocations: true, tphotos: true },
+  });
+
+  if (services.length === 0) {
+    return [];
+  }
+
+  return services.map(mapToSearchableService);
+}
+
+/**
+ * Получение сервисов по списку идентификаторов.
+ * - фильтрация по active=true
+ * - исключение архивных записей
+ * - возврат в формате ServiceType с заполненными полями
+ *
+ * @param {number[]} serviceIds - идентификаторы сервисов
+ */
+export async function getServicesByIds(serviceIds: number[]): Promise<ServiceType[]> {
+  if (!Array.isArray(serviceIds) || serviceIds.length === 0) {
+    return [];
+  }
+
+  const where = {
+    id: { in: serviceIds },
+    active: true,
+    status: { not: 'archived' },
+  };
+
+  return fetchServices(where, serviceIds.length);
+}
+
 /**
  * Нормализует входное значение поиска.
  * Удаляет пробелы по краям и предотвращает выполнение запроса при пустой строке.
@@ -142,10 +183,10 @@ async function resolveAreaIdFromUser(): Promise<number | null> {
  */
 async function fetchServices(where: any, take: number): Promise<ServiceType[]> {
   const services = await prisma.tservices.findMany({
-    where,              // Фильтры по имени, категории и локации
-    orderBy: { priority: 'desc' },            // Сортировка по «популярности»
-    take,               // Лимит записей
-    include: { tcategories: true }, // Присоединяем полную категорию
+    where,
+    orderBy: { priority: 'desc' },
+    take,
+    include: { tcategories: true, tlocations: true, tphotos: true },
   });
 
   if (services.length === 0) {
@@ -247,6 +288,32 @@ function buildWhereForCategories(
 }
 
 /**
+ * Получение сервиса по ID.
+ *
+ * @param {number} serviceId Идентификатор сервиса
+ * @returns {Promise<ServiceType | null>} Сервис с полем category
+ */
+export async function getServiceById(serviceId: number): Promise<ServiceTypeFull | null> {
+  const service = await prisma.tservices.findUnique({
+    where: { id: serviceId },
+    include: { tcategories: true, tlocations: true, tcontacts: true, tphotos: true },
+  });
+  
+  const result = mapToSearchableService(service);
+
+  let photos = service?.tphotos ?? [];
+
+  photos = photos.sort((photo1, photo2) => {
+    if (photo1.is_primary === photo2.is_primary) {
+      return 0;
+    }
+    return photo1.is_primary ? -1 : 1; // Changed from 1 : -1 to -1 : 1
+  });
+
+  return { ...result, contacts: service?.tcontacts ?? [], photos: photos };
+}
+
+/**
  * Преобразует результат Prisma (с полем tcategories) в ожидаемую форму
  * с полем category и без поля tcategories.
  *
@@ -254,7 +321,8 @@ function buildWhereForCategories(
  * @returns {ServiceType} Сервис с полем category
  */
 function mapToSearchableService(service: any): ServiceType {
-  const { tcategories: category, ...rest } = service;
+  const { tcategories: category, tlocations: location, tphotos: photos, ...rest } = service;
+
   const mappedCategory: CategoryEntity = {
     id: category.id,
     code: category.code,
@@ -262,7 +330,10 @@ function mapToSearchableService(service: any): ServiceType {
     name: category.name,
     photo: category.photo,
     parent_id: category.parent_id,
+    priority: category.priority
   };
+
+  const previewPhoto = photos.find(photo => photo.is_primary);
 
   return {
     id: rest.id,
@@ -275,9 +346,10 @@ function mapToSearchableService(service: any): ServiceType {
     created_at: rest.created_at,
     priority: rest.priority,
     category: mappedCategory,
-    rating: rest.rating ? Number(rest.rating) : undefined,
-    view_count: rest.view_count
+    rating: rest.rating.toString(),
+    view_count: rest.view_count,
+    options: rest.service_options,
+    address: location[0].address,
+    preview_photo_url: !previewPhoto || !previewPhoto.url ? DEFAULT_SERVICE_IMAGE_3 : previewPhoto.url
   };
 }
-
-

@@ -8,10 +8,15 @@ export const PAGE_ROUTES = {
   TELEGRAM_AUTH: '/login/telegram',
   
   // Main pages
-  HOME: '/',
+  HOME: '/home',
+  IN_PROGRESS: '/in-progress',
+  NO_AUTH: '/no-auth',
   PROFILE: '/profile',
   REQUESTS: '/requests',
   MAP: '/map',
+  // todo - можно сделать `/error` с параметрами с какой страницы и по какой причине ошибка,
+  //  чтобы показать информативную ошибку пользователю
+  ERROR: '/error',
   
   // Service routes
   SERVICES: {
@@ -21,13 +26,18 @@ export const PAGE_ROUTES = {
   // Provider routes
   PROVIDER: {
     SERVICES: '/provider/services',
-    PROFILE: '/provider/profile'
+    CREATE_SERVICE: '/provider/services/create',
+    PROFILE: '/provider/profile',
+    REQUESTS: '/provider/requests'
   },
   
   // Catalog routes
   CATALOG: {
     ROOT: '/catalog',
-    RESULT: '/catalog/result'
+    RESULT: '/catalog/result',
+    POPULAR: '/catalog/popular',
+    CATEGORY: '/catalog/[categoryId]',
+    CATEGORY_SERVICES: '/catalog/[categoryId]/services'
   },
   
   // Profile sub-routes

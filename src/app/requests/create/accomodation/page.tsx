@@ -16,7 +16,7 @@ export default function AccomodationRequestPage() {
         <FormField
             {...form.register('tbids_accomodation_attrs.date_from')}
             name="tbids_accomodation_attrs.date_from"
-            label="Дата заезда (date_from)"
+            label="Дата заезда"
             type="date"
             required
             error={errors.tbids_accomodation_attrs?.date_from as any}
@@ -24,7 +24,7 @@ export default function AccomodationRequestPage() {
         <FormField
             {...form.register('tbids_accomodation_attrs.date_to')}
             name="tbids_accomodation_attrs.date_to"
-            label="Дата выезда (date_to)"
+            label="Дата выезда"
             type="date"
             required
             error={errors.tbids_accomodation_attrs?.date_to as any}
@@ -32,7 +32,7 @@ export default function AccomodationRequestPage() {
         <FormField
             {...form.register('tbids_accomodation_attrs.adults_qty', { valueAsNumber: true })}
             name="tbids_accomodation_attrs.adults_qty"
-            label="Взрослые (adults_qty)"
+            label="Количество взрослых"
             type="number"
             required
             error={errors.tbids_accomodation_attrs?.adults_qty as any}
@@ -40,7 +40,7 @@ export default function AccomodationRequestPage() {
         <FormField
             {...form.register('tbids_accomodation_attrs.kids_qty', { valueAsNumber: true })}
             name="tbids_accomodation_attrs.kids_qty"
-            label="Дети (kids_qty)"
+            label="Количество детей"
             type="number"
             error={errors.tbids_accomodation_attrs?.kids_qty as any}
         />

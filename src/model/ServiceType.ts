@@ -12,10 +12,18 @@ export interface ServiceType {
   created_at?: string;
   priority?: string;
   category?: CategoryEntity;
-  rating?: number;
+  rating?: string;
   view_count?: number;
+  options: string[];
+  address: string;
+  preview_photo_url: string;
+}
+
+export interface Photos {
+  url: string
 }
 
 export interface ServiceTypeFull extends ServiceType {
   contacts: ContactsType[];
+  photos: Photos[]
 }

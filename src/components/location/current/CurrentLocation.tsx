@@ -1,15 +1,49 @@
-import React from 'react';
-import { currentLocation } from '@/lib/location/currentLocation';
-import { CurrentLocationClient } from '@/components/location/current/CurrentLocationClient';
+'use client';
 
-export async function CurrentLocation() {
-  const location = await currentLocation();
+import React, {useState} from 'react';
+import { SelectCurrentLocationComponent } from '@/components/location/current/SelectCurrentLocationComponent';
+import {usePathname} from "next/navigation";
+import {PAGE_ROUTES} from "@/utils/routes";
+import {useAuth} from "@/contexts/AuthContext";
+
+const CurrentLocationSkeleton: React.FC = () => (
+  <div className="flex justify-center bg-white p-1">
+    <div className="w-20 h-4 bg-gray-300 rounded-full animate-pulse mb-1"></div>
+  </div>
+);
+
+export const CurrentLocation: React.FC = () => {
+  const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const { isLoading, location, refreshUser } = useAuth();
+
+  // Скрываем навбар на странице авторизации Telegram
+  if (pathname === PAGE_ROUTES.TELEGRAM_AUTH || pathname === PAGE_ROUTES.NO_AUTH) {
+    return null;
+  }
+
+  if (isLoading) {
+    return <CurrentLocationSkeleton />;
+  }
+
   return (
-    <CurrentLocationClient
-      locationName={location?.name ?? 'Выберите локацию'}
-      currentLocationId={location?.id}
-    />
+    <div className="flex justify-center bg-white">
+      <button
+        type="button"
+        className="font-medium text-blue-600 hover:underline"
+        onClick={() => setIsOpen(true)}
+      >
+        {location?.name || 'Выберите локацию'}
+      </button>
+
+      <SelectCurrentLocationComponent
+        isOpen={isOpen}
+        onClose={() => setIsOpen(false)}
+        currentLocationId={location?.id}
+        refreshUser={refreshUser}
+      />
+    </div>
   );
-}
+};
 
 

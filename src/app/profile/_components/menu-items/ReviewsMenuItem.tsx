@@ -2,6 +2,7 @@
 
 import React from 'react';
 import {useRouter} from 'next/navigation';
+import { PAGE_ROUTES } from '@/utils/routes';
 import BaseMenuItem from './BaseMenuItem';
 
 export default function ReviewsMenuItem() {
@@ -20,7 +21,7 @@ export default function ReviewsMenuItem() {
       <BaseMenuItem
           title="Оставить отзывы"
           icon={icon}
-          onClick={() => router.push('/profile')}
+          onClick={() => router.push(PAGE_ROUTES.IN_PROGRESS)}
       />
   );
 }

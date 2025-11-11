@@ -1,6 +1,6 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {ServicesClicksService} from '@/service/ServicesClicksService';
-import {getUserAuthOrThrow} from '@/lib/auth/userAuth';
+import {getUserAuthOrThrow} from '@/lib/auth/getUserAuth';
 import {withErrorHandling} from '@/lib/api/errorHandler';
 
 async function handlePost(_request: NextRequest, { params }: { params: { serviceId: string } }) {

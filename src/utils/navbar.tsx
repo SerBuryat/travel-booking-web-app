@@ -61,7 +61,8 @@ export const Navbar: React.FC<NavbarProps> = ({ buttons }) => {
   );
 };
 
-// Icon Components
+/* Иконки кнопок*/
+
 const HomeIcon = (props: SvgIconProps) => (
   <SvgIcon {...props} sx={{width:"22", height:"22", viewBox:"0 0 22 22", fill:"none", xmlns:"http://www.w3.org/2000/svg"}}>
     <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -124,17 +125,18 @@ const MyServicesIcon = (props: SvgIconProps) => (
   </SvgIcon>
 );
 
-// Individual button configurations
+/* Кнопки навигации*/
+
 export const HOME_BUTTON: NavbarButtonConfig = {
   href: PAGE_ROUTES.HOME,
   icon: HomeIcon,
-  title: 'Home',
+  title: 'Главная',
 };
 
 export const CATALOG_BUTTON: NavbarButtonConfig = {
   href: PAGE_ROUTES.CATALOG.ROOT,
   icon: CatalogIcon,
-  title: 'Catalog',
+  title: 'Каталог',
 };
 
 export const MY_SERVICES_BUTTON: NavbarButtonConfig = {
@@ -146,27 +148,33 @@ export const MY_SERVICES_BUTTON: NavbarButtonConfig = {
 export const PROFILE_BUTTON: NavbarButtonConfig = {
   href: PAGE_ROUTES.PROFILE,
   icon: ProfileIcon,
-  title: 'Profile',
-  badgeContent: 4,
+  title: 'Профиль'
 };
 
 export const MAP_BUTTON: NavbarButtonConfig = {
   href: PAGE_ROUTES.MAP,
   icon: MapIcon,
-  title: 'Map',
+  title: 'Карта',
 };
 
 export const REQUESTS_BUTTON: NavbarButtonConfig = {
   href: PAGE_ROUTES.REQUESTS,
   icon: RequestsIcon,
-  title: 'Requests',
+  title: 'Мои заявки',
 };
 
-// Navbar configurations for different roles
+export const PROVIDER_REQUESTS_BUTTON: NavbarButtonConfig = {
+  href: PAGE_ROUTES.PROVIDER.REQUESTS,
+  icon: RequestsIcon,
+  title: 'Мои заявки',
+};
+
+/* Список кнопок навигации в зависимости от ролей */
+
 export const USER_NAVBAR: NavbarButtonConfig[] = [
   HOME_BUTTON,
   CATALOG_BUTTON,
-  MAP_BUTTON,
+  // MAP_BUTTON, // Пока в работе
   REQUESTS_BUTTON,
   PROFILE_BUTTON,
 ];
@@ -174,12 +182,13 @@ export const USER_NAVBAR: NavbarButtonConfig[] = [
 export const PROVIDER_NAVBAR: NavbarButtonConfig[] = [
   HOME_BUTTON,
   MY_SERVICES_BUTTON,
-  MAP_BUTTON,
-  REQUESTS_BUTTON,
+  // MAP_BUTTON, // Пока в работе
+  PROVIDER_REQUESTS_BUTTON,
   PROFILE_BUTTON,
 ];
 
-// Function to get navbar buttons by role
+/* Функция получения навигации в зависимости от роли */
+
 export function getNavbarButtonsByRole(role?: string): NavbarButtonConfig[] {
   if (role === 'provider') {
     return PROVIDER_NAVBAR;

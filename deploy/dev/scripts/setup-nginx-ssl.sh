@@ -26,6 +26,8 @@ server {
     listen 80;
     server_name dev.travel-app-service.ru;
 
+    client_max_body_size 10M;
+
     location /.well-known/acme-challenge/ {
         root /var/www/html;
     }

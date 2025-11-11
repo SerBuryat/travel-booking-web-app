@@ -1,6 +1,6 @@
 import React from 'react';
-import {ServiceService} from '@/service/ServiceService';
-import SingleServiceView from './SingleServiceView';
+import SingleServiceView from './_components/SingleServiceView';
+import {getServiceById} from "@/lib/service/searchServices";
 
 export default async function ServicePage({ params }: { params: Promise<{ serviceId: string }> }) {
   const { serviceId } = await params;
@@ -15,8 +15,7 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
       </div>
     );
   }
-  const serviceService = new ServiceService();
-  const service = await serviceService.getServiceById(id);
+  const service = await getServiceById(id);
   if (!service) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
@@ -27,5 +26,7 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
       </div>
     );
   }
-  return <SingleServiceView service={service} />;
+  return <div>
+    <SingleServiceView service={service} />
+  </div>;
 } 

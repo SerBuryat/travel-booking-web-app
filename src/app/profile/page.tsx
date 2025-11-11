@@ -4,9 +4,8 @@ import {ClientService} from '@/service/ClientService';
 import ProfileHeader from "@/app/profile/_components/ProfileHeader";
 import ProfileMenu from "@/app/profile/_components/ProfileMenu";
 import {PAGE_ROUTES} from '@/utils/routes';
-import {getUserAuthOrThrow} from "@/lib/auth/userAuth";
+import {getUserAuthOrThrow} from "@/lib/auth/getUserAuth";
 import {ClientWithAuthType} from "@/model/ClientType";
-import {CurrentLocation} from "@/components/location/current/CurrentLocation";
 
 // Принудительно делаем страницу динамической
 export const dynamic = 'force-dynamic';
@@ -15,14 +14,11 @@ export default async function ProfilePage() {
 
   const user = await getUser();
   if (!user) {
-    redirect(PAGE_ROUTES.TELEGRAM_AUTH);
+    redirect(PAGE_ROUTES.NO_AUTH);
   }
 
   return (
       <div className="min-h-screen bg-gray-50 pt-2">
-        <div className="">
-          <CurrentLocation/>
-        </div>
         <ProfileHeader user={user} />
         <div className="max-w-md mx-auto pt-6 px-4">
           <ProfileMenu/>
@@ -31,7 +27,6 @@ export default async function ProfilePage() {
   );
 } 
 
-// todo - такой логики на страницах быть не должно
 async function getUser(): Promise<ClientWithAuthType | null> {
   try {
     const userAuth = await getUserAuthOrThrow();

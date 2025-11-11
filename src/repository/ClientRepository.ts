@@ -21,44 +21,7 @@ export class ClientRepository {
     }
   }
 
-  /**
-   * Найти клиента по ID с активной аутентификацией
-   */
-  async findByIdWithActiveAuth(id: number, authId: number): Promise<ClientWithAuthType | null> {
-    try {
-      const client = await prisma.tclients.findUnique({
-        where: { id },
-        include: {
-          tclients_auth: {
-            where: {
-              id: authId,
-              is_active: true,
-            },
-          },
-          tproviders: {
-            select: {
-              id: true
-            }
-          }
-        },
-      });
-
-      if (!client) return null;
-
-      // Добавляем providerId если клиент является провайдером
-      const providerId = client.tproviders.length > 0 ? client.tproviders[0].id : undefined;
-      
-      return {
-        ...client,
-        providerId
-      } as ClientWithAuthType;
-    } catch (error) {
-      console.error('Error finding client by ID with active auth:', error);
-      return null;
-    }
-  }
-
-  // todo - тут поиск по ИМЕННО auth_id, не путать с tclients_auth.id
+  // todo - тут поиск, ИМЕННО, по auth_id, не путать с tclients_auth.id
   //  потом при рефакторинге переделается, а то уже раз запутался
   async findByAuthId(authId: string): Promise<ClientWithAuthType | null> {
     try {
@@ -85,6 +48,7 @@ export class ClientRepository {
     }
   }
 
+  // todo - оставить для функции refresh jwt "на лету"
   /**
    * Обновить refresh token
    */
@@ -107,25 +71,4 @@ export class ClientRepository {
     }
   }
 
-  /**
-   * Деактивировать аутентификацию клиента
-   */
-  async deactivateAuth(authId: number): Promise<boolean> {
-    try {
-      await prisma.tclients_auth.updateMany({
-        where: {
-          id: authId,
-        },
-        data: {
-          is_active: false,
-          refresh_token: null,
-          token_expires_at: null,
-        },
-      });
-      return true;
-    } catch (error) {
-      console.error('Error deactivating client auth:', error);
-      return false;
-    }
-  }
 } 

@@ -1,15 +1,17 @@
 'use client';
 
 import React, {useState} from 'react';
-import {useRouter} from 'next/navigation';
 import BaseMenuItem from './BaseMenuItem';
-import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/provider/switchToProvider";
+import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/role/switchToProvider";
+import {useAuth} from "@/contexts/AuthContext";
 
-export default function BusinessMenuItem() {
-  const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [apiResponse, setApiResponse] = useState<ProviderSwitchResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+interface BusinessMenuItemProps {
+  onSwitchResult?: (result: ProviderSwitchResult) => void;
+}
+
+export default function BusinessMenuItem({ onSwitchResult }: BusinessMenuItemProps) {
+  const { refreshUser } = useAuth();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const icon = (
       <svg width="18" height="16" viewBox="0 0 18 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -20,26 +22,21 @@ export default function BusinessMenuItem() {
   );
 
   const handleSwitchToProvider = async () => {
-    setIsLoading(true);
+    if (isProcessing) return;
+    setIsProcessing(true);
     try {
       const data = await switchToProvider();
-      setApiResponse(data);
-      setIsModalOpen(true);
+      // Если переключение успешно, обновляем контекст
+      if (data?.success) {
+        await refreshUser();
+      }
+      onSwitchResult?.(data ?? { success: false, error: 'Unknown error' });
     } catch (error) {
       console.error('Error switching to provider:', error);
-      setApiResponse({
-        success: false,
-        error: 'Ошибка сети при переключении на провайдера'
-      });
-      setIsModalOpen(true);
+      onSwitchResult?.({ success: false, error: 'Ошибка сети при переключении на провайдера' });
     } finally {
-      setIsLoading(false);
+      setIsProcessing(false);
     }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setApiResponse(null);
   };
 
   return (
@@ -49,74 +46,6 @@ export default function BusinessMenuItem() {
           icon={icon}
           onClick={handleSwitchToProvider}
       />
-
-      {/* Модальное окно с результатом API */}
-      {isModalOpen && (
-                 <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 max-h-[80vh] overflow-y-auto">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold text-gray-900">
-                {apiResponse?.success ? 'Успешное переключение' : 'Ошибка переключения'}
-              </h2>
-              <button
-                onClick={handleCloseModal}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <div className="text-sm text-gray-700 space-y-4">
-              {isLoading ? (
-                <div className="text-center py-4">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-2">Переключение на провайдера...</p>
-                </div>
-              ) : apiResponse ? (
-                <>
-                  {apiResponse.success ? (
-                    <div className="space-y-3">
-                      <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                        <p className="text-green-800 font-medium">✅ Успешно переключились на роль провайдера!</p>
-                      </div>
-                      
-                                             <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                         <p className="text-blue-800 text-sm">
-                           Теперь вы можете управлять своими сервисами в бизнес-аккаунте.
-                         </p>
-                       </div>
-
-                       <div className="flex justify-center">
-                         <button
-                           onClick={() => router.push('/provider/services')}
-                           className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                         >
-                           Перейти в бизнес-аккаунт
-                         </button>
-                       </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                        <p className="text-red-800 font-medium">❌ Ошибка при переключении</p>
-                        <p className="text-red-700 text-sm mt-1">{apiResponse.error}</p>
-                      </div>
-                      
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
-                        <p className="text-yellow-800 text-sm">
-                          Убедитесь, что у вас есть бизнес-аккаунт. Если его нет, сначала зарегистрируйте сервис.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

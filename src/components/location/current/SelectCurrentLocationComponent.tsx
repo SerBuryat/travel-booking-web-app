@@ -11,9 +11,10 @@ interface SelectLocationComponentProps {
   isOpen: boolean;
   onClose: () => void;
   currentLocationId?: number;
+  refreshUser: () => void
 }
 
-export const SelectCurrentLocationComponent: React.FC<SelectLocationComponentProps> = ({ isOpen, onClose, currentLocationId }) => {
+export const SelectCurrentLocationComponent: React.FC<SelectLocationComponentProps> = ({ isOpen, onClose, currentLocationId, refreshUser }) => {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [pendingId, setPendingId] = useState<number | null>(null);
@@ -52,7 +53,7 @@ export const SelectCurrentLocationComponent: React.FC<SelectLocationComponentPro
       setActionError(null);
       const result = await updateCurrentLocation(areaId);
       if (result === true) {
-        // Обновляем серверные компоненты и закрываем модалку
+        refreshUser();
         router.refresh();
         onClose();
       }

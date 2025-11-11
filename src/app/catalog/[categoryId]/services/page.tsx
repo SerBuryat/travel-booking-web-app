@@ -1,8 +1,9 @@
-import {CategoryService} from '@/service/CategoryService';
 import {CategoryHeaderComponent} from '@/components/CategoryHeaderComponent';
 import ServicesClient from './ServicesClient';
 import {notFound} from 'next/navigation';
 import {servicesForCategories} from "@/lib/service/searchServices";
+import {getCategoryWithChildren} from "@/lib/category/searchCategories";
+import React from "react";
 
 interface PageProps {
   params: Promise<{ categoryId: string }>;
@@ -10,11 +11,10 @@ interface PageProps {
 }
 
 async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { categoryId: number, childCategoryIdsParam?: string }) {
-  const categoryService = new CategoryService();
-  const categoryWithRelations = await categoryService.getById(categoryId);
+  const categoryWithRelations = await getCategoryWithChildren(categoryId);
   if (!categoryWithRelations) return notFound();
   
-  const childCategoriesIds = categoryWithRelations.children.map((child) => child.id);  
+  const childCategoriesIds = categoryWithRelations.children.map((child) => child.id);
 
   // Parse selected child category IDs from param
   let selectedChildIds: number[] = [];
@@ -25,30 +25,32 @@ async function CategoryServicesContent({ categoryId, childCategoryIdsParam }: { 
   // If none selected, use parent + all children; else use parent + selected children
   const serviceCategoryIds =
       selectedChildIds.length > 0
-        ? [categoryId, ...selectedChildIds]
+        ? [...selectedChildIds]
         : [categoryId, ...childCategoriesIds];
+
   const services = await servicesForCategories(serviceCategoryIds);
 
   return (
     <>
-      <div className="pt-8 pb-4">
-        <CategoryHeaderComponent name={categoryWithRelations.name} photo={categoryWithRelations.photo} />
+      <div className="pt-4 pb-4">
+        <CategoryHeaderComponent category={categoryWithRelations} />
       </div>
       <ServicesClient
-        category={categoryWithRelations}
-        childCategories={categoryWithRelations.children}
-        initialServices={services}
-        selectedChildIds={selectedChildIds}
+          category={categoryWithRelations}
+          childCategories={categoryWithRelations.children}
+          initialServices={services}
+          selectedChildIds={selectedChildIds}
       />
     </>
   );
 }
 
-export default async function CategoryServicesPage({ params, searchParams }: PageProps) {
-  const { categoryId } = await params;
+export default async function CategoryServicesPage({params, searchParams}: PageProps) {
+  const {categoryId} = await params;
   const resolvedSearchParams = await searchParams;
   const childCategoryIdsParam = resolvedSearchParams?.childCategoryIds;
   const categoryIdNum = Number(categoryId);
+
   if (isNaN(categoryIdNum)) return notFound();
 
   return (

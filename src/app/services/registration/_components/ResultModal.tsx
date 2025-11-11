@@ -4,7 +4,8 @@ import React from 'react';
 import {useRouter} from 'next/navigation';
 import {ServiceCreationResult} from '../_hooks/useServiceRegistration';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {switchToProvider} from "@/lib/auth/provider/switchToProvider";
+import {switchToProvider} from "@/lib/auth/role/switchToProvider";
+import {useAuth} from "@/contexts/AuthContext";
 
 interface ResultModalProps {
   result: ServiceCreationResult;
@@ -13,6 +14,7 @@ interface ResultModalProps {
 
 export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => {
   const router = useRouter();
+  const { refreshUser } = useAuth();
 
   const handleViewService = () => {
     if (result.serviceId) {
@@ -26,7 +28,8 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
       const data = await switchToProvider()!;
 
       if (data!.success) {
-        // Роль успешно изменена, переходим в бизнес-аккаунт
+        // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт
+        await refreshUser();
         onClose();
         router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {

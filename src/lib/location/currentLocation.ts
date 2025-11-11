@@ -1,17 +1,17 @@
 'use server';
 
 import { withUserAuth } from '@/lib/auth/withUserAuth';
-import type { UserAuth } from '@/lib/auth/userAuth';
+import type { UserAuth } from '@/lib/auth/getUserAuth';
 import { prisma } from '@/lib/db/prisma';
 
-export type CurrentLocation = { id: number; name: string } | null;
+export type CurrentLocationType = { id: number; name: string } | null;
 
 /**
  * Возвращает текущую локацию пользователя
  * @throws {Error} Если клиент не найден или нет выбранной локации
  * @throws {Error} Если локация не найдена
  */
-export async function currentLocation(): Promise<CurrentLocation> {
+export async function currentLocation(): Promise<CurrentLocationType> {
   return withUserAuth(async ({ userAuth }) => {
     const tareaId = await getClientAreaId(userAuth);
     const area = await getAreaById(tareaId);

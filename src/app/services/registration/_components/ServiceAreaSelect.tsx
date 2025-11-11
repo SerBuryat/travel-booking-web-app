@@ -1,7 +1,8 @@
 'use client';
 
-import React, {useEffect, useState} from 'react';
-import {AreaEntity} from '@/entity/AreaEntity';
+import React, {useEffect, useMemo, useState} from 'react';
+import {type LocationEntity, locationsForSelect} from "@/lib/location/locationsForSelect";
+import {SELECTABLE_AREA_TIER} from "@/lib/location/constants";
 
 interface ServiceAreaSelectProps {
   selectedArea: number;
@@ -15,8 +16,8 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
   error 
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [areas, setAreas] = useState<AreaEntity[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [areas, setAreas] = useState<LocationEntity[]>([]);
+  const [isLoading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   // Загружаем зоны при открытии модального окна
@@ -29,11 +30,8 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
   const loadAreas = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/areas');
-      if (response.ok) {
-        const data = await response.json();
-        setAreas(data.areas);
-      }
+      const data = await locationsForSelect();
+      setAreas(data);
     } catch (error) {
       console.error('Ошибка загрузки зон:', error);
     } finally {
@@ -57,161 +55,237 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
   };
 
   const getSelectedAreaDisplay = () => {
-    if (!selectedArea) return 'Выберите зону';
-    
-    const area = areas.find(a => a.id === selectedArea);
-    if (!area) return `Зона ${selectedArea}`;
+    if (!selectedArea) return <span className="text-gray-400"> Выберите зону </span>;
+
+    const currentArea = findById(areas, selectedArea);
 
     return (
-      <div className="flex items-center space-x-2">
-        <span className="text-blue-600 font-medium">{area.name}</span>
-        {area.parent_id && (
-          <span className="text-gray-400 text-sm">(Подзона)</span>
-        )}
-      </div>
+        <div className="flex items-center space-x-2">
+          <span>{currentArea.parent.name}</span>
+          <span>→</span>
+          <span>{currentArea.name}</span>
+        </div>
     );
   };
 
-  const filteredAreas = areas.filter(area =>
-    area.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // todo - повторяет функционал "выбора локации пользователем"
+  function filterTree(nodes: LocationEntity[], term: string): LocationEntity[] {
+    if (!term) return nodes;
+    const lower = term.toLowerCase();
+    const walk = (list: LocationEntity[]): LocationEntity[] =>
+        list
+        .map((node) => {
+          const children = node.children ? walk(node.children) : [];
+          const selfMatched = node.name.toLowerCase().includes(lower);
+          if (selfMatched || children.length > 0) {
+            return { ...node, children } as LocationEntity;
+          }
+          return null;
+        })
+        .filter(Boolean) as LocationEntity[];
+    return walk(nodes);
+  }
 
-  const parentAreas = filteredAreas.filter(area => !area.parent_id);
-  const childAreas = filteredAreas.filter(area => area.parent_id);
+  const filteredTree = useMemo(() => {
+    if (!areas) return null;
+    return filterTree(areas, searchTerm);
+  }, [areas, searchTerm]);
+
+  function findById(nodes: LocationEntity[] | null | undefined, id?: number): LocationEntity | null {
+    if (!nodes || !id) return null;
+    for (const n of nodes) {
+      if (n.id === id) return n;
+      const found = findById(n.children, id);
+      if (found) return found;
+    }
+    return null;
+  }
 
   return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">
-        Зона *
-      </label>
-      
-      {/* Кнопка выбора зоны */}
-      <button
-        type="button"
-        onClick={handleOpenModal}
-        className={`
+      <div className="relative">
+        <label className="block text-sm font-medium mb-0 pl-2" style={{
+          color: '#A2ACB0',
+          marginLeft: '8px',
+          marginTop: '4px',
+          marginBottom: '-8px',
+          zIndex: 10,
+          position: 'relative',
+          width: 'fit-content',
+          background: '#F9FAFB',
+          paddingLeft: '4px',
+          paddingRight: '4px'
+        }}>
+          Зона *
+        </label>
+
+        {/* Кнопка выбора зоны */}
+        <button
+            type="button"
+            onClick={handleOpenModal}
+            className={`
           w-full px-3 py-2 border rounded-md shadow-sm text-left focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black
           ${error ? 'border-red-300' : 'border-gray-300'}
-          ${selectedArea ? 'bg-blue-50 border-blue-300' : 'bg-white'}
+          'bg-white'
         `}
-      >
-        {getSelectedAreaDisplay()}
-      </button>
+            style={{ borderRadius: '14px' }}
+        >
+          {getSelectedAreaDisplay()}
+        </button>
 
-      {error && (
-        <p className="mt-1 text-sm text-red-600">
-          {error.message}
-        </p>
-      )}
-
-      {/* Модальное окно выбора зоны */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
-            {/* Заголовок */}
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Выберите зону
-                </h3>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-
-            {/* Поиск */}
-            <div className="px-6 py-4 border-b border-gray-200">
-              <input
-                type="text"
-                placeholder="Поиск по названию зоны..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
-              />
-            </div>
-
-            {/* Содержимое */}
-            <div className="px-6 py-4 overflow-y-auto max-h-[50vh]">
-              {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="ml-2">Загрузка зон...</span>
+        {isOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/50 backdrop-blur-sm">
+              <div
+                  className="w-full max-w-2xl max-h-[80vh] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-xl">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-200">
+                  <h3 className="text-base font-semibold text-neutral-900">Выберите локацию</h3>
+                  <button
+                      onClick={handleCloseModal}
+                      className="inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                      aria-label="Закрыть"
+                  >
+                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <path d="M6 18L18 6M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </button>
                 </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Основные зоны */}
-                  {parentAreas.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Основные зоны</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {parentAreas.map((area) => (
-                          <button
-                            key={area.id}
-                            onClick={() => handleAreaSelect(area.id)}
-                            className="text-left p-3 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                          >
-                            <div className="font-medium text-gray-900">{area.name}</div>
-                            <div className="text-sm text-gray-500">{area.sysname}</div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
 
-                  {/* Подзоны */}
-                  {childAreas.length > 0 && (
-                    <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-3">Подзоны</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        {childAreas.map((area) => (
-                          <button
-                            key={area.id}
-                            onClick={() => handleAreaSelect(area.id)}
-                            className="text-left p-3 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors"
-                          >
-                            <div className="font-medium text-gray-900">{area.name}</div>
-                            <div className="text-sm text-gray-500">{area.sysname}</div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {filteredAreas.length === 0 && searchTerm && (
-                    <div className="text-center py-8 text-gray-500">
-                      Зоны не найдены по запросу &#34;{searchTerm}&#34;
-                    </div>
-                  )}
-
-                  {filteredAreas.length === 0 && !searchTerm && (
-                    <div className="text-center py-8 text-gray-500">
-                      Зоны не найдены
-                    </div>
+                <div className="px-5 py-4 border-b border-neutral-200">
+                  <div className="relative">
+                    <svg
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400"
+                        viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      <circle cx="11" cy="11" r="7" strokeWidth="2"/>
+                      <path d="M20 20l-3.5-3.5" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                    <input
+                        type="text"
+                        placeholder="Поиск по названию локации"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full rounded-lg border border-neutral-300 bg-white py-2.5 pl-10 pr-3 text-sm text-neutral-900 placeholder:text-neutral-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                    />
+                  </div>
+                  {error && (
+                      <div className="mt-2 text-sm text-red-600">{error}</div>
                   )}
                 </div>
-              )}
-            </div>
 
-            {/* Футер */}
-            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  Отмена
-                </button>
+                <div className="px-5 py-4 overflow-y-auto max-h-[50vh]">
+                  <div className="space-y-6">
+                    {isLoading && (
+                        <div className="py-10 text-center text-neutral-500">Загрузка...</div>
+                    )}
+
+                    {!isLoading && filteredTree && (
+                        <>
+                          {filteredTree.length === 0 && (
+                              <div className="py-10 text-center text-neutral-500">Локации не найдены</div>
+                          )}
+                          <div className="space-y-1">
+                            {filteredTree.map((node) => (
+                                <TreeNode
+                                    key={node.id}
+                                    node={node}
+                                    depth={0}
+                                    onSelect={handleAreaSelect}
+                                    currentLocationId={selectedArea}
+                                />
+                            ))}
+                          </div>
+                        </>
+                    )}
+                  </div>
+                </div>
+
+                <div className="px-5 py-4 border-t border-neutral-200 bg-neutral-50">
+                  <div className="flex justify-end gap-3">
+                    <button
+                        onClick={handleCloseModal}
+                        className="inline-flex items-center rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                    >
+                      Отмена
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
   );
 };
+
+interface TreeNodeProps {
+  node: LocationEntity;
+  depth: number;
+  onSelect: (id: number) => void;
+  currentLocationId?: number;
+}
+
+function TreeNode({node, depth, onSelect, currentLocationId}: TreeNodeProps) {
+  const isCurrent = node.id === currentLocationId;
+  const padding = 12 + depth * 16; // базовый отступ + отступ на уровень
+  const isClickable = node.tier === SELECTABLE_AREA_TIER;
+  return (
+      <div>
+        <button
+            onClick={() => {
+              if (!isClickable) return;
+              return onSelect(node.id);
+            }}
+            className={`group flex w-full items-start justify-between gap-3 rounded-lg border text-left transition-colors ${
+                isCurrent
+                    ? 'border-blue-300 bg-blue-50/60'
+                    : isClickable
+                        ? 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
+                        : 'border-neutral-200 bg-neutral-50/60 text-neutral-500 cursor-not-allowed'
+            }`}
+            style={{padding: '12px', paddingLeft: `${padding}px`}}
+            title={isClickable ? 'Выбрать эту локацию' : 'Выберите более конкретную локацию'}
+        >
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              {node.children && node.children.length > 0 ? (
+                  <svg className="h-4 w-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+              ) : (
+                  <span
+                      className={`inline-block h-2 w-2 rounded-full ${isClickable ? 'bg-blue-500' : 'bg-neutral-300'}`}/>
+              )}
+              <div
+                  className={`truncate font-medium ${isClickable ? 'text-neutral-900' : 'text-neutral-500'}`}>{node.name}</div>
+            </div>
+          </div>
+          {isCurrent ? (
+              <svg className="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M5 13l4 4L19 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+          ) : isClickable ? (
+              <svg className="h-5 w-5 text-neutral-300 group-hover:text-neutral-500" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor">
+                <path d="M9 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+          ) : (
+              <svg className="h-5 w-5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M12 17a2 2 0 100-4 2 2 0 000 4z" strokeWidth="2"/>
+                <path d="M6 10V8a6 6 0 1112 0v2" strokeWidth="2" strokeLinecap="round"/>
+              </svg>
+          )}
+        </button>
+
+        {node.children && node.children.length > 0 && (
+            <div className="mt-1 space-y-1">
+              {node.children.map((child) => (
+                  <TreeNode
+                      key={child.id}
+                      node={child}
+                      depth={depth + 1}
+                      onSelect={onSelect}
+                      currentLocationId={currentLocationId}
+                  />
+              ))}
+            </div>
+        )}
+      </div>
+  );
+}

@@ -83,15 +83,15 @@ const ExistingProviderModal: React.FC<{
 
 export const ServiceRegistrationBanner: React.FC = () => {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
   const [isChecking, setIsChecking] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [providerProfile, setProviderProfile] = useState<ProviderProfile | null>(null);
 
   const handleConnectBusiness = async () => {
     if (!user) {
-      // Если пользователь не аутентифицирован, перенаправляем на страницу входа
-      router.push(PAGE_ROUTES.TELEGRAM_AUTH);
+      // Если пользователь не аутентифицирован, перенаправляем на страницу инструкции
+      router.push(PAGE_ROUTES.NO_AUTH);
       return;
     }
 
@@ -132,7 +132,8 @@ export const ServiceRegistrationBanner: React.FC = () => {
       const data = await response.json();
 
       if (data.success) {
-        // Роль успешно изменена, переходим в бизнес-аккаунт
+        // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт
+        await refreshUser();
         setShowModal(false);
         router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {
@@ -148,23 +149,24 @@ export const ServiceRegistrationBanner: React.FC = () => {
 
   return (
     <>
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 rounded-lg mx-4 my-6 shadow-lg">
+      <div className="p-6 rounded-lg mx-4 my-6 shadow-lg" style={{ backgroundColor: '#C7FFCD' }}>
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-3">
-            Подключите свой бизнес
+          <h2 className="font-bold mb-3 text-black" style={{ fontSize: '17px' }}>
+          Подключите ваш бизнес к нашему приложению
           </h2>
-          <p className="text-blue-100 mb-6 max-w-2xl mx-auto">
-            Расширьте свою клиентскую базу и увеличьте доходы. 
-            Зарегистрируйте свои услуги на нашей платформе и получите доступ к тысячам потенциальных клиентов.
+          <p className="mb-6 max-w-2xl mx-auto text-black" style={{ fontSize: '13px' }}>
+          Увеличьте количество клиентов, привлекая аудиторию нашего приложения. 
+          Подключите ваш отель, ресторан, кафе или развлекательное заведение всего за несколько шагов.
           </p>
           <button
             onClick={handleConnectBusiness}
             disabled={isChecking}
-            className={`px-8 py-3 rounded-full font-semibold transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 ${
+            className={`w-full py-3 rounded-full transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-105 ${
               isChecking
                 ? 'bg-gray-400 text-gray-200 cursor-not-allowed'
-                : 'bg-white text-blue-600 hover:bg-blue-50'
+                : 'bg-white hover:bg-blue-50'
             }`}
+            style={{ fontSize: '14px', fontWeight: 400, color: 'black' }}
           >
             {isChecking ? (
               <div className="flex items-center justify-center">
@@ -172,7 +174,7 @@ export const ServiceRegistrationBanner: React.FC = () => {
                 Проверяем...
               </div>
             ) : (
-              'Подключить бизнес'
+              'подключить бизнес'
             )}
           </button>
         </div>

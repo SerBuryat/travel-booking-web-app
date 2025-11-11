@@ -16,7 +16,7 @@ export default function TransportRequestPage() {
         <FormField
             {...form.register('tbids_transport_attrs.provision_time')}
             name="tbids_transport_attrs.provision_time"
-            label="Время предоставления (provision_time)"
+            label="Время предоставления"
             type="datetime-local"
             required
             error={errors.tbids_transport_attrs?.provision_time as any}
@@ -24,7 +24,7 @@ export default function TransportRequestPage() {
         <FormField
             {...form.register('tbids_transport_attrs.adults_qty', { valueAsNumber: true })}
             name="tbids_transport_attrs.adults_qty"
-            label="Взрослые (adults_qty)"
+            label="Количество взрослых"
             type="number"
             required
             error={errors.tbids_transport_attrs?.adults_qty as any}
@@ -32,7 +32,7 @@ export default function TransportRequestPage() {
         <FormField
             {...form.register('tbids_transport_attrs.kids_qty', { valueAsNumber: true })}
             name="tbids_transport_attrs.kids_qty"
-            label="Дети (kids_qty)"
+            label="Количество детей"
             type="number"
             error={errors.tbids_transport_attrs?.kids_qty as any}
         />

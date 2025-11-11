@@ -51,24 +51,24 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
   }
 
   return (
-    <div className="relative w-full h-64 overflow-hidden">
+    <div className="relative w-full h-80 overflow-hidden">
       {/* Images */}
       <div 
         className="flex transition-transform duration-500 ease-in-out h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
         {images.map((image, index) => (
-          <div 
+          <div
             key={index}
             className="w-full h-full flex-shrink-0"
-            style={{ background: image }}
+            style={{ backgroundImage: `url(${image})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
           />
         ))}
       </div>
 
       {/* Dots Indicator */}
       {images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-1.5">
           {images.map((_, index) => {
             const isActive = index === currentIndex;
             
@@ -77,7 +77,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
                 key={index}
                 onClick={() => goToSlide(index)}
                 className={`relative rounded-full overflow-hidden transition-all duration-300 ease-in-out ${
-                  isActive ? 'w-6 h-3' : 'w-3 h-3'
+                  isActive ? 'w-4 h-1' : 'w-2 h-1'
                 }`}
                 aria-label={`Go to image ${index + 1}`}
               >

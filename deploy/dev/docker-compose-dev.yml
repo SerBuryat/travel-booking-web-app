@@ -15,6 +15,7 @@ services:
       - DB_NAME=${DB_NAME}
       # Next.js Environment
       - NODE_ENV=${NODE_ENV}
+      - STAGE=${STAGE}
       # Telegram Bot Configuration
       - BOT_TOKEN=${BOT_TOKEN}
       - BOT_NAME=${BOT_NAME}
@@ -22,6 +23,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
       - REFRESH_TOKEN_EXPIRES_IN=${REFRESH_TOKEN_EXPIRES_IN}
+      - COOKIE_JWT_TTL=${COOKIE_JWT_TTL}
+      - COOKIE_REFRESH_JWT_TTL=${COOKIE_REFRESH_JWT_TTL}
       # Prisma Logging Configuration
       - PRISMA_LOG_LEVELS=${PRISMA_LOG_LEVELS}
       # Cloud.ru artifact registry
@@ -29,6 +32,12 @@ services:
       - ARTIFACT_REGISTRY_NAME=${ARTIFACT_REGISTRY_NAME}
       - CLOUD_RU_KEY_ID=${CLOUD_RU_KEY_ID}
       - CLOUD_RU_KEY_SECRET=${CLOUD_RU_KEY_SECRET}
+      # Cloud.ru object storage
+      - OBJECT_STORAGE_REGION=${OBJECT_STORAGE_REGION}
+      - OBJECT_STORAGE_ENDPOINT=${OBJECT_STORAGE_ENDPOINT}
+      - OBJECT_STORAGE_BUCKET_NAME=${OBJECT_STORAGE_BUCKET_NAME}
+      - OBJECT_STORAGE_BUCKET_ENDPOINT=${OBJECT_STORAGE_BUCKET_ENDPOINT}
+      - OBJECT_STORAGE_TENANT_ID=${OBJECT_STORAGE_TENANT_ID}
     env_file:
       - .env
     restart: unless-stopped

@@ -6,7 +6,6 @@ import { FieldError } from 'react-hook-form';
 interface FormFieldProps {
   label: string;
   type?: 'text' | 'email' | 'tel' | 'textarea' | 'number' | 'date' | 'datetime-local';
-
   placeholder?: string;
   required?: boolean;
   error?: FieldError;
@@ -17,39 +16,25 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
   ({ label, type = 'text', placeholder, required = false, error, name, rows = 3, ...props }, ref) => {
     const fieldId = `field-${name}`;
     
-    const inputStyle = {
-      width: '100%',
-      padding: '12px 20px',
-      border: error ? '1px solid #EF4444' : '1px solid #A2ACB0',
-      borderRadius: '14px',
-      fontSize: '15px',
-      fontFamily: 'Inter, sans-serif',
-      color: '#000000',
-      outline: 'none',
-      transition: 'border-color 0.2s',
-    };
-
-    const labelStyle = {
-      position: 'absolute' as const,
-      top: '-8px',
-      left: '12px',
-      backgroundColor: 'white',
-      padding: '0 4px',
-      fontSize: '14px',
-      fontWeight: 500,
-      color: error ? '#EF4444' : '#A2ACB0',
-      zIndex: 1,
-    };
-
-    const containerStyle = {
-      position: 'relative' as const,
-      marginBottom: '20px',
-    };
-
     return (
-      <div style={containerStyle}>
-        <label htmlFor={fieldId} style={labelStyle}>
-          {label} {required && <span style={{ color: '#EF4444' }}>*</span>}
+      <div className="relative">
+        <label 
+          htmlFor={fieldId} 
+          className="block text-sm font-medium mb-0 pl-2"
+          style={{ 
+            color: '#A2ACB0', 
+            marginLeft: '8px', 
+            marginTop: '4px', 
+            marginBottom: '-8px', 
+            zIndex: 10, 
+            position: 'relative', 
+            width: 'fit-content', 
+            background: 'white',
+            paddingLeft: '4px', 
+            paddingRight: '4px' 
+          }}
+        >
+          {label} {required && <span style={{ color: '#A2ACB0' }}>*</span>}
         </label>
         {type === 'textarea' ? (
           <textarea
@@ -59,7 +44,10 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             name={name}
             placeholder={placeholder}
             rows={rows}
-            style={inputStyle}
+            className={`w-full px-3 py-2 border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-[#A2ACB0] ${
+              error ? 'border-red-300' : 'border-gray-300'
+            }`}
+            style={{ borderRadius: '14px' }}
           />
         ) : (
           <input
@@ -69,8 +57,10 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
             name={name}
             type={type}
             placeholder={placeholder}
-            required={required}
-            style={inputStyle}
+            className={`w-full px-3 py-2 border shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-[#A2ACB0] ${
+              error ? 'border-red-300' : 'border-gray-300'
+            }`}
+            style={{ borderRadius: '14px' }}
           />
         )}
         {error && (
@@ -82,3 +72,5 @@ export const FormField = forwardRef<HTMLInputElement | HTMLTextAreaElement, Form
     );
   }
 );
+
+FormField.displayName = 'FormField';

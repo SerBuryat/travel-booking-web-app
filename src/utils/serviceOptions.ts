@@ -10,9 +10,9 @@ export interface ServiceCategoryOption {
 }
 
 export const ServiceOptions: Record<string, ServiceCategoryOption> = {
-  PROPERTY: {
-    name: "PROPERTY",
-    description: "Недвижимость",
+  ACCOMMODATION: {
+    name: "accommodation",
+    description: "Проживание",
     options: [
       "wi-fi",
       "бассейн", 
@@ -24,9 +24,9 @@ export const ServiceOptions: Record<string, ServiceCategoryOption> = {
       "детская площадка"
     ]
   },
-  TRANSFER: {
-    name: "TRANSFER",
-    description: "Трансфер",
+  TRANSPORT: {
+    name: "transport",
+    description: "Транспорт",
     options: [
       "встреча в аэропорту",
       "доставка до отеля",
@@ -36,8 +36,8 @@ export const ServiceOptions: Record<string, ServiceCategoryOption> = {
       "багаж включен"
     ]
   },
-  MEAL: {
-    name: "MEAL",
+  FOOD: {
+    name: "food",
     description: "Питание",
     options: [
       "завтрак",
@@ -50,38 +50,3 @@ export const ServiceOptions: Record<string, ServiceCategoryOption> = {
     ]
   }
 };
-
-/**
- * Получить все доступные категории опций
- */
-export function getServiceCategories(): string[] {
-  return Object.keys(ServiceOptions);
-}
-
-/**
- * Получить опции для конкретной категории
- */
-export function getOptionsForCategory(category: string): string[] {
-  return ServiceOptions[category]?.options || [];
-}
-
-/**
- * Получить описание категории
- */
-export function getCategoryDescription(category: string): string {
-  return ServiceOptions[category]?.description || "";
-}
-
-/**
- * Проверить, существует ли категория
- */
-export function isValidCategory(category: string): boolean {
-  return category in ServiceOptions;
-}
-
-/**
- * Получить все опции всех категорий (плоский список)
- */
-export function getAllOptions(): string[] {
-  return Object.values(ServiceOptions).flatMap(category => category.options);
-}

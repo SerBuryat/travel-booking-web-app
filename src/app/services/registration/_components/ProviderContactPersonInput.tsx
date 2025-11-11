@@ -11,17 +11,18 @@ export const ProviderContactPersonInput: React.FC<ProviderContactPersonInputProp
   error
 }) => {
   return (
-    <div>
-      <label htmlFor="providerContactPerson" className="block text-sm font-medium text-gray-700 mb-2">
+    <div className="relative">
+      <label htmlFor="providerContactPerson" className="block text-sm font-medium mb-0 pl-2" style={{ color: '#A2ACB0', marginLeft: '8px', marginTop: '4px', marginBottom: '-8px', zIndex: 10, position: 'relative', width: 'fit-content', background: '#F9FAFB', paddingLeft: '4px', paddingRight: '4px' }}>
         Контактное лицо <span className="text-red-500">*</span>
       </label>
       <input
         type="text"
         id="providerContactPerson"
         {...register('providerContactPerson')}
-        className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black ${
+        className={`w-full px-4 py-3 border shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors text-black ${
           error ? 'border-red-300 bg-red-50' : 'border-gray-300 hover:border-gray-400'
         }`}
+        style={{ borderRadius: '14px' }}
         placeholder="Ваше имя"
       />
       {error && (

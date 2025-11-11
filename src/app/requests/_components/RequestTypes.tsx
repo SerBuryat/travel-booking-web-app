@@ -2,40 +2,52 @@
 
 import React from 'react';
 import Link from 'next/link';
+import {RequestType} from "@/lib/request/requestType";
 
-export interface RequestType {
-  id: string;
+export interface RequestTypeButton {
+  id: RequestType;
   name: string;
   href: string;
-  sysname: 'accommodation' | 'transport' | 'entertainment';
 }
 
-export const REQUEST_TYPES: RequestType[] = [
+export const REQUEST_TYPE_BUTTONS: RequestTypeButton[] = [
   {
-    id: 'accomodation',
+    id: RequestType.ACCOMMODATION,
     name: 'Проживание',
-    href: '/requests/create/accomodation',
-    sysname: 'accommodation'
+    href: '/requests/create/accomodation'
   },
   {
-    id: 'transport',
+    id: RequestType.TRANSPORT,
     name: 'Транспорт',
-    href: '/requests/create/transport',
-    sysname: 'transport'
+    href: '/requests/create/transport'
   },
   {
-    id: 'entertainment',
+    id: RequestType.ENTERTAINMENT,
     name: 'Туры/активности',
-    href: '/requests/create/entertainment',
-    sysname: 'entertainment'
+    href: '/requests/create/entertainment'
+  },
+  {
+    id: RequestType.FOOD,
+    name: 'Питание',
+    href: '/requests/create/food'
+  },
+  {
+    id: RequestType.HEALTH,
+    name: 'Здоровье',
+    href: '/requests/create/health'
+  },
+  {
+    id: RequestType.PACKAGE,
+    name: 'Комплексный отдых',
+    href: '/requests/create/package'
   }
 ];
 
 interface RequestTypeButtonProps {
-  type: RequestType;
+  type: RequestTypeButton;
 }
 
-const RequestTypeButton: React.FC<RequestTypeButtonProps> = ({ type }) => (
+const CreateRequestTypeButton: React.FC<RequestTypeButtonProps> = ({ type }) => (
   <Link href={type.href}>
     <button
       className="py-2 px-2 text-black font-medium transition-colors"
@@ -52,16 +64,16 @@ const RequestTypeButton: React.FC<RequestTypeButtonProps> = ({ type }) => (
 );
 
 interface RequestTypesListProps {
-  types?: RequestType[];
+  types?: RequestTypeButton[];
 }
 
 export const RequestTypesList: React.FC<RequestTypesListProps> = ({ 
-  types = REQUEST_TYPES 
+  types = REQUEST_TYPE_BUTTONS
 }) => {
   return (
     <div className="flex flex-wrap gap-3">
       {types.map((type) => (
-        <RequestTypeButton key={type.id} type={type} />
+        <CreateRequestTypeButton key={type.id} type={type} />
       ))}
     </div>
   );

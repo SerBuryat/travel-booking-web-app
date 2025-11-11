@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, {useState} from 'react';
 import {useServiceRegistration} from '../_hooks/useServiceRegistration';
 import {ServiceNameInput} from './ServiceNameInput';
 import {ServiceDescriptionInput} from './ServiceDescriptionInput';
@@ -15,12 +15,32 @@ import {ProviderCompanyNameInput} from './ProviderCompanyNameInput';
 import {ProviderContactPersonInput} from './ProviderContactPersonInput';
 import {ProviderPhoneInput} from './ProviderPhoneInput';
 import {RequiredFieldsList} from './RequiredFieldsList';
-import {CreateServiceButton} from './CreateServiceButton';
 import {ProgressBar} from './ProgressBar';
 import {ResultModal} from './ResultModal';
+import {TermsModal} from './TermsModal';
+import {SectionTitle} from './SectionTitle';
+import {useServicePhotos} from "@/lib/service/hooks/useServicePhotos";
+import {ServicePhotoUpload} from "@/app/provider/services/create/_components/ServicePhotoUpload";
 
 export const ServiceRegistrationForm: React.FC = () => {
   const { form, onSubmit, isSubmitting, errors, result, resetResult } = useServiceRegistration();
+  const [showTermsModal, setShowTermsModal] = useState(false);
+  const {
+    photos,
+    addPhotos,
+    removePhoto,
+    setPrimaryPhoto,
+    clearPhotos,
+    error: photosError
+  } = useServicePhotos();
+
+  const handleSubmit = (data: any) => {
+    onSubmit(data, photos);
+  };
+  
+  // Текст условий сотрудничества
+  const fullTermsText = `Условия сотрудничества\n\n1. Общие положения\nНастоящие условия определяют порядок сотрудничества между платформой и сервисными провайдерами.\n\n2. Обязанности провайдера\nПровайдер обязуется предоставлять достоверную информацию о своих услугах, поддерживать актуальность данных и соблюдать сроки предоставления услуг.\n\n3. Комиссия\nПлатформа взимает комиссию в размере 10% с каждой успешно завершенной сделки.\n\n4. Ответственность\nКаждая сторона несет ответственность за свои обязательства в соответствии с законодательством.\n\n5. Изменение условий\nПлатформа оставляет за собой право изменять условия сотрудничества с уведомлением провайдеров за 30 дней.\n\n6. Согласие\nПри регистрации сервиса вы автоматически соглашаетесь с настоящими условиями сотрудничества.`;
+  const shortTermsText = 'При регистрации сервиса вы соглашаетесь с условиями сотрудничества платформы. Мы гарантируем безопасность ваших данных и прозрачность расчетов. Комиссия платформы составляет 10% с каждой завершенной сделки. Вы обязуетесь предоставлять актуальную информацию о своих услугах и соблюдать сроки предоставления услуг.';
 
   return (
     <>
@@ -35,152 +55,141 @@ export const ServiceRegistrationForm: React.FC = () => {
         />
       )}
 
-             {/* Main Form */}
-       <form onSubmit={onSubmit} className="space-y-8 pb-20">
-        {/* Секция: Основная информация о сервисе */}
-        <div className="bg-gradient-to-br from-white to-blue-50 p-8 rounded-2xl border border-blue-100 shadow-lg shadow-blue-50">
-          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            Основная информация
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ServiceNameInput 
-              register={form.register} 
-              error={errors.name} 
-            />
-            <ServicePriceInput 
-              register={form.register} 
-              error={errors.price} 
-            />
-          </div>
-          <div className="mt-4">
-            <ServiceDescriptionInput 
-              register={form.register} 
-              error={errors.description} 
-            />
-          </div>
-        </div>
+      {/* Terms Modal */}
+      <TermsModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        fullText={fullTermsText}
+        shortText={shortTermsText}
+      />
 
-        {/* Секция: Категория и опции */}
-        <div className="bg-gradient-to-br from-white to-green-50 p-8 rounded-2xl border border-green-100 shadow-lg shadow-green-50">
-          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-600 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-              </svg>
-            </div>
-            Категория и опции
-          </h3>
-          <div className="space-y-4">
-            <CategorySelectionModal 
-              selectedCategory={form.watch('tcategories_id')}
-              onSelect={(categoryId) => form.setValue('tcategories_id', categoryId)}
-              error={errors.tcategories_id}
-            />
-            <ServiceOptionsSelection 
-              selectedOptions={form.watch('serviceOptions') || []}
-              onOptionsChange={(options) => form.setValue('serviceOptions', options)}
-            />
-          </div>
-        </div>
+      {/* Main Form */}
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-8 pb-20">
+        {/* Заполните анкету */}
+        <SectionTitle>Заполните анкету</SectionTitle>
 
-        {/* Секция: Локация */}
-        <div className="bg-gradient-to-br from-white to-orange-50 p-8 rounded-2xl border border-orange-100 shadow-lg shadow-orange-50">
-          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </div>
-            Локация
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ServiceAddressInput 
-              register={form.register} 
-              error={errors.address} 
-            />
-            <ServiceAreaSelect 
-              selectedArea={form.watch('tarea_id')}
-              onAreaSelect={(areaId) => form.setValue('tarea_id', areaId)}
-              error={errors.tarea_id}
-            />
-          </div>
-        </div>
+        <ServiceNameInput
+            register={form.register}
+            error={errors.name}
+        />
 
-        {/* Секция: Данные провайдера */}
-        <div className="bg-gradient-to-br from-white to-indigo-50 p-8 rounded-2xl border border-indigo-100 shadow-lg shadow-indigo-50">
-          <h3 className="text-xl font-bold text-black mb-6 flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            Данные компании
-          </h3>
-          <div className="space-y-4">
-            <ProviderCompanyNameInput 
-              register={form.register} 
-              error={errors.providerCompanyName} 
-            />
-            <ProviderContactPersonInput 
-              register={form.register} 
-              error={errors.providerContactPerson} 
-            />
-            <ProviderPhoneInput 
-              register={form.register} 
-              error={errors.providerPhone} 
-            />
-          </div>
-        </div>
+        <CategorySelectionModal
+            selectedCategory={form.watch('tcategories_id')}
+            onSelect={(categoryId) => form.setValue('tcategories_id', categoryId)}
+            error={errors.tcategories_id}
+        />
 
-        {/* Секция: Контакты */}
-        <div className="bg-gradient-to-br from-white to-purple-50 p-8 rounded-2xl border border-purple-100 shadow-lg shadow-purple-50">
-          <h3 className="text-xl font-bold text-gray-800 mb-6 flex items-center">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center mr-3">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2 2v10a2 2 0 002 2z" />
-              </svg>
-            </div>
-            Контактная информация
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <ServicePhoneInput 
-              register={form.register} 
-              error={errors.phone} 
-            />
-            <ServiceTelegramInput 
-              register={form.register} 
-              error={errors.tg_username} 
-            />
-          </div>
+        <ServiceAreaSelect
+            selectedArea={form.watch('tarea_id')}
+            onAreaSelect={(areaId) => form.setValue('tarea_id', areaId)}
+            error={errors.tarea_id}
+        />
+
+        <ServiceAddressInput
+            register={form.register}
+            error={errors.address}
+        />
+
+        <ServiceDescriptionInput
+            register={form.register}
+            error={errors.description}
+        />
+
+        {/* Контакты заведения */}
+        <SectionTitle>Контакты заведения</SectionTitle>
+
+        <ServicePhoneInput
+            register={form.register}
+            error={errors.phone}
+        />
+
+        <ServiceTelegramInput
+            register={form.register}
+            error={errors.tg_username}
+        />
+
+        {/* Стоимость */}
+        <SectionTitle>Стоимость</SectionTitle>
+
+        <ServicePriceInput
+            register={form.register}
+            error={errors.price}
+        />
+
+        {/* Данные контактного лица */}
+        <SectionTitle>Данные контактного лица</SectionTitle>
+
+        <ProviderCompanyNameInput
+            register={form.register}
+            error={errors.providerCompanyName}
+        />
+
+        <ProviderContactPersonInput
+            register={form.register}
+            error={errors.providerContactPerson}
+        />
+
+        <ProviderPhoneInput
+            register={form.register}
+            error={errors.providerPhone}
+        />
+
+        {/* Логотип и Фото заведения */}
+        <SectionTitle>Логотип и Фото заведения</SectionTitle>
+
+        <ServicePhotoUpload
+            photos={photos}
+            onAddPhotos={addPhotos}
+            onRemovePhoto={removePhoto}
+            onSetPrimary={setPrimaryPhoto}
+            onClearPhotos={clearPhotos}
+            error={photosError}
+        />
+
+        {/* Дополнительно */}
+        <SectionTitle>Дополнительно</SectionTitle>
+
+        <ServiceOptionsSelection
+            selectedOptions={form.watch('serviceOptions') || []}
+            onOptionsChange={(options) => form.setValue('serviceOptions', options)}
+        />
+
+        {/* Условия сотрудничества */}
+        <SectionTitle>Условия сотрудничества</SectionTitle>
+
+        <div className="bg-gray-50 rounded-lg">
+          <p style={{color: '#707579'}}>
+            {shortTermsText.substring(0, 75)}...
+            <button
+                type="button"
+                onClick={() => setShowTermsModal(true)}
+                className="font-bold underline hover:opacity-80"
+                style={{color: '#707579'}}
+            >
+              Читать полностью
+            </button>
+          </p>
         </div>
 
         {/* Список незаполненных полей */}
-        <RequiredFieldsList 
-          watch={form.watch}
-          errors={errors}
+        <RequiredFieldsList
+            watch={form.watch}
+            errors={errors}
         />
 
         {/* Кнопка отправки */}
-        <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-8 rounded-2xl border border-blue-100 shadow-lg">
-          <div className="text-center mb-6">
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">
-              Готовы создать сервис?
-            </h3>
-            <p className="text-sm text-gray-600">
-              Заполните все обязательные поля и нажмите кнопку ниже
-            </p>
-          </div>
-          <CreateServiceButton 
-            isSubmitting={isSubmitting}
-            disabled={!form.formState.isValid}
-          />
-        </div>
+        <button
+            type="submit"
+            disabled={!form.formState.isValid || isSubmitting}
+            className="w-full py-2 transition-all duration-300 text-lg"
+            style={{
+              backgroundColor: isSubmitting || !form.formState.isValid ? '#ccc' : '#95E59D',
+              color: isSubmitting || !form.formState.isValid ? 'white' : '#000000',
+              borderRadius: '128px'
+            }}
+        >
+          {isSubmitting ? 'Отправка...' : 'отправить заявку'}
+        </button>
       </form>
     </>
   );

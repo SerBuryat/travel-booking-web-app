@@ -1,5 +1,4 @@
 import {type NextRequest, NextResponse} from 'next/server';
-import {UserAuthError} from '@/lib/auth/userAuth';
 
 export type RouteHandler<Context = unknown> = (
   request: NextRequest,
@@ -26,14 +25,6 @@ export function withErrorHandling<Context = unknown>(
     } catch (error) {
       if (isNextSpecialError(error)) {
         throw error as Error;
-      }
-
-      if (error instanceof UserAuthError) {
-        const body =
-          typeof options?.authErrorMessage === 'string'
-            ? { error: options!.authErrorMessage }
-            : options?.authErrorMessage ?? { error: (error as Error).message };
-        return NextResponse.json(body, { status: 401 });
       }
 
       const method = request.method;
