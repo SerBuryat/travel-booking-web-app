@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { ServiceType } from '@/model/ServiceType';
-import {getActiveProviderId} from "@/lib/provider/searchProvider";
+import {getActiveProviderIdBYClientId} from "@/lib/provider/searchProvider";
 import { getServicesByIds } from '@/lib/service/searchServices';
 
 export interface ProposalServiceType extends ServiceType {
@@ -34,7 +34,7 @@ export async function getProviderServicesForRequest(requestId: number): Promise<
       return null;
     }
 
-    const provider = await getActiveProviderId(userAuth.userId);
+    const provider = await getActiveProviderIdBYClientId(userAuth.userId);
     if (!provider) {
       return { services: [] };
     }

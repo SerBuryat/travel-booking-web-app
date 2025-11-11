@@ -11,7 +11,11 @@ import ClientMenuItem from './menu-items/ClientMenuItem';
 import LogoutMenuItem from './menu-items/LogoutMenuItem';
 import {useAuth} from '@/contexts/AuthContext';
 
-export default function ProfileMenu() {
+interface ProfileMenuProps {
+  providerInfo: {id: number; status: string} | null;
+}
+
+export default function ProfileMenu({ providerInfo }: ProfileMenuProps) {
   const { user } = useAuth();
 
   const isProvider = user?.role === 'provider';
@@ -42,7 +46,7 @@ export default function ProfileMenu() {
       <FaqMenuItem />
       {/* Держим обе кнопки смонтированными, чтобы не терять состояние модалки при смене роли */}
       <div className={isProvider ? 'hidden' : ''}>
-        <BusinessMenuItem onSwitchResult={handleProviderSwitchResult} />
+        <BusinessMenuItem onSwitchResult={handleProviderSwitchResult} providerInfo={providerInfo} />
       </div>
       <div className={!isProvider ? 'hidden' : ''}>
         <ClientMenuItem onSwitchResult={handleClientSwitchResult} />

@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
 import { getClientRequestsForProvider } from '@/lib/request/provider/clientRequestsForProvider';
-import { getActiveProviderId } from '@/lib/provider/searchProvider';
+import { getActiveProviderIdBYClientId } from '@/lib/provider/searchProvider';
 import { ClientRequestsList } from './_components/ClientRequestsList';
 
 /**
@@ -30,7 +30,7 @@ export default async function ProviderRequestsPage() {
   }
 
   // Получаем заявки для провайдера
-  const provider = await getActiveProviderId(userAuth.userId);
+  const provider = await getActiveProviderIdBYClientId(userAuth.userId);
   const providerId = provider?.id ?? null;
   const requests = await getClientRequestsForProvider();
 

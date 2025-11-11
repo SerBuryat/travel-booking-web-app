@@ -2,7 +2,7 @@
 
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { prisma } from '@/lib/db/prisma';
-import { getActiveProviderId } from '@/lib/provider/searchProvider';
+import { getActiveProviderIdBYClientId } from '@/lib/provider/searchProvider';
 
 export async function markAlertsAsRead(providerId: number, bidId: number) {
   if (!providerId || !bidId) {
@@ -14,7 +14,7 @@ export async function markAlertsAsRead(providerId: number, bidId: number) {
       return;
     }
 
-    const activeProvider = await getActiveProviderId(userAuth.userId);
+    const activeProvider = await getActiveProviderIdBYClientId(userAuth.userId);
     if (!activeProvider || activeProvider.id !== providerId) {
       return;
     }
