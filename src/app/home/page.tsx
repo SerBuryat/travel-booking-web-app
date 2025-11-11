@@ -43,9 +43,10 @@ export default async function HomePage() {
         </div>
 
         {/* Кнопки Registry service и Private policy */}
-        <div className="flex flex-col items-center space-y-3">
-          <RegistryServiceButton />
-          <PrivatePolicyButton />
+        <div className="flex flex-col items-center space-y-3 pt-10">
+          {/*todo - уточнить что должно быть при нажатии этих кнопок*/}
+          {/*<RegistryServiceButton />*/}
+          {/*<PrivatePolicyButton />*/}
           <DeveloperLink />
         </div>
       </div>
