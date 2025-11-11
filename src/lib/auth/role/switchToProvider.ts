@@ -4,7 +4,7 @@ import {withUserAuth} from '@/lib/auth/withUserAuth';
 import {AuthTokens, generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction} from '@/lib/auth/authUtils';
 import {prisma} from '@/lib/db/prisma';
 import {UserAuth} from '@/lib/auth/getUserAuth';
-import { getActiveProviderId } from '../../provider/searchProvider';
+import { getActiveProviderIdBYClientId } from '../../provider/searchProvider';
 
 export interface ProviderSwitchResult {
   success: boolean;
@@ -71,7 +71,7 @@ async function updateUserRole(userAuth: UserAuth, role: string) : Promise<void> 
   }
 
   if (role === 'provider') {
-    const activeProviderId = await getActiveProviderId(userAuth.userId);
+    const activeProviderId = await getActiveProviderIdBYClientId(userAuth.userId);
     if (!activeProviderId) {
       throw new Error('No active business account found. Please register a service first.');
     }

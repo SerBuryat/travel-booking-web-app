@@ -4,6 +4,7 @@ import React, {useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {useAuth} from '@/contexts/AuthContext';
 import {PAGE_ROUTES} from '@/utils/routes';
+import {switchToProvider} from "@/lib/auth/role/switchToProvider";
 
 interface ProviderProfile {
   id: number;
@@ -99,6 +100,7 @@ export const ServiceRegistrationBanner: React.FC = () => {
 
     try {
       // Проверяем наличие бизнес-аккаунта
+      // todo - переделать на server actions
       const response = await fetch('/api/provider/profile');
       const data: ProviderProfileResponse = await response.json();
 
@@ -122,22 +124,15 @@ export const ServiceRegistrationBanner: React.FC = () => {
   const handleGoToBusinessAccount = async () => {
     try {
       // Вызываем API для смены роли на провайдера
-      const response = await fetch('/api/auth/provider', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const providerSwitchResult = await switchToProvider();
 
-      const data = await response.json();
-
-      if (data.success) {
+      if (providerSwitchResult.success) {
         // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт
         await refreshUser();
         setShowModal(false);
         router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {
-        console.error('Failed to switch to provider role:', data.error);
+        console.error('Failed to switch to provider role:', providerSwitchResult.error);
         // В случае ошибки закрываем модальное окно
         setShowModal(false);
       }

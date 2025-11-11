@@ -4,7 +4,7 @@ import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { prisma } from '@/lib/db/prisma';
 import { requestById } from '@/lib/request/client/view/requestById';
 import { AnyRequestView } from '@/lib/request/client/view/types';
-import { getActiveProviderId } from '@/lib/provider/searchProvider';
+import { getActiveProviderIdBYClientId } from '@/lib/provider/searchProvider';
 
 export interface ProviderClientRequestItem {
   request: AnyRequestView;
@@ -31,7 +31,7 @@ export async function getClientRequestsForProvider(): Promise<ProviderClientRequ
       return null;
     }
 
-    const provider = await getActiveProviderId(userAuth.userId);
+    const provider = await getActiveProviderIdBYClientId(userAuth.userId);
     if (!provider) {
       return [];
     }

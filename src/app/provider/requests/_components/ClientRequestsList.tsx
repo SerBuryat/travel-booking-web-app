@@ -19,8 +19,8 @@ type FilterOption = 'all' | 'new' | 'awaiting' | 'responded' | 'archived';
 const FILTER_OPTIONS: { key: FilterOption; label: string }[] = [
   { key: 'all', label: 'Все' },
   { key: 'new', label: 'Новые' },
-  { key: 'awaiting', label: 'Ожидают ответа' },
-  { key: 'responded', label: 'Отвеченные' },
+  { key: 'awaiting', label: 'Ждут отклика' },
+  { key: 'responded', label: 'Откликались' },
   { key: 'archived', label: 'Архив' },
 ];
 
@@ -225,7 +225,7 @@ export function ClientRequestsList({ providerId, requests }: ClientRequestsListP
                         className="w-full text-black transition-transform hover:scale-[1.01]"
                         style={{ backgroundColor: '#95E59D', borderRadius: 30, fontSize: 17, fontWeight: 400, padding: '10px 16px' }}
                       >
-                        Откликнуться
+                        Посмотреть
                       </button>
                     </div>
                   </div>

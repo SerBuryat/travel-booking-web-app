@@ -7,7 +7,7 @@ import { TelegramService } from '@/service/TelegramService';
 import { UserAuth } from '@/lib/auth/getUserAuth';
 import {tarea, tclients_auth} from "@prisma/client";
 import { SELECTABLE_AREA_TIER } from '@/lib/location/constants';
-import {getActiveProviderId} from "@/lib/provider/searchProvider";
+import {getActiveProviderIdBYClientId} from "@/lib/provider/searchProvider";
 
 const TELEGRAM_AUTH_TYPE = 'telegram';
 const DEFAULT_AUTH_ROLE = 'user';
@@ -104,7 +104,7 @@ export async function updateExistUser(existsAuth: tclients_auth, telegramData: T
 }
 
 async function getProviderUserAuth(clientId: number, authId: number) {
-  const provider = await getActiveProviderId(clientId);
+  const provider = await getActiveProviderIdBYClientId(clientId);
 
   if(!provider) {
     console.error(

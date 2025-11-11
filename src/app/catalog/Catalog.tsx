@@ -22,9 +22,10 @@ export default async function Catalog() {
       />
       <ServiceRegistrationBanner />
       {/* Кнопки Registry service и Private policy */}
-      <div className="flex flex-col items-center space-y-3">
-        <PrivatePolicyButton />
-      </div>
+      {/*todo - уточнить что должно быть при нажатии этой кнопки*/}
+      {/*<div className="flex flex-col items-center space-y-3">*/}
+      {/*  <PrivatePolicyButton />*/}
+      {/*</div>*/}
     </>
   );
 } 

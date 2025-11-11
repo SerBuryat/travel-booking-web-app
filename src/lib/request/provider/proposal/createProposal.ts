@@ -4,7 +4,7 @@ import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { createProposalSchema, CreateProposalData } from '@/schemas/proposal/createProposalSchema';
 import { createNewProposalNotificationForClient } from '@/lib/notifications/createNewProposalNotificationForClient';
-import {getActiveProviderId} from "@/lib/provider/searchProvider";
+import {getActiveProviderIdBYClientId} from "@/lib/provider/searchProvider";
 
 /**
  * Создает предложение провайдера на заявку клиента.
@@ -31,7 +31,7 @@ export async function createProposal(proposalData: CreateProposalData): Promise<
       }
 
       // Получаем tproviders запись пользователя
-      const provider = await getActiveProviderId(userAuth.userId);
+      const provider = await getActiveProviderIdBYClientId(userAuth.userId);
       if (!provider) {
         return { success: false, message: 'Провайдер не найден.' };
       }

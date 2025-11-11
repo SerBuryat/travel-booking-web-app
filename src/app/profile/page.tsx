@@ -6,6 +6,7 @@ import ProfileMenu from "@/app/profile/_components/ProfileMenu";
 import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow} from "@/lib/auth/getUserAuth";
 import {ClientWithAuthType} from "@/model/ClientType";
+import {getProviderInfoByClientId} from "@/lib/provider/searchProvider";
 
 // Принудительно делаем страницу динамической
 export const dynamic = 'force-dynamic';
@@ -17,11 +18,14 @@ export default async function ProfilePage() {
     redirect(PAGE_ROUTES.NO_AUTH);
   }
 
+  // Получаем информацию о провайдере для пользователя
+  const providerInfo = await getProviderInfoByClientId(user.id);
+
   return (
       <div className="min-h-screen bg-gray-50 pt-2">
         <ProfileHeader user={user} />
         <div className="max-w-md mx-auto pt-6 px-4">
-          <ProfileMenu/>
+          <ProfileMenu providerInfo={providerInfo} />
         </div>
       </div>
   );

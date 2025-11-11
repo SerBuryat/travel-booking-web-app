@@ -6,6 +6,9 @@ services:
     container_name: travel-booking-web-app
     network_mode: "host"
     environment:
+      # Application
+      - APPLICATION_NAME=${APPLICATION_NAME}
+      - DEVELOPED_BY=${DEVELOPED_BY}
       # Database Configuration (подключение к PostgreSQL на хосте)
       - DATABASE_URL=${DATABASE_URL}
       - DB_HOST=localhost

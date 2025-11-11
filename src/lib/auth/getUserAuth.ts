@@ -2,7 +2,7 @@
 
 import {prisma} from '@/lib/db/prisma';
 import {getJWTFromCookies, verifyJWT, getRefreshTokenFromRequest, verifyRefreshToken, generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction} from '@/lib/auth/authUtils';
-import {getActiveProviderId} from '@/lib/provider/searchProvider';
+import {getActiveProviderIdBYClientId} from '@/lib/provider/searchProvider';
 
 export interface UserAuth {
   userId: number;
@@ -140,7 +140,7 @@ async function refreshToken(): Promise<UserAuth | null> {
     
     // If provider role, get providerId
     if (clientAuth.role === 'provider') {
-      const provider = await getActiveProviderId(userId);
+      const provider = await getActiveProviderIdBYClientId(userId);
       
       if (provider) {
         userAuth.providerId = provider.id;
