@@ -5,6 +5,7 @@ import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeCo
 import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
 import {RegistryServiceButton} from '@/components/RegistryServiceButton';
 import {PrivatePolicyButton} from '@/components/PrivatePolicyButton';
+import {DeveloperLink} from '@/components/DeveloperLink';
 import {popularServices} from "@/lib/service/searchServices";
 import {PAGE_ROUTES} from "@/utils/routes";
 import {parentCategories} from "@/lib/category/searchCategories";
@@ -45,6 +46,7 @@ export default async function HomePage() {
         <div className="flex flex-col items-center space-y-3">
           <RegistryServiceButton />
           <PrivatePolicyButton />
+          <DeveloperLink />
         </div>
       </div>
     </div>
