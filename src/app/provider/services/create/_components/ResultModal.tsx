@@ -4,8 +4,6 @@ import React from 'react';
 import {useRouter} from 'next/navigation';
 import {ServiceCreationResult} from '../_hooks/useProvideCreateService';
 import {PAGE_ROUTES} from "@/utils/routes";
-import {switchToProvider} from "@/lib/auth/role/switchToProvider";
-import {useAuth} from "@/contexts/AuthContext";
 
 interface ResultModalProps {
   result: ServiceCreationResult;
@@ -14,7 +12,6 @@ interface ResultModalProps {
 
 export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => {
   const router = useRouter();
-  const { refreshUser } = useAuth();
 
   const handleViewService = () => {
     if (result.serviceId) {
@@ -23,28 +20,9 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
     onClose();
   };
 
-  const handleGoToBusinessAccount = async () => {
-    try {
-      const data = await switchToProvider();
-
-      if (data!.success) {
-        // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт
-        await refreshUser();
-        onClose();
-        router.push(PAGE_ROUTES.PROVIDER.SERVICES);
-      } else {
-        console.error('Failed to switch to provider role:', data!.error);
-        // В случае ошибки показываем уведомление
-        alert('Ошибка при переходе в бизнес-аккаунт: ' + data!.error);
-      }
-    } catch (error) {
-      console.error('Error switching to provider role:', error);
-      alert('Ошибка при переходе в бизнес-аккаунт');
-    }
-  };
-
-  const handleClose = () => {
+  const handleGoToMyServices = () => {
     onClose();
+    router.push(PAGE_ROUTES.PROVIDER.SERVICES);
   };
 
   if (result.success) {
@@ -67,10 +45,10 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
           
           <div className="flex flex-col space-y-3">
             <button
-              onClick={handleGoToBusinessAccount}
+              onClick={handleGoToMyServices}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium"
             >
-              Перейти в бизнес-аккаунт
+              Перейти в 'Мои объекты'
             </button>
             
             <button
@@ -78,13 +56,6 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
               className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
               Посмотреть сервис
-            </button>
-            
-            <button
-              onClick={handleClose}
-              className="w-full bg-gray-200 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors"
-            >
-              Закрыть
             </button>
           </div>
         </div>
@@ -114,13 +85,6 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
             {result.error}
           </p>
         )}
-        
-        <button
-          onClick={handleClose}
-          className="w-full bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-        >
-          Закрыть
-        </button>
       </div>
     </div>
   );
