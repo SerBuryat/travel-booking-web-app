@@ -174,7 +174,7 @@ export const PROVIDER_REQUESTS_BUTTON: NavbarButtonConfig = {
 export const USER_NAVBAR: NavbarButtonConfig[] = [
   HOME_BUTTON,
   CATALOG_BUTTON,
-  MAP_BUTTON,
+  // MAP_BUTTON, // Пока в работе
   REQUESTS_BUTTON,
   PROFILE_BUTTON,
 ];
@@ -182,7 +182,7 @@ export const USER_NAVBAR: NavbarButtonConfig[] = [
 export const PROVIDER_NAVBAR: NavbarButtonConfig[] = [
   HOME_BUTTON,
   MY_SERVICES_BUTTON,
-  MAP_BUTTON,
+  // MAP_BUTTON, // Пока в работе
   PROVIDER_REQUESTS_BUTTON,
   PROFILE_BUTTON,
 ];
