@@ -172,8 +172,10 @@ export default function UserInfoModal({ isOpen, onClose, user }: UserInfoModalPr
                 </svg>
                 <span className="text-sm text-gray-600 font-medium">Роль</span>
               </div>
-              <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold border ${getRoleColor(latestAuth?.role)}`}>
-                {getRoleName(latestAuth?.role)}
+              <div className="flex justify-center">
+                <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold border ${getRoleColor(latestAuth?.role)}`}>
+                  {getRoleName(latestAuth?.role)}
+                </div>
               </div>
             </div>
             
@@ -184,12 +186,14 @@ export default function UserInfoModal({ isOpen, onClose, user }: UserInfoModalPr
                 </svg>
                 <span className="text-sm text-gray-600 font-medium">Статус</span>
               </div>
-              <div className={`inline-block px-3 py-1 rounded-full text-sm font-semibold ${
-                latestAuth?.is_active 
-                  ? 'bg-green-100 text-green-800 border border-green-200' 
-                  : 'bg-red-100 text-red-800 border border-red-200'
-              }`}>
-                {latestAuth?.is_active ? 'Активен' : 'Неактивен'}
+              <div className="flex justify-center">
+                <div className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                  latestAuth?.is_active 
+                    ? 'bg-green-100 text-green-800 border border-green-200' 
+                    : 'bg-red-100 text-red-800 border border-red-200'
+                }`}>
+                  {latestAuth?.is_active ? 'Активен' : 'Неактивен'}
+                </div>
               </div>
             </div>
           </div>

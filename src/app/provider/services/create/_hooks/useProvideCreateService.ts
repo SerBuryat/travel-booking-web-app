@@ -23,7 +23,9 @@ export const useProvideCreateService = () => {
   const { user } = useAuth();
 
   const form = useForm<CreateServiceData>({
-    resolver: zodResolver(createServiceSchema)
+    resolver: zodResolver(createServiceSchema),
+    mode: 'onChange', // Валидация при изменении полей
+    reValidateMode: 'onChange' // Перевалидация при изменении после первой валидации
   });
 
   const onSubmit = async (data: CreateServiceData, photos?: PhotoItem[]) => {
