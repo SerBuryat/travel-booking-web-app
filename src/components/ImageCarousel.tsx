@@ -42,6 +42,14 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     setProgress(0);
   };
 
+  const goToNextSlide = () => {
+    if (images.length <= 1) return;
+    setCurrentIndex((prevIndex) => 
+      prevIndex === images.length - 1 ? 0 : prevIndex + 1
+    );
+    setProgress(0);
+  };
+
   if (images.length === 0) {
     return (
       <div className="w-full h-64 bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
@@ -54,8 +62,9 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     <div className="relative w-full h-80 overflow-hidden">
       {/* Images */}
       <div 
-        className="flex transition-transform duration-500 ease-in-out h-full"
+        className="flex transition-transform duration-500 ease-in-out h-full cursor-pointer"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+        onClick={goToNextSlide}
       >
         {images.map((image, index) => (
           <div
