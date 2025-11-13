@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useRouter } from 'next/navigation';
 import {
   CreateServiceData,
   createServiceSchema,
@@ -11,7 +10,6 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { updateService } from '@/lib/provider/servicesEdit';
 import type { ServiceEditData, PhotoUpdateData } from '@/lib/provider/servicesEdit';
-import { PAGE_ROUTES } from '@/utils/routes';
 
 export interface ServiceUpdateResult {
   success: boolean;
@@ -28,7 +26,6 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
   const [result, setResult] = useState<ServiceUpdateResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useAuth();
-  const router = useRouter();
 
   const form = useForm<CreateServiceData>({
     resolver: zodResolver(createServiceSchema),

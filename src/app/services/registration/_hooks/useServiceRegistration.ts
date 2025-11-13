@@ -23,7 +23,9 @@ export const useServiceRegistration = () => {
   const { user } = useAuth();
 
   const form = useForm<CreateServiceWithProviderData>({
-    resolver: zodResolver(createServiceWithProviderSchema)
+    resolver: zodResolver(createServiceWithProviderSchema),
+    mode: 'onChange', // Валидация при изменении полей
+    reValidateMode: 'onChange' // Перевалидация при изменении после первой валидации
   });
 
   const onSubmit = async (data: CreateServiceWithProviderData, photos?: PhotoItem[]) => {
