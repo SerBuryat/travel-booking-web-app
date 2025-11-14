@@ -4,14 +4,12 @@ import {ImageCarousel} from '@/components/ImageCarousel';
 import {ServiceTypeFull} from '@/model/ServiceType';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
-import {DEFAULT_SERVICE_IMAGE_1, DEFAULT_SERVICE_IMAGE_2, DEFAULT_SERVICE_IMAGE_3} from '@/utils/images';
+import {DEFAULT_SERVICE_IMAGE_3} from '@/utils/images';
 
 export default function SingleServiceView({ 
-  service, 
-  parentCategoryName 
+  service
 }: { 
   service: ServiceTypeFull;
-  parentCategoryName?: string | null;
 }) {
 
   const imagesUrls =
@@ -38,18 +36,6 @@ export default function SingleServiceView({
       openModal();
     }
   }
-
-  const handleCategoryClick = useCallback(() => {
-    if (service.category?.id) {
-      router.push(`/catalog/${service.category.id}/services`);
-    }
-  }, [service.category, router]);
-
-  const handleParentCategoryClick = useCallback(() => {
-    if (service.category?.parent_id) {
-      router.push(`/catalog/${service.category.parent_id}/services`);
-    }
-  }, [service.category, router]);
 
   const formatDate = (dateValue?: string | Date): string => {
     if (!dateValue) return '';
@@ -136,91 +122,6 @@ export default function SingleServiceView({
           {service.address}
         </p>
 
-        {/* Category and Options - два ряда */}
-        {(service.category || serviceOptions.length > 0) && (
-          <div className="mb-3 space-y-2">
-            {/* Первый ряд - Category */}
-            {service.category && (
-              <div className="flex items-center gap-2">
-                {parentCategoryName ? (
-                  <>
-                    <button
-                      onClick={handleParentCategoryClick}
-                      className="inline-flex items-center px-3 py-1 rounded-full transition-colors hover:opacity-80"
-                      style={{ 
-                        backgroundColor: '#E3F2FD',
-                        color: '#007AFF',
-                        fontSize: '13px',
-                        fontWeight: 500
-                      }}
-                    >
-                      {parentCategoryName}
-                    </button>
-                    <svg 
-                      width="16" 
-                      height="16" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="#AAAAAA" 
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      className="flex-shrink-0"
-                    >
-                      <path d="M9 18l6-6-6-6" />
-                    </svg>
-                    <button
-                      onClick={handleCategoryClick}
-                      className="inline-flex items-center px-3 py-1 rounded-full transition-colors hover:opacity-80"
-                      style={{ 
-                        backgroundColor: '#E3F2FD',
-                        color: '#007AFF',
-                        fontSize: '13px',
-                        fontWeight: 500
-                      }}
-                    >
-                      {service.category.name}
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={handleCategoryClick}
-                    className="inline-flex items-center px-3 py-1 rounded-full transition-colors hover:opacity-80"
-                    style={{ 
-                      backgroundColor: '#E3F2FD',
-                      color: '#007AFF',
-                      fontSize: '13px',
-                      fontWeight: 500
-                    }}
-                  >
-                    {service.category.name}
-                  </button>
-                )}
-              </div>
-            )}
-            {/* Второй ряд - Options */}
-            {serviceOptions.length > 0 && (
-              <div className="overflow-x-auto scrollbar-hide">
-                <div className="flex gap-2" style={{ minWidth: 'max-content' }}>
-                  {serviceOptions.map((option, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 rounded-full text-xs whitespace-nowrap flex-shrink-0"
-                      style={{
-                        backgroundColor: '#F5F5F5',
-                        color: '#707579',
-                        fontWeight: 400
-                      }}
-                    >
-                      {option}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
-
         {/* Description Section */}
         <div className="bg-gray-100 rounded-lg p-4 mb-3">
           <h2 
@@ -236,6 +137,27 @@ export default function SingleServiceView({
             {service.description}
           </p>
         </div>
+
+        {/* Options */}
+        {serviceOptions.length > 0 && (
+          <div className="mb-3">
+            <div className="flex flex-wrap gap-2">
+              {serviceOptions.map((option, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 rounded-full text-xs"
+                  style={{
+                    backgroundColor: '#F5F5F5',
+                    color: '#707579',
+                    fontWeight: 400
+                  }}
+                >
+                  {option}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Additional Service Info */}
         <div className="mt-4 space-y-3">

@@ -1,7 +1,6 @@
 import React from 'react';
 import SingleServiceView from './_components/SingleServiceView';
 import {getServiceById} from "@/lib/service/searchServices";
-import {getCategoryNameById} from "@/lib/category/searchCategories";
 
 export default async function ServicePage({ params }: { params: Promise<{ serviceId: string }> }) {
   const { serviceId } = await params;
@@ -28,18 +27,7 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
     );
   }
 
-  // Загружаем название родительской категории, если она есть
-  let parentCategoryName: string | null = null;
-  if (service.category?.parent_id !== null && service.category?.parent_id !== undefined) {
-    try {
-      parentCategoryName = await getCategoryNameById(service.category.parent_id);
-    } catch (error) {
-      console.error('Ошибка при загрузке родительской категории:', error);
-      // Продолжаем без родительской категории
-    }
-  }
-
   return <div>
-    <SingleServiceView service={service} parentCategoryName={parentCategoryName} />
+    <SingleServiceView service={service} />
   </div>;
 } 
