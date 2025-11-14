@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 
 interface ImageCarouselProps {
   images: string[];
@@ -13,33 +13,58 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [progress, setProgress] = useState(0);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const slideIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const startTimeRef = useRef<number>(Date.now());
 
-  useEffect(() => {
+  const startTimers = () => {
+    // Clear existing timers
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    if (slideIntervalRef.current) {
+      clearInterval(slideIntervalRef.current);
+    }
+
+    // Reset start time
+    startTimeRef.current = Date.now();
+    setProgress(0);
+
     if (images.length <= 1) return;
 
-    const startTime = Date.now();
-    const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime;
+    // Start progress timer
+    progressIntervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTimeRef.current;
       const progressPercent = (elapsed % autoPlayInterval) / autoPlayInterval;
       setProgress(progressPercent);
     }, 16); // Update progress every 16ms (~60fps) for smoother animation
 
-    const slideInterval = setInterval(() => {
+    // Start slide timer
+    slideIntervalRef.current = setInterval(() => {
       setCurrentIndex((prevIndex) => 
         prevIndex === images.length - 1 ? 0 : prevIndex + 1
       );
+      startTimeRef.current = Date.now();
       setProgress(0);
     }, autoPlayInterval);
+  };
+
+  useEffect(() => {
+    startTimers();
 
     return () => {
-      clearInterval(interval);
-      clearInterval(slideInterval);
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+      if (slideIntervalRef.current) {
+        clearInterval(slideIntervalRef.current);
+      }
     };
   }, [images.length, autoPlayInterval]);
 
   const goToSlide = (index: number) => {
     setCurrentIndex(index);
-    setProgress(0);
+    startTimers(); // Reset timers when manually switching
   };
 
   const goToNextSlide = () => {
@@ -47,7 +72,7 @@ export const ImageCarousel: React.FC<ImageCarouselProps> = ({
     setCurrentIndex((prevIndex) => 
       prevIndex === images.length - 1 ? 0 : prevIndex + 1
     );
-    setProgress(0);
+    startTimers(); // Reset timers when manually switching
   };
 
   if (images.length === 0) {

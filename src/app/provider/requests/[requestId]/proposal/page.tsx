@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation';
-import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
-import { requestById } from '@/lib/request/client/view/requestById';
-import { getProviderServicesForRequest } from '@/lib/request/provider/proposal/getProviderServicesForRequest';
-import { CreateProposalForm } from '@/app/provider/requests/[requestId]/proposal/_components/CreateProposalForm';
+import { getUserAuthOrThrow, UserAuth} from '@/lib/auth/getUserAuth';
+import {requestById} from '@/lib/request/client/view/requestById';
+import {getProviderServicesForRequest} from '@/lib/request/provider/proposal/getProviderServicesForRequest';
+import {CreateProposalForm} from '@/app/provider/requests/[requestId]/proposal/_components/CreateProposalForm';
+import {PAGE_ROUTES} from "@/utils/routes";
+import { AnyRequestView } from '@/lib/request/client/view/types';
 
 interface ProposalPageProps {
   params: {
@@ -12,41 +14,40 @@ interface ProposalPageProps {
 
 /**
  * Страница создания предложения провайдера на заявку клиента
- * 
+ *
  * Требования:
  * - Только для пользователей с ролью 'provider'
  * - Отображает детали заявки клиента
  * - Показывает подходящие сервисы провайдера
  * - Форма для создания предложения
  */
-export default async function ProposalPage({ params }: ProposalPageProps) {
-  const { requestId: requestIdString } = await params;
+export default async function ProposalPage({params}: ProposalPageProps) {
+  const {requestId: requestIdString} = await params;
   const requestId = parseInt(requestIdString);
 
-  // todo - разобраться с редиректами
   if (isNaN(requestId)) {
-    redirect('/error');
+    redirect(PAGE_ROUTES.ERROR);
   }
 
   // Проверяем аутентификацию и роль пользователя
-  let userAuth;
+  let userAuth: UserAuth;
   try {
     userAuth = await getUserAuthOrThrow();
   } catch (error) {
-    redirect('/login');
+    redirect(PAGE_ROUTES.NO_AUTH);
   }
 
   // Проверяем, что пользователь - провайдер
   if (userAuth.role !== 'provider') {
-    redirect('/profile');
+    redirect(PAGE_ROUTES.PROFILE);
   }
 
   // Получаем детали заявки клиента
-  let requestDetails;
+  let requestDetails: AnyRequestView;
   try {
     requestDetails = await requestById(requestId, userAuth);
   } catch (error) {
-    redirect('/provider/requests');
+    redirect(PAGE_ROUTES.PROVIDER.REQUESTS);
   }
 
   // Проверяем статус заявки
