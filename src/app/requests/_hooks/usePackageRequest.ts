@@ -19,7 +19,8 @@ export const usePackageRequest = () => {
 
   const form = useForm<PackageRequestData>({
     resolver: zodResolver(packageRequestSchema),
-    mode: 'onChange', // Валидация в реальном времени
+    mode: 'onChange', // Валидация при изменении полей
+    reValidateMode: 'onChange', // Перевалидация при изменении после первой валидации
     defaultValues: {
       budget: 0,
       comment: null,

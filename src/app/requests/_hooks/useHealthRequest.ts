@@ -19,7 +19,8 @@ export const useHealthRequest = () => {
 
   const form = useForm<HealthRequestData>({
     resolver: zodResolver(healthRequestSchema),
-    mode: 'onChange', // Валидация в реальном времени
+    mode: 'onChange', // Валидация при изменении полей
+    reValidateMode: 'onChange', // Перевалидация при изменении после первой валидации
     defaultValues: {
       budget: 0,
       comment: null,

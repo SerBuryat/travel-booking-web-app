@@ -26,6 +26,7 @@ export default async function ServicePage({ params }: { params: Promise<{ servic
       </div>
     );
   }
+
   return <div>
     <SingleServiceView service={service} />
   </div>;

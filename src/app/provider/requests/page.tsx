@@ -1,32 +1,30 @@
 import { redirect } from 'next/navigation';
-import { getUserAuthOrThrow } from '@/lib/auth/getUserAuth';
-import { getClientRequestsForProvider } from '@/lib/request/provider/clientRequestsForProvider';
-import { getActiveProviderIdBYClientId } from '@/lib/provider/searchProvider';
-import { ClientRequestsList } from './_components/ClientRequestsList';
+import { getUserAuthOrThrow, UserAuth} from '@/lib/auth/getUserAuth';
+import {getClientRequestsForProvider} from '@/lib/request/provider/clientRequestsForProvider';
+import {getActiveProviderIdBYClientId} from '@/lib/provider/searchProvider';
+import {ClientRequestsList} from './_components/ClientRequestsList';
+import {PAGE_ROUTES} from "@/utils/routes";
 
 /**
  * Страница просмотра заявок клиентов для провайдеров
- * 
+ *
  * Требования:
  * - Только для пользователей с ролью 'provider'
  * - Отображает список заявок, подходящих для текущего провайдера
  * - Заявки получаются через систему алертов (talerts)
  */
 export default async function ProviderRequestsPage() {
-  // todo - переделать логику редиректов
   // Проверяем аутентификацию и роль пользователя
-  let userAuth;
+  let userAuth: UserAuth;
   try {
     userAuth = await getUserAuthOrThrow();
   } catch (error) {
-    // todo - PAGE_ROUTES
-    redirect('/login');
+    redirect(PAGE_ROUTES.NO_AUTH);
   }
 
   // Проверяем, что пользователь - провайдер
   if (userAuth.role !== 'provider') {
-    // todo - PAGE_ROUTES
-    redirect('/profile');
+    redirect(PAGE_ROUTES.PROFILE);
   }
 
   // Получаем заявки для провайдера
