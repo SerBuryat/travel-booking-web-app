@@ -29,6 +29,8 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
 
   const form = useForm<CreateServiceData>({
     resolver: zodResolver(createServiceSchema),
+    mode: 'onChange', // Валидация при изменении полей
+    reValidateMode: 'onChange', // Перевалидация при изменении после первой валидации
     defaultValues: {
       name: initialData.name,
       description: initialData.description || '',
