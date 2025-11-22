@@ -71,7 +71,7 @@ export function useTelegramAuthState() {
 
     try {
       await loginViaTelegram(userData);
-      router.push(PAGE_ROUTES.PROFILE);
+      router.push(PAGE_ROUTES.HOME);
     } catch (error) {
       setAuthState(TelegramAuthState.ERROR);
       setError({
@@ -84,7 +84,7 @@ export function useTelegramAuthState() {
   useEffect(() => {
     if (isAuthenticated) {
       setAuthState(TelegramAuthState.ALREADY_AUTHENTICATED);
-      router.push(PAGE_ROUTES.PROFILE);
+      router.push(PAGE_ROUTES.HOME);
     } else {
       try {
         const hash = window.location.hash;

@@ -1,4 +1,45 @@
 // ========================
+// PostHog integration for error tracking
+// ========================
+/**
+ * Отправляет ошибку в PostHog, если включено логирование для текущего окружения
+ */
+function sendErrorToPostHog(error: Error | ApiError, context?: Record<string, unknown>): void {
+  // Проверяем, нужно ли отправлять логи в PostHog
+  if (typeof window === 'undefined') return; // Только на клиенте
+  
+  const nodeEnv = process.env.NODE_ENV;
+  const logsFor = process.env.NEXT_PUBLIC_POST_HOG_LOGS_FOR;
+
+  if (!nodeEnv || !logsFor) return;
+
+  const allowedEnvs = logsFor.split(',').map(env => env.trim().toLowerCase());
+  if (!allowedEnvs.includes(nodeEnv.toLowerCase())) return;
+
+  // Динамически импортируем posthog только если нужно
+  import('posthog-js').then((posthogModule) => {
+    const posthog = posthogModule.default;
+    
+    // Создаем Error объект из ApiError если нужно
+    const errorObj = error instanceof Error 
+      ? error 
+      : new Error((error as ApiError).message || 'API Error');
+
+    // Добавляем контекст ошибки
+    const errorContext = {
+      $exception_type: 'http_client_error',
+      ...(error as ApiError).status && { http_status: (error as ApiError).status },
+      ...(error as ApiError).error && { error_code: (error as ApiError).error },
+      ...context,
+    };
+
+    posthog.captureException(errorObj, errorContext);
+  }).catch(() => {
+    // Игнорируем ошибки импорта PostHog (если не инициализирован)
+  });
+}
+
+// ========================
 // Configurable constants (easy to move to env later)
 // ========================
 /**
@@ -98,14 +139,34 @@ async function request<TResponse = unknown, TBody = unknown>(
   } catch (e: any) {
     const errorMsg = e?.message || 'Network error';
     const context = `${method} ${url}`;
-    throw {status: 0, error: 'NETWORK_ERROR', message: `${errorMsg} (${context})`} as ApiError;
+    const apiError: ApiError = {status: 0, error: 'NETWORK_ERROR', message: `${errorMsg} (${context})`};
+    
+    // Отправляем ошибку в PostHog
+    sendErrorToPostHog(apiError, {
+      request_method: method,
+      request_url: url,
+      error_type: 'network_error',
+    });
+    
+    throw apiError;
   }
 
   const data = await readJsonIfAny(response);
   if (!response.ok) {
     const errorFromServer = (data as any)?.error || 'UNKNOWN_ERROR';
     const message = (data as any)?.message || (data as any)?.error || `HTTP ${response.status}`;
-    throw {status: response.status, error: errorFromServer, message} as ApiError;
+    const apiError: ApiError = {status: response.status, error: errorFromServer, message};
+    
+    // Отправляем ошибку в PostHog
+    sendErrorToPostHog(apiError, {
+      request_method: method,
+      request_url: url,
+      http_status: response.status,
+      error_type: 'http_error',
+      server_error: errorFromServer,
+    });
+    
+    throw apiError;
   }
   return data as TResponse;
 }

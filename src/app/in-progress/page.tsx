@@ -25,7 +25,7 @@ export default function InProgressPage() {
 
         <div className="pt-2">
           <Link
-            href={PAGE_ROUTES.PROFILE}
+            href={PAGE_ROUTES.HOME}
             className="inline-flex items-center justify-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
           >
             Вернуться в профиль

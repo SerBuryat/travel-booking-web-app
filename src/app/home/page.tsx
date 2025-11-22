@@ -3,8 +3,6 @@ import {Header} from '@/components/Header';
 import {SearchBarWrapper} from '@/components/SearchBarWrapper';
 import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
 import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
-import {RegistryServiceButton} from '@/components/RegistryServiceButton';
-import {PrivatePolicyButton} from '@/components/PrivatePolicyButton';
 import {DeveloperLink} from '@/components/DeveloperLink';
 import {popularServices} from "@/lib/service/searchServices";
 import {PAGE_ROUTES} from "@/utils/routes";
