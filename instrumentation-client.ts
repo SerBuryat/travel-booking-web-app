@@ -21,7 +21,8 @@ if (typeof window !== 'undefined' && shouldInitializePostHog()) {
 
   if (posthogKey && posthogHost) {
     posthog.init(posthogKey, {
-      api_host: posthogHost,
+      ui_host: posthogHost,
+      api_host: "/relay-HcYE"
     });
 
     // Настраиваем автоматический перехват ошибок
