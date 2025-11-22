@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import {closingBehavior, init} from '@telegram-apps/sdk';
 
 /**
  * Хук для настройки поведения закрытия Telegram Mini App
@@ -17,27 +18,13 @@ import { useEffect } from 'react';
  */
 export function useTelegramClosingBehavior(enabled: boolean = true) {
   useEffect(() => {
-    // Проверка на серверной стороне (SSR)
-    if (typeof window === 'undefined') {
-      return;
-    }
-
-    // Проверка наличия Telegram Web App API
-    if (!window.Telegram?.WebApp) {
-      return;
-    }
-
-    const tg = window.Telegram.WebApp;
-
     try {
-      // Включить подтверждение закрытия
-      if (enabled) {
-        tg.setupClosingBehavior(true);
-      } else {
-        tg.setupClosingBehavior(false);
-      }
-    } catch (error) {
-      console.error('Ошибка при настройке поведения закрытия Telegram Mini App:', error);
+      init();
+      closingBehavior.mount();
+      closingBehavior.enableConfirmation();
+      console.log("Enable `closingBehavior.enableConfirmation()` for telegram mini app");
+    } catch (e) {
+      console.error("Can't enable tg mini app `closingBehavior.enableConfirmation()` cause", e);
     }
   }, [enabled]);
 }
