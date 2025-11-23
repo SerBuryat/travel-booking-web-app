@@ -8,9 +8,12 @@ import { useEffect } from 'react';
  */
 export function YandexMetricaScript() {
   useEffect(() => {
+    console.log("Загружаем Яндекс Метрику")
     const metricaId = parseInt(process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || '0');
+    console.log("metcricId: " + metricaId)
     
     if (metricaId > 0 && typeof window !== 'undefined') {
+      console.log("Загружаем 'yandex-metrica-script'")
       // Проверяем, не загружен ли уже скрипт
       if (document.getElementById('yandex-metrica-script')) {
         return;
@@ -41,6 +44,7 @@ export function YandexMetricaScript() {
       const noscript = document.createElement('noscript');
       noscript.innerHTML = `<div><img src="https://mc.yandex.ru/watch/${metricaId}" style="position:absolute; left:-9999px;" alt="" /></div>`;
       document.body.appendChild(noscript);
+      console.log("'yandex-metrica-script' загружен!")
     }
   }, []);
 
