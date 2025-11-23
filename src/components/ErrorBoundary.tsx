@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
-import { usePostHog } from '@posthog/react';
+import { MetricaErrorTracker } from '@/lib/metrica';
 import Link from 'next/link';
 import { PAGE_ROUTES } from '@/utils/routes';
 
@@ -71,35 +71,18 @@ interface ErrorBoundaryProps {
 
 /**
  * Глобальный Error Boundary для перехвата ошибок рендеринга React компонентов
- * Автоматически отправляет ошибки в PostHog
+ * Автоматически отправляет ошибки в Yandex Metrica
  */
 export function ErrorBoundary({ children }: ErrorBoundaryProps) {
-  const posthog = usePostHog();
-
-  // Проверяем, нужно ли отправлять логи в PostHog
-  const shouldLogToPostHog = (): boolean => {
-    const nodeEnv = process.env.NODE_ENV;
-    const logsFor = process.env.NEXT_PUBLIC_POST_HOG_LOGS_FOR;
-
-    if (!nodeEnv || !logsFor) {
-      return false;
-    }
-
-    const allowedEnvs = logsFor.split(',').map(env => env.trim().toLowerCase());
-    return allowedEnvs.includes(nodeEnv.toLowerCase());
-  };
-
   const handleError = (error: Error, errorInfo: { componentStack: string }) => {
     // Логируем в консоль для отладки
     console.error('ErrorBoundary caught an error:', error, errorInfo);
 
-    // Отправляем ошибку в PostHog, если нужно
-    if (shouldLogToPostHog() && posthog) {
-      posthog.captureException(error, {
-        $exception_type: 'react_error_boundary',
-        $exception_message: error.message,
-        $exception_stack: error.stack,
+    // Отправляем ошибку в Yandex Metrica, если нужно
+    if (MetricaErrorTracker.shouldLog()) {
+      MetricaErrorTracker.captureError(error, {
         componentStack: errorInfo.componentStack,
+        error_type: 'react_error_boundary',
       });
     }
   };

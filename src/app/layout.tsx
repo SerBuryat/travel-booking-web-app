@@ -6,7 +6,8 @@ import {AuthProvider} from "@/contexts/AuthContext";
 import {CurrentLocation} from "@/components/location/current/CurrentLocation";
 import {TelegramClosingHandler} from "@/components/TelegramClosingHandler";
 import {ErrorBoundary} from "@/components/ErrorBoundary";
-import {PostHogProvider} from "./providers";
+import {MetricaProviderWrapper} from "./providers";
+import {YandexMetricaScript} from "@/components/YandexMetricaScript";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
@@ -20,10 +21,13 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const metricaId = parseInt(process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || '0');
+
   return (
     <html lang="en" className="">
       <body className={inter.className}>
-        <PostHogProvider>
+        <YandexMetricaScript />
+        <MetricaProviderWrapper>
           <ErrorBoundary>
             <AuthProvider>
               <TelegramClosingHandler />
@@ -34,7 +38,7 @@ export default function RootLayout({
               <Footer />
             </AuthProvider>
           </ErrorBoundary>
-        </PostHogProvider>
+        </MetricaProviderWrapper>
       </body>
     </html>
   );
