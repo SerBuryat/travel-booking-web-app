@@ -21,7 +21,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const metricaId = parseInt(process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || '0');
+  const metrikaId = parseInt(process.env.NEXT_PUBLIC_YANDEX_METRICA_ID || '0');
+  console.log("Yandex Metrika id: " + metrikaId)
 
   return (
     <html lang="en" className="">
