@@ -7,6 +7,7 @@ import {DeveloperLink} from '@/components/DeveloperLink';
 import {popularServices} from "@/lib/service/searchServices";
 import {PAGE_ROUTES} from "@/utils/routes";
 import {parentCategories} from "@/lib/category/searchCategories";
+import {PostHogTest} from './PostHogTest';
 
 // Принудительно делаем страницу динамической
 export const dynamic = 'force-dynamic';
@@ -48,6 +49,9 @@ export default async function HomePage() {
           <DeveloperLink />
         </div>
       </div>
+      
+      {/* Компонент для тестирования PostHog */}
+      <PostHogTest />
     </div>
   );
 } 

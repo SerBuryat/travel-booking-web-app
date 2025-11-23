@@ -1,114 +1,115 @@
 'use client';
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import posthog from 'posthog-js';
+import React from 'react';
+import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
+import { usePostHog } from '@posthog/react';
 import Link from 'next/link';
 import { PAGE_ROUTES } from '@/utils/routes';
 
-interface Props {
-  children: ReactNode;
+interface ErrorFallbackProps {
+  error: Error;
+  resetErrorBoundary: () => void;
 }
 
-interface State {
-  hasError: boolean;
-  error: Error | null;
+/**
+ * Компонент для отображения ошибки при падении приложения
+ */
+function ErrorFallback({ error, resetErrorBoundary }: ErrorFallbackProps) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col items-center justify-center p-4">
+      <div className="max-w-md mx-auto text-center">
+        <div className="text-6xl mb-6">😅</div>
+        
+        <h1 className="text-2xl font-bold text-gray-800 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
+          Упс! Что-то пошло не так
+        </h1>
+        
+        <p className="text-gray-600 mb-8 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
+          Произошла непредвиденная ошибка. Мы уже работаем над решением этой проблемы.
+        </p>
+
+        {process.env.NODE_ENV === 'development' && error && (
+          <details className="mb-6 text-left bg-red-50 p-4 rounded-lg">
+            <summary className="cursor-pointer font-semibold text-red-800 mb-2">
+              Детали ошибки (только в development)
+            </summary>
+            <pre className="text-xs text-red-700 overflow-auto">
+              {error.toString()}
+              {error.stack && `\n\n${error.stack}`}
+            </pre>
+          </details>
+        )}
+        
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => {
+              resetErrorBoundary();
+              window.location.reload();
+            }}
+            className="inline-flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            🔄 Перезагрузить страницу
+          </button>
+          
+          <Link 
+            href={PAGE_ROUTES.HOME}
+            className="inline-flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+            style={{ fontFamily: 'Inter, sans-serif' }}
+          >
+            🏠 Вернуться на главную
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
 }
 
 /**
  * Глобальный Error Boundary для перехвата ошибок рендеринга React компонентов
  * Автоматически отправляет ошибки в PostHog
  */
-export class ErrorBoundary extends Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    this.state = {
-      hasError: false,
-      error: null,
-    };
-  }
+export function ErrorBoundary({ children }: ErrorBoundaryProps) {
+  const posthog = usePostHog();
 
-  static getDerivedStateFromError(error: Error): State {
-    return {
-      hasError: true,
-      error,
-    };
-  }
-
-  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Проверяем, нужно ли отправлять логи в PostHog
+  // Проверяем, нужно ли отправлять логи в PostHog
+  const shouldLogToPostHog = (): boolean => {
     const nodeEnv = process.env.NODE_ENV;
     const logsFor = process.env.NEXT_PUBLIC_POST_HOG_LOGS_FOR;
 
-    if (nodeEnv && logsFor) {
-      const allowedEnvs = logsFor.split(',').map(env => env.trim().toLowerCase());
-      if (allowedEnvs.includes(nodeEnv.toLowerCase())) {
-        // Отправляем ошибку в PostHog с дополнительным контекстом
-        posthog.captureException(error, {
-          $exception_type: 'react_error_boundary',
-          $exception_message: error.message,
-          $exception_stack: error.stack,
-          componentStack: errorInfo.componentStack,
-        });
-      }
+    if (!nodeEnv || !logsFor) {
+      return false;
     }
 
+    const allowedEnvs = logsFor.split(',').map(env => env.trim().toLowerCase());
+    return allowedEnvs.includes(nodeEnv.toLowerCase());
+  };
+
+  const handleError = (error: Error, errorInfo: { componentStack: string }) => {
     // Логируем в консоль для отладки
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-  }
 
-  render() {
-    if (this.state.hasError) {
-      return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col items-center justify-center p-4">
-          <div className="max-w-md mx-auto text-center">
-            <div className="text-6xl mb-6">😅</div>
-            
-            <h1 className="text-2xl font-bold text-gray-800 mb-4" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Упс! Что-то пошло не так
-            </h1>
-            
-            <p className="text-gray-600 mb-8 leading-relaxed" style={{ fontFamily: 'Inter, sans-serif' }}>
-              Произошла непредвиденная ошибка. Мы уже работаем над решением этой проблемы.
-            </p>
-
-            {process.env.NODE_ENV === 'development' && this.state.error && (
-              <details className="mb-6 text-left bg-red-50 p-4 rounded-lg">
-                <summary className="cursor-pointer font-semibold text-red-800 mb-2">
-                  Детали ошибки (только в development)
-                </summary>
-                <pre className="text-xs text-red-700 overflow-auto">
-                  {this.state.error.toString()}
-                  {this.state.error.stack && `\n\n${this.state.error.stack}`}
-                </pre>
-              </details>
-            )}
-            
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={() => {
-                  this.setState({ hasError: false, error: null });
-                  window.location.reload();
-                }}
-                className="inline-flex items-center justify-center px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                🔄 Перезагрузить страницу
-              </button>
-              
-              <Link 
-                href={PAGE_ROUTES.HOME}
-                className="inline-flex items-center justify-center px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
-                style={{ fontFamily: 'Inter, sans-serif' }}
-              >
-                🏠 Вернуться на главную
-              </Link>
-            </div>
-          </div>
-        </div>
-      );
+    // Отправляем ошибку в PostHog, если нужно
+    if (shouldLogToPostHog() && posthog) {
+      posthog.captureException(error, {
+        $exception_type: 'react_error_boundary',
+        $exception_message: error.message,
+        $exception_stack: error.stack,
+        componentStack: errorInfo.componentStack,
+      });
     }
+  };
 
-    return this.props.children;
-  }
+  return (
+    <ReactErrorBoundary
+      FallbackComponent={ErrorFallback}
+      onError={handleError}
+    >
+      {children}
+    </ReactErrorBoundary>
+  );
 }
-
