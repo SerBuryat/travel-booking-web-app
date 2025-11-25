@@ -6,8 +6,7 @@ import {AuthProvider} from "@/contexts/AuthContext";
 import {CurrentLocation} from "@/components/location/current/CurrentLocation";
 import {TelegramClosingHandler} from "@/components/TelegramClosingHandler";
 import {ErrorBoundary} from "@/components/ErrorBoundary";
-import {MetricaProviderWrapper} from "./providers";
-import {YandexMetricaScript} from "@/components/YandexMetricaScript";
+import {LogsProvider} from "@/components/LogsProvider";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
@@ -24,9 +23,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="">
       <body className={inter.className}>
-        <YandexMetricaScript />
-        <MetricaProviderWrapper>
-          <ErrorBoundary>
+        <ErrorBoundary>
+          <LogsProvider>
             <AuthProvider>
               <TelegramClosingHandler />
               <CurrentLocation/>
@@ -35,8 +33,8 @@ export default function RootLayout({
               </main>
               <Footer />
             </AuthProvider>
-          </ErrorBoundary>
-        </MetricaProviderWrapper>
+          </LogsProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

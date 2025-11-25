@@ -2,9 +2,9 @@
 
 import React from 'react';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
-import { MetricaErrorTracker } from '@/lib/metrica';
 import Link from 'next/link';
 import { PAGE_ROUTES } from '@/utils/routes';
+import { sendClientLog } from '@/lib/logsSender/clientLogger';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -71,20 +71,18 @@ interface ErrorBoundaryProps {
 
 /**
  * Глобальный Error Boundary для перехвата ошибок рендеринга React компонентов
- * Автоматически отправляет ошибки в Yandex Metrica
  */
 export function ErrorBoundary({ children }: ErrorBoundaryProps) {
   const handleError = (error: Error, errorInfo: { componentStack: string }) => {
     // Логируем в консоль для отладки
     console.error('ErrorBoundary caught an error:', error, errorInfo);
 
-    // Отправляем ошибку в Yandex Metrica, если нужно
-    if (MetricaErrorTracker.shouldLog()) {
-      MetricaErrorTracker.captureError(error, {
-        componentStack: errorInfo.componentStack,
-        error_type: 'react_error_boundary',
-      });
-    }
+    // Отправляем ошибку в сервис логирования
+    sendClientLog(error, 'react_error_boundary', {
+      componentStack: errorInfo.componentStack,
+    }).catch(() => {
+      // Игнорируем ошибки отправки логов, чтобы избежать зацикливания
+    });
   };
 
   return (
