@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 export interface PhotoItem {
   id: string;
@@ -12,7 +12,7 @@ export interface PhotoItem {
 }
 
 const MAX_PHOTOS = 10;
-const MAX_FILE_SIZE_MB = 10; // Максимальный размер файла в MB
+export const MAX_FILE_SIZE_MB = 10; // Максимальный размер всех новых фото за один раз в MB
 
 interface UseServicePhotosOptions {
   initialPhotos?: PhotoItem[];
@@ -23,6 +23,7 @@ interface UseServicePhotosReturn {
   photos: PhotoItem[];
   primaryPhotoId: string | null;
   error: string | null;
+  isSizeLimitExceeded: boolean; // Флаг превышения лимита размера всех новых фото
   setPhotos: (photos: PhotoItem[]) => void;
   addPhotos: (files: FileList | null) => void;
   removePhoto: (id: string) => void;
@@ -67,7 +68,8 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
   }, []);
 
   /**
-   * Валидация размера файла
+   * Валидация размера файла (устаревший метод, теперь проверяем общий размер)
+   * Оставлен для обратной совместимости, но не используется в addPhotos
    */
   const validateFileSize = useCallback((file: File): boolean => {
     const fileSizeMB = file.size / 1024 / 1024;
@@ -105,10 +107,14 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
     }
 
     // Валидация новых фото (не существующих)
-    photos.filter(p => !p.isExisting && p.file).forEach((photo) => {
-      if (photo.file && !validateFileSize(photo.file)) {
-        errors.push(`Фото "${photo.file.name}" превышает максимальный размер ${MAX_FILE_SIZE_MB}MB`);
-      }
+    const newPhotos = photos.filter(p => !p.isExisting && p.file);
+    const totalSizeMB = newPhotos.reduce((sum, p) => sum + (p.file ? p.file.size : 0), 0) / 1024 / 1024;
+    
+    if (totalSizeMB > MAX_FILE_SIZE_MB) {
+      errors.push(`Общий размер всех новых фото (${totalSizeMB.toFixed(2)} MB) превышает максимальный лимит ${MAX_FILE_SIZE_MB} MB`);
+    }
+    
+    newPhotos.forEach((photo) => {
       if (photo.file && !validateFileType(photo.file)) {
         errors.push(`Файл "${photo.file.name}" не является изображением`);
       }
@@ -141,33 +147,41 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
     let firstValidPhotoId: string | null = null;
     const newPhotos: PhotoItem[] = [];
     const processedFileNames = new Set<string>();
+    const validFiles: File[] = [];
 
+    // Первый проход: валидация всех файлов и проверка общего размера
     for (const file of filesToProcess) {
       // Валидация типа файла
       if (!validateFileType(file)) {
         setError(`Файл "${file.name}" не является изображением`);
-        continue;
-      }
-
-      // Валидация размера файла
-      if (!validateFileSize(file)) {
-        setError(`Файл "${file.name}" превышает максимальный размер ${MAX_FILE_SIZE_MB}MB`);
-        continue;
+        return;
       }
 
       // Валидация дубликатов: проверка с уже существующими фото
       if (!validateFileNameDuplicate(file.name, photos)) {
         setError(`Фото с именем "${file.name}" уже существует`);
-        continue;
+        return;
       }
 
       // Валидация дубликатов: проверка внутри добавляемых файлов
       if (processedFileNames.has(file.name)) {
         setError(`Фото с именем "${file.name}" уже выбрано для загрузки`);
-        continue;
+        return;
       }
 
       processedFileNames.add(file.name);
+      validFiles.push(file);
+    }
+
+    // Проверка общего размера всех файлов за один раз
+    const totalSizeMB = validFiles.reduce((sum, file) => sum + file.size, 0) / 1024 / 1024;
+    if (totalSizeMB > MAX_FILE_SIZE_MB) {
+      setError(`Общий размер всех выбранных фото (${totalSizeMB.toFixed(2)} MB) превышает максимальный лимит ${MAX_FILE_SIZE_MB} MB`);
+      return;
+    }
+
+    // Второй проход: обработка валидных файлов
+    for (const file of validFiles) {
 
       const id = `${Date.now()}-${Math.random()}`;
 
@@ -286,10 +300,18 @@ export const useServicePhotos = (options: UseServicePhotosOptions = {}): UseServ
     return { existing, new: newPhotos };
   }, [photos, extractFileNameFromUrl]);
 
+  // Вычисляем, превышен ли лимит размера для всех новых фото
+  const isSizeLimitExceeded = useMemo(() => {
+    const newPhotos = photos.filter(p => !p.isExisting && p.file);
+    const totalSizeMB = newPhotos.reduce((sum, p) => sum + (p.file ? p.file.size : 0), 0) / 1024 / 1024;
+    return totalSizeMB > MAX_FILE_SIZE_MB;
+  }, [photos]);
+
   return {
     photos,
     primaryPhotoId,
     error,
+    isSizeLimitExceeded,
     setPhotos,
     addPhotos,
     removePhoto,
