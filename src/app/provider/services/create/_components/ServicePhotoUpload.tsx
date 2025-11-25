@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import { PhotoItem } from '@/lib/service/hooks/useServicePhotos';
+import { PhotoItem, MAX_FILE_SIZE_MB } from '@/lib/service/hooks/useServicePhotos';
 
 const MAX_PHOTOS = 10;
 
@@ -65,22 +65,58 @@ export const ServicePhotoUpload: React.FC<ServicePhotoUploadProps> = ({
   };
 
   const canAddMore = photos.length < MAX_PHOTOS;
+  const progressPercentage = (photos.length / MAX_PHOTOS) * 100;
+  
+  // Вычисляем общий размер всех новых фото (не существующих)
+  const totalSizeMB = photos
+    .filter(p => p.file && !p.isExisting)
+    .reduce((sum, p) => sum + (p.file ? p.file.size : 0), 0) / 1024 / 1024;
+  
+  const sizePercentage = Math.min((totalSizeMB / MAX_FILE_SIZE_MB) * 100, 100);
 
   return (
     <div className="space-y-4">
-      {/* Счетчик фото */}
+      {/* Визуальная шкала заполнения */}
       {photos.length > 0 && (
-        <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm font-medium text-blue-700">
-            Загружено: {photos.length} / {MAX_PHOTOS} фото
-          </p>
-          <button
-            type="button"
-            onClick={handleClearAll}
-            className="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
-          >
-            Очистить
-          </button>
+        <div className="space-y-2">
+          {/* Количество фото */}
+          <div className="flex items-center justify-between text-xs text-gray-600">
+            <span>Фото: {photos.length}/{MAX_PHOTOS}</span>
+            <button
+              type="button"
+              onClick={handleClearAll}
+              className="px-2.5 py-1 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 border border-red-200 rounded-md transition-colors"
+            >
+              Очистить все
+            </button>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+            <div
+              className="h-full bg-blue-500 rounded-full transition-all duration-300"
+              style={{ width: `${Math.min(progressPercentage, 100)}%` }}
+            />
+          </div>
+          
+          {/* Размер новых фото */}
+          {totalSizeMB > 0 && (
+            <>
+              <div className="flex items-center justify-between text-xs text-gray-600">
+                <span>Размер: {totalSizeMB.toFixed(1)}/{MAX_FILE_SIZE_MB} MB</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-300 ${
+                    totalSizeMB >= MAX_FILE_SIZE_MB 
+                      ? 'bg-red-500' 
+                      : totalSizeMB >= MAX_FILE_SIZE_MB * 0.8
+                      ? 'bg-orange-500'
+                      : 'bg-green-500'
+                  }`}
+                  style={{ width: `${sizePercentage}%` }}
+                />
+              </div>
+            </>
+          )}
         </div>
       )}
 
@@ -266,11 +302,11 @@ export const ServicePhotoUpload: React.FC<ServicePhotoUploadProps> = ({
                 />
               </svg>
             </div>
-            <p className="text-gray-600 font-medium mb-1">
+            <p className="text-gray-600 font-medium mb-1 text-sm">
               {isDragging ? 'Отпустите для загрузки' : 'Нажмите или перетащите фото'}
             </p>
-            <p className="text-sm text-gray-400">
-              Можно загрузить до {MAX_PHOTOS - photos.length} фото. Форматы: JPG, PNG, WEBP
+            <p className="text-xs text-gray-400">
+              До {MAX_PHOTOS - photos.length} фото, до {MAX_FILE_SIZE_MB} MB
             </p>
           </div>
         </div>
