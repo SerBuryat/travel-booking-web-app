@@ -6,6 +6,7 @@ import {AuthProvider} from "@/contexts/AuthContext";
 import {CurrentLocation} from "@/components/location/current/CurrentLocation";
 import {TelegramClosingHandler} from "@/components/TelegramClosingHandler";
 import {ErrorBoundary} from "@/components/ErrorBoundary";
+import {LogsProvider} from "@/components/LogsProvider";
 
 const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
@@ -23,14 +24,16 @@ export default function RootLayout({
     <html lang="en" className="">
       <body className={inter.className}>
         <ErrorBoundary>
-          <AuthProvider>
-            <TelegramClosingHandler />
-            <CurrentLocation/>
-            <main className="pb-20">
-              {children}
-            </main>
-            <Footer />
-          </AuthProvider>
+          <LogsProvider>
+            <AuthProvider>
+              <TelegramClosingHandler />
+              <CurrentLocation/>
+              <main className="pb-20">
+                {children}
+              </main>
+              <Footer />
+            </AuthProvider>
+          </LogsProvider>
         </ErrorBoundary>
       </body>
     </html>

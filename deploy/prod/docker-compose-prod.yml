@@ -9,10 +9,6 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
-        - NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST}
-        - NEXT_PUBLIC_POST_HOG_LOGS_FOR=${NEXT_PUBLIC_POST_HOG_LOGS_FOR}
     environment:
       # Application
       - APPLICATION_NAME=${APPLICATION_NAME}
@@ -49,10 +45,9 @@ services:
       - OBJECT_STORAGE_BUCKET_NAME=${OBJECT_STORAGE_BUCKET_NAME}
       - OBJECT_STORAGE_BUCKET_ENDPOINT=${OBJECT_STORAGE_BUCKET_ENDPOINT}
       - OBJECT_STORAGE_TENANT_ID=${OBJECT_STORAGE_TENANT_ID}
-      # PostHog
-      - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
-      - NEXT_PUBLIC_POSTHOG_HOST=${NEXT_PUBLIC_POSTHOG_HOST}
-      - NEXT_PUBLIC_POST_HOG_LOGS_FOR=${NEXT_PUBLIC_POST_HOG_LOGS_FOR}
+      # Logger Service Configuration
+      - LOGGER_URL=${LOGGER_URL}
+      - LOGGER_CHAT_ID=${LOGGER_CHAT_ID}
     env_file:
       - .env
     restart: unless-stopped
