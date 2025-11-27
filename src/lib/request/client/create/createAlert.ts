@@ -42,52 +42,63 @@ async function getBidData(bidId: number): Promise<BidData> {
 }
 
 /**
- * Get providers in the specified area
+ * Находит активные сервисы для заявки по области и категории
+ * Объединяет логику поиска активных провайдеров в области и сервисов по категории
+ * 
+ * @param areaId - ID области (tarea_id), где должна быть локация сервиса
+ * @param categoryId - ID категории заявки (может быть null)
+ * @returns Массив активных сервисов с id и provider_id
+ * 
+ * Условия поиска:
+ * 1. Сервис активен (active: true)
+ * 2. Провайдер сервиса активен (tproviders.status: 'active')
+ * 3. У сервиса есть хотя бы одна локация в нужной области (tlocations.tarea_id: areaId)
+ * 4. Категория сервиса точно совпадает с categoryId ИЛИ является дочерней категорией
+ *    (tcategories_id: categoryId ИЛИ tcategories.parent_id: categoryId)
  */
-async function getActiveProvidersInArea(areaId: number): Promise<number[]> {
-  const providers = await prisma.tproviders.findMany({
-    where: {
-      status: 'active',
-      tclients: {
-        tarea_id: areaId
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  return providers.map(provider => provider.id);
-}
-
-/**
- * Get services by category and provider IDs
- * Searches for services where category matches exactly or is a child of the specified category
- */
-async function getServicesByCategoryAndProviders(
-  categoryId: number | null,
-  providerIds: number[]
+async function activeServicesForBid(
+  areaId: number,
+  categoryId: number | null
 ): Promise<ServiceData[]> {
-  if (!categoryId || providerIds.length === 0) {
+  // Если категория не указана, сервисы не найдены
+  if (!categoryId) {
     return [];
   }
 
   return prisma.tservices.findMany({
     where: {
+      // Условие 1: Сервис должен быть активным
+      active: true,
+      status: 'published',
+      
+      // Условие 2: Провайдер сервиса должен быть активным
+      // Проверяем через связь tproviders
+      tproviders: {
+        status: 'active',
+      },
+      
+      // Условие 3: У сервиса должна быть хотя бы одна локация в нужной области
+      // Проверяем через связь tlocations
+      tlocations: {
+        some: {
+          tarea_id: areaId,
+        },
+      },
+      
+      // Условие 4: Категория сервиса должна совпадать с categoryId или быть дочерней
+      // Используем OR для двух вариантов:
       OR: [
-        // Exact category match
-        {tcategories_id: categoryId},
-        // Child category match
+        // Вариант 4.1: Точное совпадение категории
+        {
+          tcategories_id: categoryId,
+        },
+        // Вариант 4.2: Категория сервиса является дочерней (parent_id = categoryId)
         {
           tcategories: {
             parent_id: categoryId,
           },
         },
       ],
-      provider_id: {
-        in: providerIds,
-      },
-      active: true,
     },
     select: {
       id: true,
@@ -145,23 +156,20 @@ export async function createAlert(bidId: number): Promise<void> {
       return;
     }
 
-    // Get providers in the bid's area
-    const providerIds = await getActiveProvidersInArea(bidData.tarea_id);
-
-    console.log(`Получены поставщики в области: ${providerIds}`);
-
-    // If no providers in area, no alerts to create
-    if (providerIds.length === 0) {
-      return;
-    }
-
-    // Get services matching category and providers
-    const services = await getServicesByCategoryAndProviders(
-      bidData.tcategories_id,
-      providerIds
+    // Get active services matching category, area, and active providers
+    // Объединенный запрос: находит активные сервисы с активными провайдерами
+    // в нужной области и подходящей категории
+    const services = await activeServicesForBid(
+      bidData.tarea_id,
+      bidData.tcategories_id
     );
 
     console.log(`Получены услуги: ${JSON.stringify(services)}`);
+
+    // If no services found, no alerts to create
+    if (services.length === 0) {
+      return;
+    }
 
     // Create alert records and get their IDs
     const alertIds = await createAlertRecords(bidId, services);
