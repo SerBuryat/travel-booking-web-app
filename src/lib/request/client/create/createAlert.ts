@@ -9,6 +9,7 @@ import { createNewAlertNotificationForProviders } from '@/lib/notifications/crea
 interface BidData {
   tcategories_id: number | null;
   tarea_id: number;
+  tclients_id: number;
 }
 
 /**
@@ -20,7 +21,7 @@ interface ServiceData {
 }
 
 /**
- * Get bid data by ID - category and area information
+ * Get bid data by ID - category, area, and client information
  */
 async function getBidData(bidId: number): Promise<BidData> {
   const bid = await prisma.tbids.findUnique({
@@ -28,6 +29,7 @@ async function getBidData(bidId: number): Promise<BidData> {
     select: {
       tcategories_id: true,
       tarea_id: true,
+      tclients_id: true,
     },
   });
 
@@ -38,56 +40,72 @@ async function getBidData(bidId: number): Promise<BidData> {
   return {
     tcategories_id: bid.tcategories_id,
     tarea_id: bid.tarea_id,
+    tclients_id: bid.tclients_id,
   };
 }
 
 /**
- * Get providers in the specified area
+ * Находит активные сервисы для заявки по области и категории
+ * Объединяет логику поиска активных провайдеров в области и сервисов по категории
+ * 
+ * @param bidData - Данные заявки (area, category, client)
+ * @returns Массив активных сервисов с id и provider_id
+ * 
+ * Условия поиска:
+ * 1. Сервис активен (active: true) и опубликован (status: 'published')
+ * 2. Провайдер сервиса активен (tproviders.status: 'active')
+ * 3. Провайдер сервиса НЕ является тем же клиентом, что создал заявку
+ *    (tproviders.tclients_id !== bidData.tclients_id)
+ * 4. У сервиса есть хотя бы одна локация в нужной области (tlocations.tarea_id: areaId)
+ * 5. Категория сервиса точно совпадает с categoryId ИЛИ является дочерней категорией
+ *    (tcategories_id: categoryId ИЛИ tcategories.parent_id: categoryId)
  */
-async function getActiveProvidersInArea(areaId: number): Promise<number[]> {
-  const providers = await prisma.tproviders.findMany({
-    where: {
-      status: 'active',
-      tclients: {
-        tarea_id: areaId
-      },
-    },
-    select: {
-      id: true,
-    },
-  });
-
-  return providers.map(provider => provider.id);
-}
-
-/**
- * Get services by category and provider IDs
- * Searches for services where category matches exactly or is a child of the specified category
- */
-async function getServicesByCategoryAndProviders(
-  categoryId: number | null,
-  providerIds: number[]
+async function activeServicesForBid(
+  bidData: BidData
 ): Promise<ServiceData[]> {
-  if (!categoryId || providerIds.length === 0) {
+  // Если категория не указана, сервисы не найдены
+  if (!bidData.tcategories_id) {
     return [];
   }
 
   return prisma.tservices.findMany({
     where: {
+      // Условие 1: Сервис должен быть активным и опубликованным
+      active: true,
+      status: 'published',
+      
+      // Условие 2: Провайдер сервиса должен быть активным
+      // Условие 3: Провайдер сервиса НЕ должен быть тем же клиентом, что создал заявку
+      // Проверяем через связь tproviders
+      tproviders: {
+        status: 'active',
+        tclients_id: {
+          not: bidData.tclients_id, // Исключаем сервисы от самого клиента
+        },
+      },
+      
+      // Условие 4: У сервиса должна быть хотя бы одна локация в нужной области
+      // Проверяем через связь tlocations
+      tlocations: {
+        some: {
+          tarea_id: bidData.tarea_id,
+        },
+      },
+      
+      // Условие 5: Категория сервиса должна совпадать с categoryId или быть дочерней
+      // Используем OR для двух вариантов:
       OR: [
-        // Exact category match
-        {tcategories_id: categoryId},
-        // Child category match
+        // Вариант 5.1: Точное совпадение категории
+        {
+          tcategories_id: bidData.tcategories_id,
+        },
+        // Вариант 5.2: Категория сервиса является дочерней (parent_id = categoryId)
         {
           tcategories: {
-            parent_id: categoryId,
+            parent_id: bidData.tcategories_id,
           },
         },
       ],
-      provider_id: {
-        in: providerIds,
-      },
-      active: true,
     },
     select: {
       id: true,
@@ -145,23 +163,18 @@ export async function createAlert(bidId: number): Promise<void> {
       return;
     }
 
-    // Get providers in the bid's area
-    const providerIds = await getActiveProvidersInArea(bidData.tarea_id);
-
-    console.log(`Получены поставщики в области: ${providerIds}`);
-
-    // If no providers in area, no alerts to create
-    if (providerIds.length === 0) {
-      return;
-    }
-
-    // Get services matching category and providers
-    const services = await getServicesByCategoryAndProviders(
-      bidData.tcategories_id,
-      providerIds
-    );
+    // Get active services matching category, area, and active providers
+    // Объединенный запрос: находит активные сервисы с активными провайдерами
+    // в нужной области и подходящей категории
+    // Исключает сервисы от самого клиента, создавшего заявку
+    const services = await activeServicesForBid(bidData);
 
     console.log(`Получены услуги: ${JSON.stringify(services)}`);
+
+    // If no services found, no alerts to create
+    if (services.length === 0) {
+      return;
+    }
 
     // Create alert records and get their IDs
     const alertIds = await createAlertRecords(bidId, services);
