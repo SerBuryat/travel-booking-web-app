@@ -3,6 +3,7 @@ import {Header} from '@/components/Header';
 import {SearchBarWrapper} from '@/components/SearchBarWrapper';
 import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
 import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
+import {AreaArticlesComponent} from '@/components/AreaArticlesComponent';
 import {DeveloperLink} from '@/components/DeveloperLink';
 import {popularServices} from "@/lib/service/searchServices";
 import {PAGE_ROUTES} from "@/utils/routes";
@@ -39,6 +40,9 @@ export default async function HomePage() {
             }}
           />
         </div>
+
+        {/* Статьи по району */}
+        <AreaArticlesComponent />
 
         {/* Кнопки Registry service и Private policy */}
         <div className="flex flex-col items-center space-y-3 pt-10">
