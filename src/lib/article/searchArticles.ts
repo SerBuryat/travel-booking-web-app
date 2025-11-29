@@ -2,7 +2,6 @@
 
 import { prisma } from '@/lib/db/prisma';
 import { currentLocation } from '@/lib/location/currentLocation';
-import ogs from 'open-graph-scraper';
 
 /**
  * Дефолтное описание для статей, если не удалось получить описание с сайта
@@ -162,6 +161,8 @@ export async function searchArticles(): Promise<ArticleType[]> {
  */
 async function fetchArticlesData(url: string): Promise<ArticleData | null> {
   try {
+    // Динамический импорт для избежания проблем с SSR/SSG
+    const ogs = (await import('open-graph-scraper')).default;
     const { result } = await ogs({
       url,
       timeout: 10000, // 10 секунд таймаут
