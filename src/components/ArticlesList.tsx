@@ -54,9 +54,11 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({ articles }) => {
 
 /**
  * Компонент карточки статьи.
- * Вдохновлен HorizontalViewServiceComponent по дизайну.
  */
 const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ article, index }) => {
+  // Константа: максимальное количество символов на всю карточку
+  const MAX_CARD_CHARS = 115;
+
   const handleClick = () => {
     window.open(article.url, '_blank', 'noopener,noreferrer');
   };
@@ -79,6 +81,15 @@ const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ articl
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   };
+
+  // Вычисляем доступное количество символов для описания
+  const titleLength = article.title?.length || 0;
+  const availableCharsForDescription = Math.max(0, MAX_CARD_CHARS - titleLength);
+  
+  // Если заголовок >= 200 символов, показываем "Это интересно!" вместо описания
+  const descriptionText = titleLength >= MAX_CARD_CHARS 
+    ? 'Это интересно!' 
+    : truncateText(article.description || '', availableCharsForDescription);
 
   const imageStyle = article.image
     ? {
@@ -109,9 +120,9 @@ const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ articl
           <div className="mb-2">
             <h3
               className="text-black font-semibold mb-1"
-              style={{ fontWeight: 600, fontSize: '17px' }}
+              style={{ fontWeight: 600, fontSize: '15px' }}
             >
-              {truncateText(article.title, 50)}
+              {article.title}
             </h3>
           </div>
 
@@ -121,7 +132,7 @@ const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ articl
               className="text-xs leading-relaxed line-clamp-3"
               style={{ color: '#333333', fontWeight: 400 }}
             >
-              {truncateText(article.description, 100)}
+              {descriptionText}
             </p>
           </div>
 
