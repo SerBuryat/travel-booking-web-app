@@ -54,6 +54,7 @@ model tarea {
   created_at  DateTime?             @default(now()) @db.Timestamp(6)
   tarea       tarea?                @relation("tareaTotarea", fields: [parent_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   other_tarea tarea[]               @relation("tareaTotarea")
+  tarticles   tarticles[]
   tbids       tbids[]
   tclients    tclients[]
   tlocations  tlocations[]
@@ -121,6 +122,7 @@ model tclients {
   tarea             tarea?              @relation(fields: [tarea_id], references: [id], onUpdate: NoAction)
   tclients_auth     tclients_auth[]
   tclients_settings tclients_settings[]
+  tfeedbacks        tfeedbacks[]
   tproviders        tproviders[]
   treviews          treviews[]
   tservices_clicks  tservices_clicks[]
@@ -381,4 +383,40 @@ model ttemplate {
   text           String
   action_name    String           @db.VarChar(255)
   tnotifications tnotifications[]
+}
+
+model tarticles {
+  id          Int       @id @default(autoincrement())
+  url         String    @db.VarChar(255)
+  description String?
+  tarea_id    Int?
+  title       String?   @db.VarChar(255)
+  image       String?   @db.VarChar(500)
+  upload_time DateTime? @db.Timestamp(6)
+  is_active   Boolean?
+  comment     String?
+  priority    Int?
+  tarea       tarea?    @relation(fields: [tarea_id], references: [id], map: "fk_tarticles_area")
+
+  @@index([tarea_id], map: "idx_tarticles_area_id")
+  @@index([is_active, priority(sort: Desc)], map: "idx_tarticles_active_priority")
+  @@index([is_active, upload_time(sort: Desc)], map: "idx_tarticles_active_upload")
+  @@index([is_active], map: "idx_tarticles_is_active")
+  @@index([priority], map: "idx_tarticles_priority")
+  @@index([priority(sort: Desc), upload_time(sort: Desc)], map: "idx_tarticles_priority_upload")
+  @@index([title], map: "idx_tarticles_title")
+  @@index([upload_time], map: "idx_tarticles_upload_time")
+}
+
+model tfeedbacks {
+  id          Int       @id @default(autoincrement())
+  tclients_id Int
+  rating      Decimal?  @db.Decimal(3, 2)
+  comment     String?
+  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  status      String?   @default("created") @db.VarChar(50)
+  tclients    tclients  @relation(fields: [tclients_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_tfeedbacks_tclients")
+
+  @@index([status, created_at], map: "idx_tfeedbacks_status_created")
+  @@index([tclients_id], map: "idx_tfeedbacks_tclients_id")
 }
