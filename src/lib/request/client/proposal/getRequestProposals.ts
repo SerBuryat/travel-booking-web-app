@@ -13,6 +13,7 @@ export interface ProposalServiceItem {
 }
 
 export interface ProposalView {
+  id: number,
   provider: {
     id: number;
     company_name: string;
@@ -101,6 +102,7 @@ export async function getRequestProposals(requestId: number): Promise<RequestPro
     } else {
       // Создаем новую группу
       groupedProposals.set(groupKey, {
+        id: proposal.id,
         provider: {
           id: provider.id,
           company_name: provider.company_name,

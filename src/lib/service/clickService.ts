@@ -25,14 +25,18 @@ export interface CreateClickResult {
  * Создание или обновление клика клиента по сервису.
  * 
  * Логика работы:
- * - Если клик с такой парой (clientId, serviceId) уже существует, обновляется timestamp
+ * - Если клик с такой комбинацией (clientId, serviceId, tproposals_id) уже существует, обновляется timestamp
  * - Если клика нет, создается новая запись и увеличивается счетчик просмотров сервиса (view_count)
  * 
  * @param {number} serviceId - Идентификатор сервиса, по которому кликнул клиент
+ * @param {number|null} [tproposals_id=null] - Опциональный идентификатор предложения (proposal), связанного с кликом
  * @returns {Promise<CreateClickResult>} Результат операции с id и timestamp клика
  * @throws {Error} Если пользователь не авторизован
  */
-export async function createOrUpdateClick(serviceId: number): Promise<CreateClickResult> {
+export async function createOrUpdateClick(
+  serviceId: number,
+  tproposals_id: number | null = null
+): Promise<CreateClickResult> {
   // Проверяем авторизацию пользователя
   const userAuth = await getUserAuthOrThrow();
   const clientId = userAuth.userId;
@@ -42,12 +46,33 @@ export async function createOrUpdateClick(serviceId: number): Promise<CreateClic
     throw new Error('Invalid serviceId');
   }
 
-  // Ищем существующий клик по паре (clientId, serviceId)
+  // Проверяем валидность tproposals_id, если передан
+  if (tproposals_id !== null && !Number.isFinite(tproposals_id)) {
+    throw new Error('Invalid tproposals_id');
+  }
+
+  // Формируем условие поиска существующего клика
+  // Уникальность определяется комбинацией (clientId, serviceId, tproposals_id)
+  const whereCondition: {
+    tclients_id: number;
+    tservices_id: number;
+    tproposals_id?: number | null;
+  } = {
+    tclients_id: clientId,
+    tservices_id: serviceId,
+  };
+
+  // Если tproposals_id передан, добавляем его в условие поиска
+  // Если null, ищем запись где tproposals_id тоже null
+  if (tproposals_id !== null) {
+    whereCondition.tproposals_id = tproposals_id;
+  } else {
+    whereCondition.tproposals_id = null;
+  }
+
+  // Ищем существующий клик по комбинации (clientId, serviceId, tproposals_id)
   const existing = await prisma.tservices_clicks.findFirst({
-    where: { 
-      tclients_id: clientId, 
-      tservices_id: serviceId 
-    },
+    where: whereCondition,
   });
 
   // Если клик существует, обновляем timestamp
@@ -66,12 +91,24 @@ export async function createOrUpdateClick(serviceId: number): Promise<CreateClic
   // Если клика нет, создаем новую запись и увеличиваем счетчик просмотров
   // Используем транзакцию для атомарности операций
   const result = await prisma.$transaction(async (tx) => {
+    // Формируем данные для создания записи о клике
+    const clickData: {
+      tclients_id: number;
+      tservices_id: number;
+      tproposals_id?: number | null;
+    } = {
+      tclients_id: clientId,
+      tservices_id: serviceId,
+    };
+
+    // Если tproposals_id передан, добавляем его в данные
+    if (tproposals_id !== null) {
+      clickData.tproposals_id = tproposals_id;
+    }
+
     // Создаем запись о клике
     const created = await tx.tservices_clicks.create({
-      data: { 
-        tclients_id: clientId, 
-        tservices_id: serviceId 
-      },
+      data: clickData,
     });
 
     // Увеличиваем счетчик просмотров сервиса на 1

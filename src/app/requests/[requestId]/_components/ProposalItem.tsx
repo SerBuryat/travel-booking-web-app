@@ -37,10 +37,10 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
-  const handleContactClick = async (serviceId: number) => {
+  const handleContactClick = async (serviceId: number, proposalId: number) => {
     try {
       // Создаем или обновляем клик через server action
-      await createOrUpdateClick(serviceId);
+      await createOrUpdateClick(serviceId, proposalId);
       
       // Загружаем полную информацию о сервисе с контактами
       const fullService = await getServiceById(serviceId);
@@ -205,7 +205,7 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
             {/* Кнопки действий */}
             <div className="flex gap-3 px-4 pb-4">
               <button
-                onClick={() => handleContactClick(service.id)}
+                onClick={() => handleContactClick(service.id, proposal.id)}
                 className="flex-1 py-3 text-black rounded-full"
                 style={{ 
                   backgroundColor: '#95E59D', 
