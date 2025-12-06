@@ -26,7 +26,7 @@ export interface CreateClickResult {
  * 
  * Логика работы:
  * - Если клик с такой парой (clientId, serviceId) уже существует, обновляется timestamp
- * - Если клика нет, создается новая запись
+ * - Если клика нет, создается новая запись и увеличивается счетчик просмотров сервиса (view_count)
  * 
  * @param {number} serviceId - Идентификатор сервиса, по которому кликнул клиент
  * @returns {Promise<CreateClickResult>} Результат операции с id и timestamp клика
@@ -63,17 +63,33 @@ export async function createOrUpdateClick(serviceId: number): Promise<CreateClic
     };
   }
 
-  // Если клика нет, создаем новую запись
-  const created = await prisma.tservices_clicks.create({
-    data: { 
-      tclients_id: clientId, 
-      tservices_id: serviceId 
-    },
+  // Если клика нет, создаем новую запись и увеличиваем счетчик просмотров
+  // Используем транзакцию для атомарности операций
+  const result = await prisma.$transaction(async (tx) => {
+    // Создаем запись о клике
+    const created = await tx.tservices_clicks.create({
+      data: { 
+        tclients_id: clientId, 
+        tservices_id: serviceId 
+      },
+    });
+
+    // Увеличиваем счетчик просмотров сервиса на 1
+    await tx.tservices.update({
+      where: { id: serviceId },
+      data: {
+        view_count: {
+          increment: 1,
+        },
+      },
+    });
+
+    return created;
   });
 
   return {
-    id: created.id,
-    timestamp: created.timestamp,
+    id: result.id,
+    timestamp: result.timestamp,
   };
 }
 
