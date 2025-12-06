@@ -7,6 +7,7 @@ import { PAGE_ROUTES } from '@/utils/routes';
 import { ServiceTypeFull } from '@/model/ServiceType';
 import { getServiceById } from '@/lib/service/searchServices';
 import { createOrUpdateClick } from '@/lib/service/clickService';
+import ContactsModal from '@/components/ContactsModal';
 
 interface ProposalItemProps {
   proposal: ProposalView;
@@ -233,35 +234,11 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
       })}
 
       {/* Contacts Modal */}
-      {isModalOpen && selectedService && (
-        <div className="fixed inset-0 flex items-end sm:items-center justify-center" style={{ zIndex: 60 }}>
-          <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
-          <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-6 m-0 sm:m-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Контакты</h3>
-              <button onClick={closeModal} className="text-gray-500">✕</button>
-            </div>
-            {selectedService.contacts && selectedService.contacts.length > 0 ? (
-              <div className="space-y-3">
-                {selectedService.contacts.map((c) => (
-                  <div key={c.id} className="rounded-lg border border-gray-100 p-4">
-                    {c.phone && <div className="text-sm text-gray-700"><span className="font-medium">Телефон:</span> {c.phone}</div>}
-                    {c.email && <div className="text-sm text-gray-700"><span className="font-medium">Email:</span> {c.email}</div>}
-                    {c.tg_username && <div className="text-sm text-gray-700"><span className="font-medium">Telegram:</span> @{c.tg_username}</div>}
-                    {c.whatsap && <div className="text-sm text-gray-700"><span className="font-medium">WhatsApp:</span> {c.whatsap}</div>}
-                    {c.website && <div className="text-sm text-blue-600"><a href={c.website} target="_blank" rel="noreferrer">Сайт</a></div>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-gray-500">Контактная информация недоступна</div>
-            )}
-            <div className="mt-6">
-              <button onClick={closeModal} className="w-full py-3 rounded-xl bg-gray-100 text-gray-700">Закрыть</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ContactsModal
+        isOpen={isModalOpen && selectedService !== null}
+        onClose={closeModal}
+        contacts={selectedService?.contacts || []}
+      />
     </div>
   );
 }
