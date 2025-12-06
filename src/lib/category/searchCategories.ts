@@ -36,7 +36,16 @@ export async function parentCategories() {
   try {
     const categories = await prisma.tcategories.findMany({
       where: { parent_id: null },
-      select: { id: true, code: true, sysname: true, name: true, photo: true, parent_id: true, priority: true }
+      select: { 
+        id: true, 
+        code: true, 
+        sysname: true, 
+        name: true, 
+        photo: true, 
+        parent_id: true, 
+        priority: true,
+        type: true
+      }
     });
 
     // Сортируем: сначала с priority (по возрастанию), затем без priority

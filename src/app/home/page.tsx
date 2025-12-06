@@ -13,7 +13,8 @@ import {parentCategories} from "@/lib/category/searchCategories";
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const categories = await parentCategories();
+  // todo - исключаем из родительских категорий категорию "Афиша" для отображения на главной странице (пока так)
+  const categories = (await parentCategories()).filter(category => category.type !== 'afisha');
   const services = await popularServices({take: 6});
 
   return (
@@ -29,20 +30,20 @@ export default async function HomePage() {
           <AllCategoriesForHomeComponent categories={categories} />
         </div>
 
+        {/* Статьи по району */}
+        <AreaArticlesComponent />
+
         {/* Популярные сервисы */}
         <div>
           <VerticalServicesViewComponent
-            services={services}
-            title="Популярное"
-            moveToAllButton={{
-              text: "Все",
-              href: PAGE_ROUTES.CATALOG.POPULAR
-            }}
+              services={services}
+              title="Популярное"
+              moveToAllButton={{
+                text: "Все",
+                href: PAGE_ROUTES.CATALOG.POPULAR
+              }}
           />
         </div>
-
-        {/* Статьи по району */}
-        <AreaArticlesComponent />
 
         {/* Кнопки Registry service и Private policy */}
         <div className="flex flex-col items-center space-y-3 pt-10">

@@ -29,8 +29,8 @@ export class ServicesClicksRepository {
     timestamp: Date;
   }> {
     // ищем по clientId и serviceId существующий клик
-    const existing = await prisma.tservices_clicks.findUnique({
-      where: { tclients_id_tservices_id: { tclients_id: clientId, tservices_id: serviceId } },
+    const existing = await prisma.tservices_clicks.findFirst({
+      where: { tclients_id: clientId, tservices_id: serviceId },
     });
 
     // если находим, то обновляем timestamp
