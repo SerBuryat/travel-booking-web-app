@@ -6,6 +6,7 @@ import { ProposalView } from '@/lib/request/client/proposal/getRequestProposals'
 import { PAGE_ROUTES } from '@/utils/routes';
 import { ServiceTypeFull } from '@/model/ServiceType';
 import { getServiceById } from '@/lib/service/searchServices';
+import { createOrUpdateClick } from '@/lib/service/clickService';
 
 interface ProposalItemProps {
   proposal: ProposalView;
@@ -37,17 +38,23 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
 
   const handleContactClick = async (serviceId: number) => {
     try {
-      const res = await fetch(`/api/services/${serviceId}/click`, { method: 'POST' });
-      if (res.status === 401) {
-        router.push(PAGE_ROUTES.NO_AUTH);
-        return;
-      }
+      // Создаем или обновляем клик через server action
+      await createOrUpdateClick(serviceId);
       
       // Загружаем полную информацию о сервисе с контактами
       const fullService = await getServiceById(serviceId);
       setSelectedService(fullService);
-    } catch (e) {
-      // ignore for MVP
+    } catch (error) {
+      // Если ошибка авторизации (JWT is required, Invalid JWT и т.д.), перенаправляем на страницу входа
+      if (error instanceof Error && (
+        error.message.includes('JWT') || 
+        error.message.includes('auth') ||
+        error.message.includes('Unauthorized')
+      )) {
+        router.push(PAGE_ROUTES.NO_AUTH);
+        return;
+      }
+      // Игнорируем другие ошибки для MVP
     } finally {
       openModal();
     }

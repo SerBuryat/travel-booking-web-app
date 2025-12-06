@@ -5,6 +5,7 @@ import {ServiceTypeFull} from '@/model/ServiceType';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {DEFAULT_SERVICE_IMAGE_3} from '@/utils/images';
+import {createOrUpdateClick} from '@/lib/service/clickService';
 
 export default function SingleServiceView({ 
   service
@@ -23,15 +24,20 @@ export default function SingleServiceView({
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   async function handleContactClick() {
-    // todo -  переделать на server action
     try {
-      const res = await fetch(`/api/services/${service.id}/click`, { method: 'POST' });
-      if (res.status === 401) {
+      // Создаем или обновляем клик через server action
+      await createOrUpdateClick(service.id);
+    } catch (error) {
+      // Если ошибка авторизации (JWT is required, Invalid JWT и т.д.), перенаправляем на страницу входа
+      if (error instanceof Error && (
+        error.message.includes('JWT') || 
+        error.message.includes('auth') ||
+        error.message.includes('Unauthorized')
+      )) {
         router.push(PAGE_ROUTES.NO_AUTH);
         return;
       }
-    } catch (e) {
-      // ignore for MVP
+      // Игнорируем другие ошибки для MVP
     } finally {
       openModal();
     }
