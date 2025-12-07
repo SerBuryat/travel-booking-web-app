@@ -7,6 +7,7 @@ import {PAGE_ROUTES} from '@/utils/routes';
 import {DEFAULT_SERVICE_IMAGE_3} from '@/utils/images';
 import {createOrUpdateClick} from '@/lib/service/clickService';
 import ContactsModal from '@/components/ContactsModal';
+import {formatRating} from '@/utils/rating';
 
 export default function SingleServiceView({ 
   service
@@ -177,11 +178,7 @@ export default function SingleServiceView({
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Рейтинг:</span>
             <span className="text-xl font-bold text-blue-600">
-              {
-                service.rating && service.view_count && service.view_count > 0
-                    ? `${service.rating}/5`
-                    : 'Нет оценок'
-              }
+              {formatRating(service.rating)}
             </span>
           </div>
         </div>

@@ -8,6 +8,7 @@ import { ServiceTypeFull } from '@/model/ServiceType';
 import { getServiceById } from '@/lib/service/searchServices';
 import { createOrUpdateClick } from '@/lib/service/clickService';
 import ContactsModal from '@/components/ContactsModal';
+import { formatRating } from '@/utils/rating';
 
 interface ProposalItemProps {
   proposal: ProposalView;
@@ -184,11 +185,7 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
                       className="text-xs font-semibold"
                       style={{ color: '#007AFF', fontWeight: 600, fontSize: "17px" }}
                     >
-                      {
-                        service.rating && service.view_count > 0
-                          ? `${service.rating}/5`
-                          : 'Нет оценок'
-                      }
+                      {formatRating(service.rating)}
                     </span>
                     {/* Price on the right */}
                     <span 

@@ -3,6 +3,7 @@
 import React from 'react';
 import {useRouter} from 'next/navigation';
 import {ServiceType} from '@/model/ServiceType';
+import {formatRating} from '@/utils/rating';
 
 interface HorizontalViewServiceComponentProps {
   service: ServiceType;
@@ -103,11 +104,7 @@ export const HorizontalViewServiceComponent: React.FC<HorizontalViewServiceCompo
               className="text-xs font-semibold"
               style={{ color: '#007AFF', fontWeight: 600 }}
             >
-              {
-                service.rating && service.view_count > 0
-                    ? `${service.rating}/5`
-                    : 'Нет оценок'
-              }
+              {formatRating(service.rating)}
             </span>
             {/* Price on the right */}
             <span 
