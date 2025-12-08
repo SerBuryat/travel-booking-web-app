@@ -330,7 +330,8 @@ function mapToSearchableService(service: any): ServiceType {
     name: category.name,
     photo: category.photo,
     parent_id: category.parent_id,
-    priority: category.priority
+    priority: category.priority,
+    type: category.type
   };
 
   const previewPhoto = photos.find(photo => photo.is_primary);
@@ -350,6 +351,7 @@ function mapToSearchableService(service: any): ServiceType {
     view_count: rest.view_count,
     options: rest.service_options,
     address: location[0].address,
-    preview_photo_url: !previewPhoto || !previewPhoto.url ? DEFAULT_SERVICE_IMAGE_3 : previewPhoto.url
+    preview_photo_url: !previewPhoto || !previewPhoto.url ? DEFAULT_SERVICE_IMAGE_3 : previewPhoto.url,
+    event_date: rest.event_date || null
   };
 }

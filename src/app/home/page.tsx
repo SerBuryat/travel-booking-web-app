@@ -4,6 +4,7 @@ import {SearchBarWrapper} from '@/components/SearchBarWrapper';
 import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
 import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
 import {AreaArticlesComponent} from '@/components/AreaArticlesComponent';
+import {AreaAfishaComponent} from '@/components/AreaAfishaComponent';
 import {DeveloperLink} from '@/components/DeveloperLink';
 import {popularServices} from "@/lib/service/searchServices";
 import {PAGE_ROUTES} from "@/utils/routes";
@@ -33,6 +34,9 @@ export default async function HomePage() {
 
         {/* Статьи по району */}
         <AreaArticlesComponent />
+
+        {/* Афиша */}
+        <AreaAfishaComponent />
 
         {/* Популярные сервисы */}
         <div>
