@@ -108,6 +108,7 @@ model tcategories {
   tservices         tservices[]
 
   @@index([path], map: "idx_categories_path", type: Gist)
+  @@index([type], map: "idx_tcategories_type")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -300,6 +301,7 @@ model tservices {
   rating_count     Int?               @default(0)
   view_count       Int?               @default(0)
   service_options  Json?
+  event_date       DateTime?          @db.Timestamp(6)
   talerts          talerts[]
   tcontacts        tcontacts[]
   tlocations       tlocations[]

@@ -17,6 +17,7 @@ import {ResultModal} from './ResultModal';
 import {TermsModal} from './TermsModal';
 import {SectionTitle} from './SectionTitle';
 import {ServicePhotoUpload} from './ServicePhotoUpload';
+import {ServiceEventDateInput} from './ServiceEventDateInput';
 import { useServicePhotos, MAX_FILE_SIZE_MB } from '@/lib/service/hooks/useServicePhotos';
 
 export const ProviderCreateServiceForm: React.FC = () => {
@@ -91,6 +92,11 @@ export const ProviderCreateServiceForm: React.FC = () => {
         <ServiceDescriptionInput 
           register={form.register} 
           error={errors.description} 
+        />
+        
+        <ServiceEventDateInput
+          register={form.register}
+          error={errors.event_date}
         />
         
         {/* Контакты заведения */}

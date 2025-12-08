@@ -14,7 +14,8 @@ export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
   // todo - исключаем из родительских категорий категорию "Афиша" для отображения на главной странице (пока так)
-  const categories = (await parentCategories()).filter(category => category.type !== 'afisha');
+  const categories =
+      (await parentCategories()).filter(category => category.type !== 'afisha');
   const services = await popularServices({take: 6});
 
   return (

@@ -2,6 +2,7 @@
 
 import React, {useEffect, useState} from 'react';
 import {ParentCategoryWithChildren} from '@/model/CategoryType';
+import {getAllParentCategoriesWithChildren} from '@/lib/category/searchCategories';
 
 interface CategorySelectionModalProps {
   selectedCategory: number;
@@ -17,7 +18,6 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [categories, setCategories] = useState<ParentCategoryWithChildren[]>([]);
   const [loading, setLoading] = useState(false);
-  const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
 
   // Загружаем категории при монтировании, если уже есть выбранная категория (режим редактирования)
   useEffect(() => {
@@ -36,12 +36,8 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
   const loadCategories = async () => {
     setLoading(true);
     try {
-      // todo - заменить на server actions, в `searchCategories` есть функция
-      const response = await fetch('/api/categories/parent-with-children');
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data.categories);
-      }
+      const categoriesData = await getAllParentCategoriesWithChildren();
+      setCategories(categoriesData);
     } catch (error) {
       console.error('Ошибка загрузки категорий:', error);
     } finally {
@@ -55,13 +51,11 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
 
   const handleCloseModal = () => {
     setIsOpen(false);
-    setSelectedParentId(null);
   };
 
   const handleCategorySelect = (categoryId: number) => {
     onSelect(categoryId);
     setIsOpen(false);
-    setSelectedParentId(null);
   };
 
   const getSelectedCategoryDisplay = () => {
@@ -124,84 +118,109 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
 
       {/* Модальное окно выбора категории */}
       {isOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[80vh] overflow-hidden">
+        <div 
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+          onClick={handleCloseModal}
+        >
+          {/* Overlay */}
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+          
+          {/* Модальное окно */}
+          <div 
+            className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col animate-slideUp"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Заголовок */}
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-black">
-                  Выберите категорию
-                </h3>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
+            <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Выберите категорию
+              </h3>
+              <button
+                onClick={handleCloseModal}
+                className="p-2 -mr-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Закрыть"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
             {/* Содержимое */}
-            <div className="px-6 py-4 overflow-y-auto max-h-[60vh]">
+            <div className="flex-1 overflow-y-auto overscroll-contain">
               {loading ? (
-                <div className="flex items-center justify-center py-8">
-                  <div className="w-6 h-6 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                  <span className="ml-2 text-gray-600">Загрузка категорий...</span>
+                <div className="flex items-center justify-center py-12">
+                  <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                  <span className="ml-3 text-sm text-gray-600">Загрузка...</span>
                 </div>
               ) : (
-                <div className="space-y-4">
+                <div className="px-4 sm:px-6 py-4 space-y-1">
                   {categories.map((parentCategory) => (
-                    <div key={parentCategory.id} className="border border-gray-200 rounded-lg">
+                    <div key={parentCategory.id} className="mb-4 last:mb-0">
                       {/* Родительская категория */}
-                      <div className="p-4 bg-gray-50 border-b border-gray-200">
-                        <button
-                          onClick={() => handleCategorySelect(parentCategory.id)}
-                          className="w-full text-left hover:bg-gray-100 p-2 rounded transition-colors"
+                      <button
+                        onClick={() => handleCategorySelect(parentCategory.id)}
+                        className={`
+                          w-full text-left px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer
+                          flex items-center justify-between group
+                          ${selectedCategory === parentCategory.id 
+                            ? 'bg-blue-50 text-blue-700 font-medium' 
+                            : 'hover:bg-gray-50 text-gray-900 active:bg-gray-100'
+                          }
+                        `}
+                      >
+                        <span>{parentCategory.name}</span>
+                        <svg 
+                          className={`w-5 h-5 transition-transform duration-200 ${
+                            selectedCategory === parentCategory.id 
+                              ? 'text-blue-600' 
+                              : 'text-gray-400 group-hover:text-gray-600'
+                          }`}
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
                         >
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-900">{parentCategory.name}</span>
-                            <span className="text-sm text-gray-500">Основная категория</span>
-                          </div>
-                        </button>
-                      </div>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
 
                       {/* Дочерние категории */}
                       {parentCategory.children.length > 0 && (
-                        <div className="p-4">
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                            {parentCategory.children.map((childCategory) => (
-                              <button
-                                key={childCategory.id}
-                                onClick={() => handleCategorySelect(childCategory.id)}
-                                className="text-left p-3 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-300 transition-colors"
+                        <div className="mt-1 ml-4 pl-4 border-l-2 border-gray-100 space-y-0.5">
+                          {parentCategory.children.map((childCategory) => (
+                            <button
+                              key={childCategory.id}
+                              onClick={() => handleCategorySelect(childCategory.id)}
+                              className={`
+                                w-full text-left px-4 py-2.5 rounded-lg text-sm transition-all duration-200 cursor-pointer
+                                flex items-center justify-between group
+                                ${selectedCategory === childCategory.id
+                                  ? 'bg-blue-50 text-blue-700 font-medium'
+                                  : 'text-gray-700 hover:bg-gray-50 active:bg-gray-100'
+                                }
+                              `}
+                            >
+                              <span>{childCategory.name}</span>
+                              <svg 
+                                className={`w-4 h-4 transition-transform duration-200 ${
+                                  selectedCategory === childCategory.id 
+                                    ? 'text-blue-600' 
+                                    : 'text-gray-400 group-hover:text-gray-600'
+                                }`}
+                                fill="none" 
+                                stroke="currentColor" 
+                                viewBox="0 0 24 24"
                               >
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-gray-600">→</span>
-                                  <span className="text-gray-900">{childCategory.name}</span>
-                                </div>
-                              </button>
-                            ))}
-                          </div>
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </button>
+                          ))}
                         </div>
                       )}
                     </div>
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Футер */}
-            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-              <div className="flex justify-end space-x-3">
-                <button
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
-                >
-                  Отмена
-                </button>
-              </div>
             </div>
           </div>
         </div>

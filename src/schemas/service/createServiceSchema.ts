@@ -36,7 +36,19 @@ export const createServiceSchema = z.object({
   .optional(),
 
   serviceOptions: z.array(z.string())
-  .optional()
+  .optional(),
+
+  event_date: z.preprocess(
+    (val) => {
+      if (!val || val === '' || (typeof val === 'string' && val.trim() === '')) {
+        return undefined;
+      }
+      // datetime-local возвращает строку в формате "YYYY-MM-DDTHH:mm"
+      // Преобразуем в Date объект
+      return new Date(val as string);
+    },
+    z.date().optional()
+  )
 });
 
 export type CreateProviderData = z.infer<typeof createProviderSchema>;

@@ -95,37 +95,4 @@ export class CategoryRepository {
 
     return categories.map(category => this.toCategoryEntity(category));
   }
-
-  /**
-   * Find all parent categories with their children using prisma include
-   */
-  async findAllParentWithChildren(): Promise<{
-    id: number;
-    code: string;
-    sysname: string;
-    name: string;
-    photo: string | null;
-    children: CategoryEntity[];
-  }[]> {
-    const parentCategories = await prisma.tcategories.findMany({
-      where: { parent_id: null },
-      select: {
-        ...this.CATEGORY_SELECT,
-        other_tcategories: {
-          select: this.CATEGORY_SELECT,
-          orderBy: { id: 'asc' },
-        }
-      },
-      orderBy: { id: 'asc' },
-    });
-
-    return parentCategories.map(parent => ({
-      id: parent.id,
-      code: parent.code,
-      sysname: parent.sysname,
-      name: parent.name,
-      photo: parent.photo,
-      children: parent.other_tcategories.map(child => this.toCategoryEntity(child))
-    }));
-  }
 } 

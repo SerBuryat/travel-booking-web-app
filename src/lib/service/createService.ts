@@ -79,6 +79,7 @@ export async function createService(
         active: true,
         status: 'published',
         service_options: createServiceData.serviceOptions || null,
+        event_date: createServiceData.event_date || null,
         tcontacts: {
           create: {
             email: 'default@example.com', // Обязательное поле в БД, проставляем мок
