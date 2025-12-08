@@ -10,7 +10,7 @@ export const createServiceSchema = z.object({
   .max(100, 'Название не должно превышать 100 символов'),
 
   description: z.string()
-  .max(1000, 'Описание не должно превышать 500 символов')
+  .max(1000, 'Описание не должно превышать 1000 символов')
   .optional(),
 
   price: z.string()

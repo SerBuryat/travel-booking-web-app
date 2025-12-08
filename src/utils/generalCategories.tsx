@@ -70,6 +70,17 @@ const PackageIcon: React.FC = () => (
     </svg>
 );
 
+const ShoppingIcon: React.FC = () => (
+  <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M6.5 6.5L4.33333 3.25H2.16667C1.70708 3.25 1.33333 3.62375 1.33333 4.08333C1.33333 4.54292 1.70708 4.91667 2.16667 4.91667H5.41667L8.66667 10.8333H19.5L22.75 4.91667H24.9167C25.3763 4.91667 25.75 4.54292 25.75 4.08333C25.75 3.62375 25.3763 3.25 24.9167 3.25H22.75L20.5833 6.5H6.5Z" 
+          stroke="#303030" strokeWidth="1.625" strokeLinecap="round" strokeLinejoin="round"/>
+    <path d="M8.66667 10.8333L6.5 21.6667H19.5L17.3333 10.8333" 
+          stroke="#303030" strokeWidth="1.625" strokeLinecap="round" strokeLinejoin="round"/>
+    <circle cx="9.75" cy="22.75" r="1.08333" fill="#303030"/>
+    <circle cx="19.5" cy="22.75" r="1.08333" fill="#303030"/>
+  </svg>
+);
+
 // Default icon for general categories
 export const DEFAULT_CATEGORY_ICON: React.ReactNode = (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -129,6 +140,13 @@ export const CATEGORIES_IMAGES_MAP: Record<string, CategoryImages> = {
     pngLarge: '/images/categories/package/package-sq-lg.png',
     pngSmall: '/images/categories/package/package-sq-sm.png',
     backgroundImage: '/images/categories/package/package-hr.png',
+  },
+  shopping: {
+    sysname: 'shopping',
+    svgIcon: <ShoppingIcon />,
+    pngLarge: '/images/categories/shopping/shopping-lg-sm.png',
+    pngSmall: '/images/categories/shopping/shopping-sq-sm.png',
+    backgroundImage: '/images/categories/shopping/shopping-hr.png',
   },
 };
 
@@ -227,6 +245,14 @@ export const PACKAGE: GeneralCategory = {
 };
 
 /**
+ * @deprecated Используйте getCategoryImages('shopping')
+ */
+export const SHOPPING: GeneralCategory = {
+  code: 'shopping',
+  icon: <ShoppingIcon />
+};
+
+/**
  * Map of general categories
  * @deprecated Используйте CATEGORIES_IMAGES_MAP
  */
@@ -237,6 +263,7 @@ const generalCategoriesMap = new Map<string, GeneralCategory>([
   [ENTERTAINMENT.code, ENTERTAINMENT],
   [HEALTH.code, HEALTH],
   [PACKAGE.code, PACKAGE],
+  [SHOPPING.code, SHOPPING],
 ]);
 
 /**

@@ -71,14 +71,15 @@ export const AllCategoriesForHomeComponent: React.FC<AllCategoriesForHomeCompone
     );
   };
 
-  // Ограничиваем количество категорий до 7
-  const displayCategories = categories.slice(0, 7);
+  // Ограничиваем количество категорий до 8
+  const displayCategories = categories.slice(0, 8);
   const count = displayCategories.length;
 
   // Логика layout в виде матрицы для наглядности
   // 1-3 категории: все большие в один ряд
   // 4 категории: 2 ряда по 2 больших
-  // 5-7 категорий: 2 ряда (верхний - 2 больших, нижний - 3-5 малых)
+  // 5-6 категорий: 2 ряда (верхний - 2 больших, нижний - 3-4 малых)
+  // 7-8 категорий: 2 ряда (верхний - 3 больших, нижний - 4-5 малых)
   
   const renderLayout = () => {
     if (count === 0) return null;
@@ -114,8 +115,8 @@ export const AllCategoriesForHomeComponent: React.FC<AllCategoriesForHomeCompone
       );
     }
 
-    // 5-7: верхний ряд 2 больших (растянуты), нижний ряд 3-5 малых
-    if (count >= 5 && count <= 7) {
+    // 5-6: верхний ряд 2 больших (растянуты), нижний ряд 3-4 малых
+    if (count >= 5 && count <= 6) {
       return (
         <div className="flex flex-col space-y-4">
           {/* Ряд 1: 2 больших, растянуты по ширине */}
@@ -124,9 +125,29 @@ export const AllCategoriesForHomeComponent: React.FC<AllCategoriesForHomeCompone
               <CategoryItem key={category.id} category={category} size="large" stretched />
             ))}
           </div>
-          {/* Ряд 2: 3-5 малых, с отступами */}
+          {/* Ряд 2: 3-4 малых, с отступами */}
           <div className="flex justify-between">
             {displayCategories.slice(2).map((category) => (
+              <CategoryItem key={category.id} category={category} size="small" />
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // 7-8: верхний ряд 3 больших (растянуты), нижний ряд 4-5 малых
+    if (count >= 7 && count <= 8) {
+      return (
+        <div className="flex flex-col space-y-4">
+          {/* Ряд 1: 3 больших, растянуты по ширине */}
+          <div className="flex gap-4">
+            {displayCategories.slice(0, 3).map((category) => (
+              <CategoryItem key={category.id} category={category} size="large" stretched />
+            ))}
+          </div>
+          {/* Ряд 2: 4-5 малых, с отступами */}
+          <div className="flex justify-between">
+            {displayCategories.slice(3).map((category) => (
               <CategoryItem key={category.id} category={category} size="small" />
             ))}
           </div>
