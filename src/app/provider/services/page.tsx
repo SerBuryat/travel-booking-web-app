@@ -27,9 +27,7 @@ export default async function ProviderServicesPage() {
   }
 
   const services = await servicesForProvider(userAuth.providerId);
-  console.log('services', services);
   const parents = await parentCategories();
-  console.log('parents', parents);
 
   // Build mapping parentId -> services[]
   const parentToServices: Record<number, typeof services> = {} as Record<number, typeof services>;
@@ -40,8 +38,6 @@ export default async function ProviderServicesPage() {
       parentToServices[parentId].push(s);
     }
   }
-
-  console.log('parentToServices', parentToServices);
 
   return (
       <ToastProvider>
