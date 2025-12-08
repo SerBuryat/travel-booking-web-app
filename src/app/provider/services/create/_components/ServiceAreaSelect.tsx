@@ -145,79 +145,87 @@ export const ServiceAreaSelect: React.FC<ServiceAreaSelectProps> = ({
         </button>
 
         {isOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-neutral-900/50 backdrop-blur-sm">
-              <div
-                  className="w-full max-w-2xl max-h-[80vh] overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-xl">
-                <div className="flex items-center justify-between px-5 py-4 border-b border-neutral-200">
-                  <h3 className="text-base font-semibold text-neutral-900">Выберите локацию</h3>
+            <div 
+              className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+              onClick={handleCloseModal}
+            >
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+              
+              {/* Модальное окно */}
+              <div 
+                className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col animate-slideUp sm:mt-0 mt-16"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Заголовок */}
+                <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-gray-100">
+                  <h3 className="text-lg font-semibold text-gray-900">Выберите локацию</h3>
                   <button
-                      onClick={handleCloseModal}
-                      className="inline-flex h-9 w-9 items-center justify-center rounded-full text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-                      aria-label="Закрыть"
+                    onClick={handleCloseModal}
+                    className="p-2 -mr-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+                    aria-label="Закрыть"
                   >
-                    <svg className="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                      <path d="M6 18L18 6M6 6l12 12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
 
-                <div className="px-5 py-4 border-b border-neutral-200">
+                {/* Поиск */}
+                <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
                   <div className="relative">
                     <svg
-                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-neutral-400"
-                        viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                      className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                    >
                       <circle cx="11" cy="11" r="7" strokeWidth="2"/>
                       <path d="M20 20l-3.5-3.5" strokeWidth="2" strokeLinecap="round"/>
                     </svg>
                     <input
-                        type="text"
-                        placeholder="Поиск по названию локации"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full rounded-lg border border-neutral-300 bg-white py-2.5 pl-10 pr-3 text-sm text-neutral-900 placeholder:text-neutral-400 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
+                      type="text"
+                      placeholder="Поиск по названию локации"
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="w-full rounded-lg border border-gray-200 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                     />
                   </div>
                   {error && (
-                      <div className="mt-2 text-sm text-red-600">{error}</div>
+                    <div className="mt-2 text-sm text-red-600">{error}</div>
                   )}
                 </div>
 
-                <div className="px-5 py-4 overflow-y-auto max-h-[50vh]">
-                  <div className="space-y-6">
-                    {isLoading && (
-                        <div className="py-10 text-center text-neutral-500">Загрузка...</div>
-                    )}
-
-                    {!isLoading && filteredTree && (
+                {/* Содержимое */}
+                <div className="flex-1 overflow-y-auto overscroll-contain">
+                  {isLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                      <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="ml-3 text-sm text-gray-600">Загрузка...</span>
+                    </div>
+                  ) : (
+                    <div className="px-4 sm:px-6 py-4 pb-24">
+                      {filteredTree && (
                         <>
-                          {filteredTree.length === 0 && (
-                              <div className="py-10 text-center text-neutral-500">Локации не найдены</div>
-                          )}
-                          <div className="space-y-1">
-                            {filteredTree.map((node) => (
+                          {filteredTree.length === 0 ? (
+                            <div className="py-10 text-center text-sm text-gray-500">Локации не найдены</div>
+                          ) : (
+                            <div className="space-y-1">
+                              {filteredTree.map((node) => (
                                 <TreeNode
-                                    key={node.id}
-                                    node={node}
-                                    depth={0}
-                                    onSelect={handleAreaSelect}
-                                    currentLocationId={selectedArea}
+                                  key={node.id}
+                                  node={node}
+                                  depth={0}
+                                  onSelect={handleAreaSelect}
+                                  currentLocationId={selectedArea}
                                 />
-                            ))}
-                          </div>
+                              ))}
+                            </div>
+                          )}
                         </>
-                    )}
-                  </div>
-                </div>
-
-                <div className="px-5 py-4 border-t border-neutral-200 bg-neutral-50">
-                  <div className="flex justify-end gap-3">
-                    <button
-                        onClick={handleCloseModal}
-                        className="inline-flex items-center rounded-lg border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-700 shadow-sm transition-colors hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
-                    >
-                      Отмена
-                    </button>
-                  </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -235,69 +243,99 @@ interface TreeNodeProps {
 
 function TreeNode({node, depth, onSelect, currentLocationId}: TreeNodeProps) {
   const isCurrent = node.id === currentLocationId;
-  const padding = 12 + depth * 16; // базовый отступ + отступ на уровень
+  const padding = depth * 20; // отступ на уровень
   const isClickable = node.tier === SELECTABLE_AREA_TIER;
+  
   return (
-      <div>
-        <button
-            onClick={() => {
-              if (!isClickable) return;
-              return onSelect(node.id);
-            }}
-            className={`group flex w-full items-start justify-between gap-3 rounded-lg border text-left transition-colors ${
-                isCurrent
-                    ? 'border-blue-300 bg-blue-50/60'
-                    : isClickable
-                        ? 'border-neutral-200 hover:border-neutral-300 hover:bg-neutral-50'
-                        : 'border-neutral-200 bg-neutral-50/60 text-neutral-500 cursor-not-allowed'
-            }`}
-            style={{padding: '12px', paddingLeft: `${padding}px`}}
-            title={isClickable ? 'Выбрать эту локацию' : 'Выберите более конкретную локацию'}
-        >
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              {node.children && node.children.length > 0 ? (
-                  <svg className="h-4 w-4 text-neutral-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
-              ) : (
-                  <span
-                      className={`inline-block h-2 w-2 rounded-full ${isClickable ? 'bg-blue-500' : 'bg-neutral-300'}`}/>
-              )}
-              <div
-                  className={`truncate font-medium ${isClickable ? 'text-neutral-900' : 'text-neutral-500'}`}>{node.name}</div>
-            </div>
-          </div>
-          {isCurrent ? (
-              <svg className="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M5 13l4 4L19 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-          ) : isClickable ? (
-              <svg className="h-5 w-5 text-neutral-300 group-hover:text-neutral-500" viewBox="0 0 24 24" fill="none"
-                   stroke="currentColor">
-                <path d="M9 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
+    <div>
+      <button
+        onClick={() => {
+          if (!isClickable) return;
+          return onSelect(node.id);
+        }}
+        className={`
+          w-full text-left px-4 py-3 rounded-xl transition-all duration-200
+          flex items-center justify-between group
+          ${isCurrent
+            ? 'bg-blue-50 text-blue-700 font-medium'
+            : isClickable
+              ? 'hover:bg-gray-50 text-gray-900 active:bg-gray-100 cursor-pointer'
+              : 'text-gray-500 cursor-not-allowed opacity-60'
+          }
+        `}
+        style={{ paddingLeft: `${16 + padding}px` }}
+        title={isClickable ? 'Выбрать эту локацию' : 'Выберите более конкретную локацию'}
+      >
+        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+          {node.children && node.children.length > 0 ? (
+            <svg 
+              className={`h-4 w-4 flex-shrink-0 ${
+                isClickable ? 'text-gray-400' : 'text-gray-300'
+              }`}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+            >
+              <path d="M9 18l6-6-6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           ) : (
-              <svg className="h-5 w-5 text-neutral-300" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                <path d="M12 17a2 2 0 100-4 2 2 0 000 4z" strokeWidth="2"/>
-                <path d="M6 10V8a6 6 0 1112 0v2" strokeWidth="2" strokeLinecap="round"/>
-              </svg>
+            <span
+              className={`inline-block h-2 w-2 rounded-full flex-shrink-0 ${
+                isClickable ? 'bg-blue-500' : 'bg-gray-300'
+              }`}
+            />
           )}
-        </button>
-
-        {node.children && node.children.length > 0 && (
-            <div className="mt-1 space-y-1">
-              {node.children.map((child) => (
-                  <TreeNode
-                      key={child.id}
-                      node={child}
-                      depth={depth + 1}
-                      onSelect={onSelect}
-                      currentLocationId={currentLocationId}
-                  />
-              ))}
-            </div>
+          <span className="truncate font-medium">{node.name}</span>
+        </div>
+        
+        {isCurrent ? (
+          <svg 
+            className="h-5 w-5 text-blue-600 flex-shrink-0 ml-2" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor"
+          >
+            <path d="M5 13l4 4L19 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        ) : isClickable ? (
+          <svg 
+            className={`h-5 w-5 flex-shrink-0 ml-2 transition-transform duration-200 ${
+              isCurrent 
+                ? 'text-blue-600' 
+                : 'text-gray-400 group-hover:text-gray-600'
+            }`}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+          >
+            <path d="M9 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        ) : (
+          <svg 
+            className="h-5 w-5 text-gray-300 flex-shrink-0 ml-2" 
+            viewBox="0 0 24 24" 
+            fill="none" 
+            stroke="currentColor"
+          >
+            <path d="M12 17a2 2 0 100-4 2 2 0 000 4z" strokeWidth="2"/>
+            <path d="M6 10V8a6 6 0 1112 0v2" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
         )}
-      </div>
+      </button>
+
+      {node.children && node.children.length > 0 && (
+        <div className="mt-0.5 space-y-0.5">
+          {node.children.map((child) => (
+            <TreeNode
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              onSelect={onSelect}
+              currentLocationId={currentLocationId}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

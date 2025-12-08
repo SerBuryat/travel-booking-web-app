@@ -115,7 +115,7 @@ export const CategorySelectionModal: React.FC<CategorySelectionModalProps> = ({
           
           {/* Модальное окно */}
           <div 
-            className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col animate-slideUp"
+            className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl rounded-t-3xl shadow-2xl max-h-[85vh] flex flex-col animate-slideUp sm:mt-0 mt-16"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Заголовок */}
