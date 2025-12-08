@@ -15,56 +15,12 @@ interface ContactsModalProps {
  * 
  * Отображает контакты с кликабельными ссылками и иконками:
  * - Телефон: tel: ссылка для вызова
- * - Telegram: ссылка на профиль в Telegram
+ * - Telegram: ссылка на профиль в Telegram (username или телефон)
  * - WhatsApp: ссылка для отправки сообщения в WhatsApp
- * - Сайт: ссылка на веб-сайт
+ * - Сайт: ссылка на веб-сайт с префиксом https://
  */
 export default function ContactsModal({ isOpen, onClose, contacts }: ContactsModalProps) {
   if (!isOpen) return null;
-
-  /**
-   * Форматирует номер телефона для tel: ссылки
-   * Удаляет все символы кроме цифр и +
-   */
-  const formatPhoneForTel = (phone: string): string => {
-    // Удаляем все символы кроме цифр, + и пробелов
-    let cleaned = phone.replace(/[^\d+\s]/g, '');
-    // Если номер не начинается с +, добавляем +7 для российских номеров
-    if (!cleaned.startsWith('+')) {
-      // Удаляем первую 8, если есть, и заменяем на +7
-      cleaned = cleaned.replace(/^8/, '7');
-      if (!cleaned.startsWith('7')) {
-        cleaned = '7' + cleaned;
-      }
-      cleaned = '+' + cleaned;
-    }
-    // Удаляем все пробелы и дефисы
-    return cleaned.replace(/[\s-]/g, '');
-  };
-
-  /**
-   * Форматирует номер телефона для WhatsApp
-   * Удаляет все символы кроме цифр
-   */
-  const formatPhoneForWhatsApp = (phone: string): string => {
-    let cleaned = phone.replace(/[^\d]/g, '');
-    // Если номер начинается с 8, заменяем на 7
-    if (cleaned.startsWith('8')) {
-      cleaned = '7' + cleaned.substring(1);
-    }
-    // Если номер не начинается с 7, добавляем 7
-    if (!cleaned.startsWith('7')) {
-      cleaned = '7' + cleaned;
-    }
-    return cleaned;
-  };
-
-  /**
-   * Очищает username от @ символа для Telegram
-   */
-  const cleanTelegramUsername = (username: string): string => {
-    return username.replace(/^@/, '');
-  };
 
   /**
    * Проверяет, является ли URL валидным и добавляет https:// если нужно
@@ -93,7 +49,7 @@ export default function ContactsModal({ isOpen, onClose, contacts }: ContactsMod
                 {/* Телефон */}
                 {c.phone && (
                   <a
-                    href={`tel:${formatPhoneForTel(c.phone)}`}
+                    href={`tel:${c.phone}`}
                     className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition-colors"
                   >
                     <PhoneIcon />
@@ -105,21 +61,21 @@ export default function ContactsModal({ isOpen, onClose, contacts }: ContactsMod
                 {/* Telegram */}
                 {c.tg_username && (
                   <a
-                    href={`https://t.me/${cleanTelegramUsername(c.tg_username)}`}
+                    href={`https://t.me/${c.tg_username}`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-3 text-sm text-gray-700 hover:text-blue-600 transition-colors"
                   >
                     <TelegramIcon />
                     <span className="font-medium">Telegram:</span>
-                    <span>@{cleanTelegramUsername(c.tg_username)}</span>
+                    <span>{c.tg_username}</span>
                   </a>
                 )}
 
                 {/* WhatsApp */}
                 {c.whatsap && (
                   <a
-                    href={`https://wa.me/${formatPhoneForWhatsApp(c.whatsap)}`}
+                    href={`https://wa.me/${c.whatsap}`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-3 text-sm text-gray-700 hover:text-green-600 transition-colors"

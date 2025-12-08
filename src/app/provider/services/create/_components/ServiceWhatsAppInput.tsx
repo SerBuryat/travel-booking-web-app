@@ -28,7 +28,7 @@ export const ServiceWhatsAppInput: React.FC<ServiceWhatsAppInputProps> = ({
             ${error ? 'border-red-300' : 'border-gray-300'}
           `}
           style={{ borderRadius: '14px' }}
-          placeholder="Введите номер с +7"
+          placeholder="Введите номер с 7"
         />
       </div>
       {error && (
