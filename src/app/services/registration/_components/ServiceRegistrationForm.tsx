@@ -10,6 +10,8 @@ import {ServiceAddressInput} from './ServiceAddressInput';
 import {ServiceAreaSelect} from './ServiceAreaSelect';
 import {ServicePhoneInput} from './ServicePhoneInput';
 import {ServiceTelegramInput} from './ServiceTelegramInput';
+import {ServiceWebsiteInput} from './ServiceWebsiteInput';
+import {ServiceWhatsAppInput} from './ServiceWhatsAppInput';
 import {ServiceOptionsSelection} from './ServiceOptionsSelection';
 import {ProviderCompanyNameInput} from './ProviderCompanyNameInput';
 import {ProviderContactPersonInput} from './ProviderContactPersonInput';
@@ -97,11 +99,6 @@ export const ServiceRegistrationForm: React.FC = () => {
             error={errors.description}
         />
 
-        <ServiceEventDateInput
-            register={form.register}
-            error={errors.event_date}
-        />
-
         {/* Контакты заведения */}
         <SectionTitle>Контакты заведения</SectionTitle>
 
@@ -113,6 +110,16 @@ export const ServiceRegistrationForm: React.FC = () => {
         <ServiceTelegramInput
             register={form.register}
             error={errors.tg_username}
+        />
+
+        <ServiceWebsiteInput
+            register={form.register}
+            error={errors.website}
+        />
+
+        <ServiceWhatsAppInput
+            register={form.register}
+            error={errors.whatsap}
         />
 
         {/* Стоимость */}
@@ -155,6 +162,11 @@ export const ServiceRegistrationForm: React.FC = () => {
 
         {/* Дополнительно */}
         <SectionTitle>Дополнительно</SectionTitle>
+
+        <ServiceEventDateInput
+            register={form.register}
+            error={errors.event_date}
+        />
 
         <ServiceOptionsSelection
             selectedOptions={form.watch('serviceOptions') || []}

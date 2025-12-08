@@ -16,7 +16,7 @@ export const ServicePhoneInput: React.FC<ServicePhoneInputProps> = ({
   return (
     <div className="relative">
       <label htmlFor="phone" className="block text-sm font-medium mb-0 pl-2" style={{ color: '#A2ACB0', marginLeft: '8px', marginTop: '4px', marginBottom: '-8px', zIndex: 10, position: 'relative', width: 'fit-content', background: '#F9FAFB', paddingLeft: '4px', paddingRight: '4px' }}>
-        Номер телефона
+        Номер телефона <span style={{ color: '#A2ACB0' }}>*</span>
       </label>
                    <input
                {...register('phone')}
@@ -27,7 +27,7 @@ export const ServicePhoneInput: React.FC<ServicePhoneInputProps> = ({
                  ${error ? 'border-red-300' : 'border-gray-300'}
                `}
                style={{ borderRadius: '14px' }}
-               placeholder="+7 (999) 123-45-67"
+               placeholder="Введите номер с +7"
              />
       {error && (
         <p className="mt-1 text-sm text-red-600">

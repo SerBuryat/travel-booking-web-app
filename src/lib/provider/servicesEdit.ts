@@ -254,6 +254,8 @@ export async function updateService(
           data: {
             phone: data.phone || null,
             tg_username: data.tg_username || null,
+            website: data.website || null,
+            whatsap: data.whatsap || null,
           },
         });
       } else {
@@ -263,6 +265,8 @@ export async function updateService(
             email: 'default@example.com', // обязательное поле
             phone: data.phone || null,
             tg_username: data.tg_username || null,
+            website: data.website || null,
+            whatsap: data.whatsap || null,
           },
         });
       }

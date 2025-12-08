@@ -85,6 +85,8 @@ export async function createService(
             email: 'default@example.com', // Обязательное поле в БД, проставляем мок
             phone: createServiceData.phone || null,
             tg_username: createServiceData.tg_username || null,
+            website: createServiceData.website || null,
+            whatsap: createServiceData.whatsap || null,
           }
         },
         tlocations: {

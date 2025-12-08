@@ -10,8 +10,8 @@ export const createServiceSchema = z.object({
   .max(100, 'Название не должно превышать 100 символов'),
 
   description: z.string()
-  .min(10, 'Описание должно содержать минимум 10 символов')
-  .max(500, 'Описание не должно превышать 500 символов'),
+  .max(1000, 'Описание не должно превышать 500 символов')
+  .optional(),
 
   price: z.string()
   .regex(/^\d+(\.\d{1,2})?$/, 'Цена должна быть числом с максимум 2 знаками после запятой')
@@ -32,7 +32,13 @@ export const createServiceSchema = z.object({
   .optional(),
 
   tg_username: z.string()
-  .regex(/^@?[a-zA-Z0-9_]{5,32}$/, 'Неверный формат username Telegram')
+  .optional(),
+
+  website: z.string()
+  .regex(/^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$|^([а-яА-ЯёЁ0-9]([а-яА-ЯёЁ0-9\-]{0,61}[а-яА-ЯёЁ0-9])?\.)+[а-яА-ЯёЁ]{2,}$/, 'Неверный формат домена')
+  .optional(),
+
+  whatsap: z.string()
   .optional(),
 
   serviceOptions: z.array(z.string())
