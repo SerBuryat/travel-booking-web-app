@@ -168,7 +168,7 @@ export default function SingleServiceView({
           </h2>
           <p 
             className="text-black leading-relaxed"
-            style={{ fontSize: '17px', color: 'black', fontWeight: 400 }}
+            style={{ fontSize: '17px', color: 'black', fontWeight: 400, whiteSpace: 'pre-line' }}
           >
             {service.description}
           </p>
@@ -198,7 +198,7 @@ export default function SingleServiceView({
         {/* Additional Service Info */}
         <div className="mt-4 space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">Цена:</span>
+            <span className="text-gray-600">Цена от:</span>
             <span className="text-2xl font-bold text-blue-600">
               {service.price} ₽
             </span>
