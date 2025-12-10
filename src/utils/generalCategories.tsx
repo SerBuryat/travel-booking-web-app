@@ -72,22 +72,23 @@ const PackageIcon: React.FC = () => (
 
 const ShoppingIcon: React.FC = () => (
   <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M6.5 6.5L4.33333 3.25H2.16667C1.70708 3.25 1.33333 3.62375 1.33333 4.08333C1.33333 4.54292 1.70708 4.91667 2.16667 4.91667H5.41667L8.66667 10.8333H19.5L22.75 4.91667H24.9167C25.3763 4.91667 25.75 4.54292 25.75 4.08333C25.75 3.62375 25.3763 3.25 24.9167 3.25H22.75L20.5833 6.5H6.5Z" 
-          stroke="#303030" strokeWidth="1.625" strokeLinecap="round" strokeLinejoin="round"/>
-    <path d="M8.66667 10.8333L6.5 21.6667H19.5L17.3333 10.8333" 
-          stroke="#303030" strokeWidth="1.625" strokeLinecap="round" strokeLinejoin="round"/>
-    <circle cx="9.75" cy="22.75" r="1.08333" fill="#303030"/>
-    <circle cx="19.5" cy="22.75" r="1.08333" fill="#303030"/>
+    <path fillRule="evenodd" clipRule="evenodd"
+          d="M11.0784 2.89423C8.57288 2.89423 6.54176 4.92534 6.54176 7.43086V7.50253H3.70513C2.72667 7.50253 1.93347 8.29572 1.93347 9.27418V16.6475C1.93347 19.662 4.37723 22.1058 7.39177 22.1058H16.6084C19.6229 22.1058 22.0667 19.662 22.0667 16.6475V9.27418C22.0667 8.29572 21.2735 7.50253 20.295 7.50253H17.4583V7.43086C17.4583 4.92535 15.4272 2.89423 12.9217 2.89423H11.0784ZM15.7583 9.20253V10.1958C15.7583 10.6653 16.1389 11.0458 16.6083 11.0458C17.0778 11.0458 17.4583 10.6653 17.4583 10.1958V9.20253H20.295C20.3346 9.20253 20.3667 9.23461 20.3667 9.27418V16.6475C20.3667 18.7231 18.684 20.4058 16.6084 20.4058H7.39177C5.31612 20.4058 3.63347 18.7231 3.63347 16.6475V9.27418C3.63347 9.23461 3.66555 9.20253 3.70513 9.20253H6.54176V10.1958C6.54176 10.6653 6.92231 11.0458 7.39176 11.0458C7.8612 11.0458 8.24176 10.6653 8.24176 10.1958V9.20253H15.7583ZM15.7583 7.50253V7.43086C15.7583 5.86423 14.4883 4.59423 12.9217 4.59423H11.0784C9.51176 4.59423 8.24176 5.86423 8.24176 7.43086V7.50253H15.7583Z"
+          fill="#1C1C1C"/>
   </svg>
 );
 
 // Default icon for general categories
 export const DEFAULT_CATEGORY_ICON: React.ReactNode = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <polyline points="3.27,6.96 12,12.01 20.73,6.96" stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="12" y1="22.08" x2="12" y2="12" stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+          d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+          stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <polyline points="3.27,6.96 12,12.01 20.73,6.96" stroke="#303030" strokeWidth="2" strokeLinecap="round"
+                strokeLinejoin="round"/>
+      <line x1="12" y1="22.08" x2="12" y2="12" stroke="#303030" strokeWidth="2" strokeLinecap="round"
+            strokeLinejoin="round"/>
+    </svg>
 );
 
 // ============================================================================
