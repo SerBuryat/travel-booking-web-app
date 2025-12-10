@@ -56,9 +56,6 @@ export const ArticlesList: React.FC<ArticlesListProps> = ({ articles }) => {
  * Компонент карточки статьи.
  */
 const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ article, index }) => {
-  // Константа: максимальное количество символов на всю карточку
-  const MAX_CARD_CHARS = 115;
-
   const handleClick = () => {
     window.open(article.url, '_blank', 'noopener,noreferrer');
   };
@@ -74,22 +71,6 @@ const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ articl
     ];
     return gradients[articleIndex % gradients.length];
   };
-
-  // Truncate text helper
-  const truncateText = (text: string, maxLength: number = 30) => {
-    if (!text) return '';
-    if (text.length <= maxLength) return text;
-    return text.substring(0, maxLength) + '...';
-  };
-
-  // Вычисляем доступное количество символов для описания
-  const titleLength = article.title?.length || 0;
-  const availableCharsForDescription = Math.max(0, MAX_CARD_CHARS - titleLength);
-  
-  // Если заголовок >= 200 символов, показываем "Это интересно!" вместо описания
-  const descriptionText = titleLength >= MAX_CARD_CHARS 
-    ? 'Это интересно!' 
-    : truncateText(article.description || '', availableCharsForDescription);
 
   const imageStyle = article.image
     ? {
@@ -107,7 +88,7 @@ const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ articl
       onClick={handleClick}
       style={{ fontFamily: 'Inter, sans-serif', width: 'calc(100vw - 6rem)', minWidth: 'calc(100vw - 6rem)', flexShrink: 0 }}
     >
-      <div className="flex h-60">
+      <div className="flex h-40">
         {/* Article image - 1/3 width */}
         <div
           className="w-1/3 h-full"
@@ -115,25 +96,15 @@ const ArticleCard: React.FC<{ article: ArticleType; index: number }> = ({ articl
         ></div>
 
         {/* Article content - 2/3 width */}
-        <div className="w-2/3 p-4 flex flex-col justify-between">
+        <div className="w-2/3 p-3 flex flex-col justify-between">
           {/* Top section: title */}
-          <div className="mb-2">
+          <div className="mb-1">
             <h3
-              className="text-black font-semibold mb-1"
-              style={{ fontWeight: 600, fontSize: '15px' }}
+              className="text-black font-semibold"
+              style={{ fontWeight: 600, fontSize: '16px' }}
             >
               {article.title}
             </h3>
-          </div>
-
-          {/* Middle section: description */}
-          <div className="mb-3 flex-1">
-            <p
-              className="text-xs leading-relaxed line-clamp-3"
-              style={{ color: '#333333', fontWeight: 400 }}
-            >
-              {descriptionText}
-            </p>
           </div>
 
           {/* Bottom section: button */}
