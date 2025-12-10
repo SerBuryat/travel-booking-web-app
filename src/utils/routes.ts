@@ -36,6 +36,7 @@ export const PAGE_ROUTES = {
     ROOT: '/catalog',
     RESULT: '/catalog/result',
     POPULAR: '/catalog/popular',
+    AFISHA_POPULAR: '/catalog/afisha/popular',
     CATEGORY: '/catalog/[categoryId]',
     CATEGORY_SERVICES: '/catalog/[categoryId]/services'
   },
