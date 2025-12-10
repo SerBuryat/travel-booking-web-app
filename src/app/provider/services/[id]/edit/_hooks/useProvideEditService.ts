@@ -40,6 +40,8 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
       tarea_id: initialData.tarea_id,
       phone: initialData.phone || '',
       tg_username: initialData.tg_username || '',
+      website: initialData.website || '',
+      whatsap: initialData.whatsap || '',
       serviceOptions: initialData.serviceOptions || [],
     },
   });
@@ -55,6 +57,8 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
       tarea_id: initialData.tarea_id,
       phone: initialData.phone || '',
       tg_username: initialData.tg_username || '',
+      website: initialData.website || '',
+      whatsap: initialData.whatsap || '',
       serviceOptions: initialData.serviceOptions || [],
     });
   }, [initialData, form]);

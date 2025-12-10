@@ -13,6 +13,8 @@ import { ServiceAddressInput } from '@/app/provider/services/create/_components/
 import { ServiceAreaSelect } from '@/app/provider/services/create/_components/ServiceAreaSelect';
 import { ServicePhoneInput } from '@/app/provider/services/create/_components/ServicePhoneInput';
 import { ServiceTelegramInput } from '@/app/provider/services/create/_components/ServiceTelegramInput';
+import { ServiceWebsiteInput } from '@/app/provider/services/create/_components/ServiceWebsiteInput';
+import { ServiceWhatsAppInput } from '@/app/provider/services/create/_components/ServiceWhatsAppInput';
 import { ServiceOptionsSelection } from '@/app/provider/services/create/_components/ServiceOptionsSelection';
 import { RequiredFieldsList } from '@/app/provider/services/create/_components/RequiredFieldsList';
 import { ProgressBar } from '@/app/provider/services/create/_components/ProgressBar';
@@ -105,6 +107,16 @@ export const ProviderEditServiceForm: React.FC<ProviderEditServiceFormProps> = (
         <ServiceTelegramInput
           register={form.register}
           error={errors.tg_username}
+        />
+
+        <ServiceWebsiteInput
+          register={form.register}
+          error={errors.website}
+        />
+
+        <ServiceWhatsAppInput
+          register={form.register}
+          error={errors.whatsap}
         />
 
         {/* Стоимость */}

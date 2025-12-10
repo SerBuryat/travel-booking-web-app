@@ -17,6 +17,8 @@ export interface ServiceEditData {
   tarea_id: number;
   phone: string | null;
   tg_username: string | null;
+  website: string | null;
+  whatsap: string | null;
   serviceOptions: string[] | null;
   photos: ExistingPhotoData[];
 }
@@ -153,6 +155,8 @@ export async function getServiceForEdit(serviceId: number): Promise<ServiceEditD
     tarea_id: location.tarea_id,
     phone: contact?.phone || null,
     tg_username: contact?.tg_username || null,
+    website: contact?.website || null,
+    whatsap: contact?.whatsap || null,
     serviceOptions: service.service_options as string[] | null,
     photos: service.tphotos.map(photo => ({
       id: photo.id,
