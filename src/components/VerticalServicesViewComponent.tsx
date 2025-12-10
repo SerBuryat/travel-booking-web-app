@@ -21,6 +21,44 @@ export const VerticalServicesViewComponent: React.FC<VerticalServicesViewCompone
   title,
   moveToAllButton
 }) => {
+  // Если сервисов нет, показываем дружелюбное сообщение
+  if (services.length === 0) {
+    return (
+      <div className="px-4 py-4">
+        {/* Заголовок (без кнопки "Все") */}
+        {title && (
+          <div className="mb-4">
+            <span 
+              className="text-[#707579]"
+              style={{ 
+                fontSize: '13px', 
+                fontWeight: 400,
+                fontFamily: 'Inter, sans-serif',
+                textTransform: 'uppercase'
+              }}
+            >
+              {title}
+            </span>
+          </div>
+        )}
+        
+        {/* Сообщение об отсутствии сервисов */}
+        <div className="py-8 text-center">
+          <p
+            className="text-[#707579]"
+            style={{
+              fontSize: '14px',
+              fontWeight: 400,
+              fontFamily: 'Inter, sans-serif',
+            }}
+          >
+            Скоро добавим интересные сервисы для вас
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-4 py-4">
       {/* Заголовок с кнопкой (показываем только если есть title или moveToAllButton) */}
