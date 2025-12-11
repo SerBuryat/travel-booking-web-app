@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import ProfileHeader from '@/app/profile/_components/ProfileHeader';
 import OrdersList from '@/app/profile/orders/_components/OrdersList';
-import {ServicesClicksService} from '@/service/ServicesClicksService';
+import {getMyClicks} from '@/lib/service/clickService';
 import {getUserAuthOrThrow} from "@/lib/auth/getUserAuth";
 import {redirect} from "next/navigation";
 import {PAGE_ROUTES} from "@/utils/routes";
@@ -15,12 +15,12 @@ export default async function ProfileOrdersPage() {
     redirect(PAGE_ROUTES.NO_AUTH);
   }
 
-  const clicksService = new ServicesClicksService();
-  const clicks = await clicksService.getByClientId(user.id);
+  // Получаем клики текущего пользователя через server action
+  const clicks = await getMyClicks();
   const orders = clicks.map((c) => ({
     id: c.id,
-    serviceId: c.tservices.id,
-    name: c.tservices.name,
+    serviceId: c.serviceId,
+    name: c.serviceName,
     respondedAt: c.timestamp,
   }));
 
@@ -31,10 +31,12 @@ export default async function ProfileOrdersPage() {
         <h1 className="text-[16px] font-semibold text-gray-900 mb-4">Мои заказы</h1>
         <OrdersList orders={orders} />
         <div className="mt-6 flex flex-col items-center space-y-2">
-          <Link href="/profile/reviews" className="text-[#707579] text-[13px] font-normal hover:underline text-center">
+          <Link href={PAGE_ROUTES.IN_PROGRESS}
+                className="text-[#707579] text-[13px] font-normal hover:underline text-center">
             Оставить отзыв
           </Link>
-          <Link href="/profile/invite" className="text-[#707579] text-[13px] font-normal hover:underline text-center">
+          <Link href={PAGE_ROUTES.IN_PROGRESS}
+                className="text-[#707579] text-[13px] font-normal hover:underline text-center">
             Пригласить друга
           </Link>
         </div>

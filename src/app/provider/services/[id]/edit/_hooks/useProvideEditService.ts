@@ -10,6 +10,8 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { updateService } from '@/lib/provider/servicesEdit';
 import type { ServiceEditData, PhotoUpdateData } from '@/lib/provider/servicesEdit';
+import {log} from '@/lib/utils/logger';
+import {generateTraceId} from '@/lib/utils/traceId';
 
 export interface ServiceUpdateResult {
   success: boolean;
@@ -40,6 +42,8 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
       tarea_id: initialData.tarea_id,
       phone: initialData.phone || '',
       tg_username: initialData.tg_username || '',
+      website: initialData.website || '',
+      whatsap: initialData.whatsap || '',
       serviceOptions: initialData.serviceOptions || [],
     },
   });
@@ -55,12 +59,25 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
       tarea_id: initialData.tarea_id,
       phone: initialData.phone || '',
       tg_username: initialData.tg_username || '',
+      website: initialData.website || '',
+      whatsap: initialData.whatsap || '',
       serviceOptions: initialData.serviceOptions || [],
     });
   }, [initialData, form]);
 
   const onSubmit = async (data: CreateServiceData, photos?: PhotoUpdateData) => {
+    // Генерируем traceId для отслеживания процесса
+    const traceId = generateTraceId();
+
     if (!user) {
+      log(
+        'useProvideEditService',
+        'Попытка обновления сервиса без аутентификации',
+        'warn',
+        { serviceId, formData: { name: data.name, categoryId: data.tcategories_id } },
+        undefined,
+        traceId
+      );
       setResult({
         success: false,
         message: 'Пользователь не аутентифицирован',
@@ -69,7 +86,32 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
       return;
     }
 
+    if (!user.providerId) {
+      log(
+        'useProvideEditService',
+        'Попытка обновления сервиса без providerId',
+        'error',
+        { userId: user.userId, serviceId, serviceName: data.name },
+        undefined,
+        traceId
+      );
+      setResult({
+        success: false,
+        message: 'Провайдер не найден',
+        error: 'Provider not found',
+      });
+      return;
+    }
+
     if (!photos) {
+      log(
+        'useProvideEditService',
+        'Попытка обновления сервиса без фото',
+        'error',
+        { userId: user.userId, providerId: user.providerId, serviceId, serviceName: data.name },
+        undefined,
+        traceId
+      );
       setResult({
         success: false,
         message: 'Необходимо загрузить фотографии',
@@ -81,9 +123,47 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
     setIsSubmitting(true);
     setResult(null);
 
+    const existingPhotosCount = photos.existing?.length || 0;
+    const newPhotosCount = photos.new?.length || 0;
+    const totalNewPhotosSizeMB = photos.new
+      ?.reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
+
+    log(
+      'useProvideEditService',
+      'Начало обновления сервиса',
+      'info',
+      {
+        userId: user.userId,
+        providerId: user.providerId,
+        serviceId,
+        serviceName: data.name,
+        categoryId: data.tcategories_id,
+        areaId: data.tarea_id,
+        existingPhotosCount,
+        newPhotosCount,
+        totalNewPhotosSizeMB: totalNewPhotosSizeMB.toFixed(2)
+      },
+      undefined,
+      traceId
+    );
+
     try {
       // Обновляем сервис
-      await updateService(serviceId, data, photos);
+      await updateService(serviceId, data, photos, traceId);
+
+      log(
+        'useProvideEditService',
+        'Сервис успешно обновлен',
+        'info',
+        {
+          userId: user.userId,
+          providerId: user.providerId,
+          serviceId,
+          serviceName: data.name
+        },
+        undefined,
+        traceId
+      );
 
       setResult({
         success: true,
@@ -91,11 +171,30 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
       });
 
     } catch (error) {
-      console.error('Ошибка обновления сервиса:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      log(
+        'useProvideEditService',
+        'Ошибка обновления сервиса',
+        'error',
+        {
+          userId: user.userId,
+          providerId: user.providerId,
+          serviceId,
+          serviceName: data.name,
+          categoryId: data.tcategories_id,
+          areaId: data.tarea_id,
+          existingPhotosCount,
+          newPhotosCount,
+          totalNewPhotosSizeMB: totalNewPhotosSizeMB.toFixed(2),
+          formErrors: form.formState.errors
+        },
+        error,
+        traceId
+      );
       setResult({
         success: false,
         message: 'Произошла ошибка при обновлении сервиса',
-        error: error instanceof Error ? error.message : 'Неизвестная ошибка',
+        error: errorMessage,
       });
     } finally {
       setIsSubmitting(false);

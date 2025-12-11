@@ -43,7 +43,7 @@ export default function ProfileCard({ user }: ProfileCardProps) {
         {/* Имя и ID */}
         <div className="flex-1">
           <div className="font-bold text-gray-900">{user.name}</div>
-          <div className="text-blue-600 text-sm">id#{user.id}</div>
+          <div className="text-blue-600 text-sm">ID: #{user.id}</div>
         </div>
         
         {/* Стрелочка */}

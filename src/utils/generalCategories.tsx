@@ -70,13 +70,44 @@ const PackageIcon: React.FC = () => (
     </svg>
 );
 
+const ShoppingIcon: React.FC = () => (
+  <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fillRule="evenodd" clipRule="evenodd"
+          d="M11.0784 2.89423C8.57288 2.89423 6.54176 4.92534 6.54176 7.43086V7.50253H3.70513C2.72667 7.50253 1.93347 8.29572 1.93347 9.27418V16.6475C1.93347 19.662 4.37723 22.1058 7.39177 22.1058H16.6084C19.6229 22.1058 22.0667 19.662 22.0667 16.6475V9.27418C22.0667 8.29572 21.2735 7.50253 20.295 7.50253H17.4583V7.43086C17.4583 4.92535 15.4272 2.89423 12.9217 2.89423H11.0784ZM15.7583 9.20253V10.1958C15.7583 10.6653 16.1389 11.0458 16.6083 11.0458C17.0778 11.0458 17.4583 10.6653 17.4583 10.1958V9.20253H20.295C20.3346 9.20253 20.3667 9.23461 20.3667 9.27418V16.6475C20.3667 18.7231 18.684 20.4058 16.6084 20.4058H7.39177C5.31612 20.4058 3.63347 18.7231 3.63347 16.6475V9.27418C3.63347 9.23461 3.66555 9.20253 3.70513 9.20253H6.54176V10.1958C6.54176 10.6653 6.92231 11.0458 7.39176 11.0458C7.8612 11.0458 8.24176 10.6653 8.24176 10.1958V9.20253H15.7583ZM15.7583 7.50253V7.43086C15.7583 5.86423 14.4883 4.59423 12.9217 4.59423H11.0784C9.51176 4.59423 8.24176 5.86423 8.24176 7.43086V7.50253H15.7583Z"
+          fill="#1C1C1C"/>
+  </svg>
+);
+
+const PosterIcon: React.FC = () => (
+  <svg width="26" height="26" viewBox="0 0 213.275 213.275" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <g>
+      <path d="M183.743,0H29.532c-4.142,0-7.5,3.358-7.5,7.5v198.275c0,4.142,3.358,7.5,7.5,7.5h103.555c1.989,0,3.896-0.79,5.304-2.197
+        l50.656-50.658c1.406-1.407,2.196-3.314,2.196-5.303V7.5C191.243,3.358,187.886,0,183.743,0z M37.032,15h139.211v132.615h-43.154
+        c-4.143,0-7.5,3.358-7.5,7.5v8.275H73.562c-4.143,0-7.5,3.358-7.5,7.5c0,4.142,3.357,7.5,7.5,7.5h52.027v19.885H37.032V15z
+         M140.589,162.615h25.051l-25.051,25.051V162.615z" fill="#303030"/>
+      <path d="M106.544,84.643c16.497,0,29.918-13.424,29.918-29.925c0-16.501-13.421-29.926-29.918-29.926
+        c-16.498,0-29.921,13.425-29.921,29.926C76.623,71.219,90.046,84.643,106.544,84.643z M106.544,39.792
+        c8.226,0,14.918,6.696,14.918,14.926c0,8.229-6.692,14.925-14.918,14.925c-8.228,0-14.921-6.695-14.921-14.925
+        C91.623,46.488,98.316,39.792,106.544,39.792z" fill="#303030"/>
+      <path d="M73.562,138.528c4.143,0,7.5-3.358,7.5-7.5v-12.447c0-7.828,6.371-14.196,14.201-14.196h22.744
+        c7.834,0,14.207,6.368,14.207,14.196v12.447c0,4.142,3.357,7.5,7.5,7.5c4.143,0,7.5-3.358,7.5-7.5v-12.447
+        c0-16.099-13.103-29.196-29.207-29.196H95.263c-16.102,0-29.201,13.097-29.201,29.196v12.447
+        C66.062,135.17,69.419,138.528,73.562,138.528z" fill="#303030"/>
+    </g>
+  </svg>
+);
+
 // Default icon for general categories
 export const DEFAULT_CATEGORY_ICON: React.ReactNode = (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <polyline points="3.27,6.96 12,12.01 20.73,6.96" stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    <line x1="12" y1="22.08" x2="12" y2="12" stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-  </svg>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+          d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+          stroke="#303030" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <polyline points="3.27,6.96 12,12.01 20.73,6.96" stroke="#303030" strokeWidth="2" strokeLinecap="round"
+                strokeLinejoin="round"/>
+      <line x1="12" y1="22.08" x2="12" y2="12" stroke="#303030" strokeWidth="2" strokeLinecap="round"
+            strokeLinejoin="round"/>
+    </svg>
 );
 
 // ============================================================================
@@ -129,6 +160,20 @@ export const CATEGORIES_IMAGES_MAP: Record<string, CategoryImages> = {
     pngLarge: '/images/categories/package/package-sq-lg.png',
     pngSmall: '/images/categories/package/package-sq-sm.png',
     backgroundImage: '/images/categories/package/package-hr.png',
+  },
+  shopping: {
+    sysname: 'shopping',
+    svgIcon: <ShoppingIcon />,
+    pngLarge: '/images/categories/shopping/shopping-lg-sm.png',
+    pngSmall: '/images/categories/shopping/shopping-sq-sm.png',
+    backgroundImage: '/images/categories/shopping/shopping-hr.png',
+  },
+  afisha: {
+    sysname: 'afisha',
+    svgIcon: <PosterIcon />,
+    pngLarge: '/images/categories/afisha/afisha-sq-lg.jpg',
+    pngSmall: '/images/categories/afisha/afisha-sq-sm.jpg',
+    backgroundImage: '/images/categories/afisha/afisha-hr.jpg',
   },
 };
 
@@ -227,6 +272,22 @@ export const PACKAGE: GeneralCategory = {
 };
 
 /**
+ * @deprecated Используйте getCategoryImages('shopping')
+ */
+export const SHOPPING: GeneralCategory = {
+  code: 'shopping',
+  icon: <ShoppingIcon />
+};
+
+/**
+ * @deprecated Используйте getCategoryImages('afisha')
+ */
+export const AFISHA: GeneralCategory = {
+  code: 'afisha',
+  icon: <PosterIcon />
+};
+
+/**
  * Map of general categories
  * @deprecated Используйте CATEGORIES_IMAGES_MAP
  */
@@ -237,6 +298,8 @@ const generalCategoriesMap = new Map<string, GeneralCategory>([
   [ENTERTAINMENT.code, ENTERTAINMENT],
   [HEALTH.code, HEALTH],
   [PACKAGE.code, PACKAGE],
+  [SHOPPING.code, SHOPPING],
+  [AFISHA.code, AFISHA],
 ]);
 
 /**

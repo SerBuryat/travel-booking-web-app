@@ -9,6 +9,8 @@ import {
 import {useAuth} from '@/contexts/AuthContext';
 import {createService} from "@/lib/service/createService";
 import { PhotoItem } from '@/lib/service/hooks/useServicePhotos';
+import {log} from '@/lib/utils/logger';
+import {generateTraceId} from '@/lib/utils/traceId';
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -29,7 +31,18 @@ export const useProvideCreateService = () => {
   });
 
   const onSubmit = async (data: CreateServiceData, photos?: PhotoItem[]) => {
+    // Генерируем traceId для отслеживания процесса
+    const traceId = generateTraceId();
+
     if (!user) {
+      log(
+        'useProvideCreateService',
+        'Попытка создания сервиса без аутентификации',
+        'warn',
+        { formData: { name: data.name, categoryId: data.tcategories_id } },
+        undefined,
+        traceId
+      );
       setResult({
         success: false,
         message: 'Пользователь не аутентифицирован',
@@ -38,12 +51,67 @@ export const useProvideCreateService = () => {
       return;
     }
 
+    if (!user.providerId) {
+      log(
+        'useProvideCreateService',
+        'Попытка создания сервиса без providerId',
+        'error',
+        { userId: user.userId, serviceName: data.name },
+        undefined,
+        traceId
+      );
+      setResult({
+        success: false,
+        message: 'Провайдер не найден. Пожалуйста, сначала создайте провайдера.',
+        error: 'Provider not found'
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setResult(null);
 
+    const photosCount = photos?.length || 0;
+    const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
+    const totalPhotosSizeMB = photos
+      ?.filter(p => !p.isExisting && p.file)
+      .reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
+
+    log(
+      'useProvideCreateService',
+      'Начало создания сервиса провайдером',
+      'info',
+      {
+        userId: user.userId,
+        providerId: user.providerId,
+        serviceName: data.name,
+        categoryId: data.tcategories_id,
+        areaId: data.tarea_id,
+        photosCount,
+        newPhotosCount,
+        totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
+      },
+      undefined,
+      traceId
+    );
+
     try {
       // Создаем сервис
-      const responseData = await createService(data, user.providerId, photos);
+      const responseData = await createService(data, user.providerId, photos, traceId);
+
+      log(
+        'useProvideCreateService',
+        'Сервис успешно создан провайдером',
+        'info',
+        {
+          userId: user.userId,
+          providerId: user.providerId,
+          serviceId: responseData.serviceId,
+          serviceName: data.name
+        },
+        undefined,
+        traceId
+      );
 
       setResult({
         success: true,
@@ -55,11 +123,29 @@ export const useProvideCreateService = () => {
       form.reset();
 
     } catch (error) {
-      console.error('Ошибка создания сервиса:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      log(
+        'useProvideCreateService',
+        'Ошибка создания сервиса провайдером',
+        'error',
+        {
+          userId: user.userId,
+          providerId: user.providerId,
+          serviceName: data.name,
+          categoryId: data.tcategories_id,
+          areaId: data.tarea_id,
+          photosCount,
+          newPhotosCount,
+          totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2),
+          formErrors: form.formState.errors
+        },
+        error,
+        traceId
+      );
       setResult({
         success: false,
         message: 'Произошла ошибка при создании сервиса',
-        error: error instanceof Error ? error.message : 'Неизвестная ошибка'
+        error: errorMessage
       });
     } finally {
       setIsSubmitting(false);

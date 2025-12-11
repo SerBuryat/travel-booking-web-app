@@ -23,7 +23,7 @@ export function useTelegramClosingBehavior(enabled: boolean = true) {
       closingBehavior.mount();
       closingBehavior.enableConfirmation();
     } catch (e) {
-      console.error("Can't enable tg mini app `closingBehavior.enableConfirmation()` cause", e);
+      console.info("Can't enable tg mini app `closingBehavior.enableConfirmation()` cause", e);
     }
   }, [enabled]);
 }

@@ -13,7 +13,6 @@ export const RequiredFieldsList: React.FC<RequiredFieldsListProps> = ({ watch, e
   // Список всех обязательных полей с их названиями
   const requiredFields = [
     { key: 'name', label: 'Название сервиса' },
-    { key: 'description', label: 'Описание сервиса' },
     { key: 'price', label: 'Цена' },
     { key: 'tcategories_id', label: 'Категория' },
     { key: 'address', label: 'Адрес' },
@@ -21,8 +20,7 @@ export const RequiredFieldsList: React.FC<RequiredFieldsListProps> = ({ watch, e
     { key: 'providerCompanyName', label: 'Название компании' },
     { key: 'providerContactPerson', label: 'Контактное лицо' },
     { key: 'providerPhone', label: 'Телефон компании' },
-    { key: 'phone', label: 'Контактный телефон' },
-    { key: 'tg_username', label: 'Телеграм ссылка заведения' }
+    { key: 'phone', label: 'Контактный телефон' }
   ];
 
   // Разделяем поля на заполненные и незаполненные

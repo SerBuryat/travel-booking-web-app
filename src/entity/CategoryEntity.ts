@@ -6,4 +6,5 @@ export interface CategoryEntity {
   photo: string | null;
   parent_id: number | null;
   priority: number | null;
+  type?: string | null;
 }

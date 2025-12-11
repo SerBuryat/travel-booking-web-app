@@ -19,12 +19,24 @@ echo "🚀 Запускаем nginx..."
 sudo systemctl start nginx
 sudo systemctl enable nginx
 
+# Настраиваем nginx.conf
+echo "⚙️  Настраиваем nginx.conf..."
+sudo tee /etc/nginx/conf.d/custom.conf > /dev/null << 'EOF'
+client_max_body_size 10M;
+
+log_format custom '$remote_addr - [$time_local] "$request" $status '
+                  '$body_bytes_sent "$http_referer" "$http_user_agent" '
+                  'body: "$request_body"';
+EOF
+
 # Создаем конфигурацию nginx
 echo "⚙️  Создаем конфигурацию nginx..."
 sudo tee /etc/nginx/sites-available/travel-app-service.ru > /dev/null << 'EOF'
 server {
     listen 80;
     server_name travel-app-service.ru;
+
+    access_log /var/log/nginx/access.log custom;
 
     client_max_body_size 10M;
 

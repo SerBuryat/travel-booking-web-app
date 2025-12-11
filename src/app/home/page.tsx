@@ -4,6 +4,7 @@ import {SearchBarWrapper} from '@/components/SearchBarWrapper';
 import {AllCategoriesForHomeComponent} from '@/components/AllCategoriesForHomeComponent';
 import {VerticalServicesViewComponent} from '@/components/VerticalServicesViewComponent';
 import {AreaArticlesComponent} from '@/components/AreaArticlesComponent';
+import {AreaAfishaComponent} from '@/components/AreaAfishaComponent';
 import {DeveloperLink} from '@/components/DeveloperLink';
 import {popularServices} from "@/lib/service/searchServices";
 import {PAGE_ROUTES} from "@/utils/routes";
@@ -13,7 +14,9 @@ import {parentCategories} from "@/lib/category/searchCategories";
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const categories = await parentCategories();
+  // todo - исключаем из родительских категорий категорию "Афиша" для отображения на главной странице (пока так)
+  const categories =
+      (await parentCategories()).filter(category => category.type !== 'afisha');
   const services = await popularServices({take: 6});
 
   return (
@@ -29,15 +32,21 @@ export default async function HomePage() {
           <AllCategoriesForHomeComponent categories={categories} />
         </div>
 
+        {/* Афиша */}
+        <AreaAfishaComponent />
+
+        {/* Статьи по району */}
+        <AreaArticlesComponent />
+
         {/* Популярные сервисы */}
         <div>
           <VerticalServicesViewComponent
-            services={services}
-            title="Популярное"
-            moveToAllButton={{
-              text: "Все",
-              href: PAGE_ROUTES.CATALOG.POPULAR
-            }}
+              services={services}
+              title="Популярное"
+              moveToAllButton={{
+                text: "Все",
+                href: PAGE_ROUTES.CATALOG.POPULAR
+              }}
           />
         </div>
 

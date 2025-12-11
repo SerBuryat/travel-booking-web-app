@@ -6,6 +6,9 @@ import { ProposalView } from '@/lib/request/client/proposal/getRequestProposals'
 import { PAGE_ROUTES } from '@/utils/routes';
 import { ServiceTypeFull } from '@/model/ServiceType';
 import { getServiceById } from '@/lib/service/searchServices';
+import { createOrUpdateClick } from '@/lib/service/clickService';
+import ContactsModal from '@/components/ContactsModal';
+import { formatRating } from '@/utils/rating';
 
 interface ProposalItemProps {
   proposal: ProposalView;
@@ -35,19 +38,25 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
   const openModal = useCallback(() => setIsModalOpen(true), []);
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
-  const handleContactClick = async (serviceId: number) => {
+  const handleContactClick = async (serviceId: number, proposalId: number) => {
     try {
-      const res = await fetch(`/api/services/${serviceId}/click`, { method: 'POST' });
-      if (res.status === 401) {
-        router.push(PAGE_ROUTES.NO_AUTH);
-        return;
-      }
+      // Создаем или обновляем клик через server action
+      await createOrUpdateClick(serviceId, proposalId);
       
       // Загружаем полную информацию о сервисе с контактами
       const fullService = await getServiceById(serviceId);
       setSelectedService(fullService);
-    } catch (e) {
-      // ignore for MVP
+    } catch (error) {
+      // Если ошибка авторизации (JWT is required, Invalid JWT и т.д.), перенаправляем на страницу входа
+      if (error instanceof Error && (
+        error.message.includes('JWT') || 
+        error.message.includes('auth') ||
+        error.message.includes('Unauthorized')
+      )) {
+        router.push(PAGE_ROUTES.NO_AUTH);
+        return;
+      }
+      // Игнорируем другие ошибки для MVP
     } finally {
       openModal();
     }
@@ -176,11 +185,7 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
                       className="text-xs font-semibold"
                       style={{ color: '#007AFF', fontWeight: 600, fontSize: "17px" }}
                     >
-                      {
-                        service.rating && service.view_count > 0
-                          ? `${service.rating}/5`
-                          : 'Нет оценок'
-                      }
+                      {formatRating(service.rating)}
                     </span>
                     {/* Price on the right */}
                     <span 
@@ -197,7 +202,7 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
             {/* Кнопки действий */}
             <div className="flex gap-3 px-4 pb-4">
               <button
-                onClick={() => handleContactClick(service.id)}
+                onClick={() => handleContactClick(service.id, proposal.id)}
                 className="flex-1 py-3 text-black rounded-full"
                 style={{ 
                   backgroundColor: '#95E59D', 
@@ -226,35 +231,11 @@ export default function ProposalItem({ proposal }: ProposalItemProps) {
       })}
 
       {/* Contacts Modal */}
-      {isModalOpen && selectedService && (
-        <div className="fixed inset-0 flex items-end sm:items-center justify-center" style={{ zIndex: 60 }}>
-          <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
-          <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-6 m-0 sm:m-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Контакты</h3>
-              <button onClick={closeModal} className="text-gray-500">✕</button>
-            </div>
-            {selectedService.contacts && selectedService.contacts.length > 0 ? (
-              <div className="space-y-3">
-                {selectedService.contacts.map((c) => (
-                  <div key={c.id} className="rounded-lg border border-gray-100 p-4">
-                    {c.phone && <div className="text-sm text-gray-700"><span className="font-medium">Телефон:</span> {c.phone}</div>}
-                    {c.email && <div className="text-sm text-gray-700"><span className="font-medium">Email:</span> {c.email}</div>}
-                    {c.tg_username && <div className="text-sm text-gray-700"><span className="font-medium">Telegram:</span> @{c.tg_username}</div>}
-                    {c.whatsap && <div className="text-sm text-gray-700"><span className="font-medium">WhatsApp:</span> {c.whatsap}</div>}
-                    {c.website && <div className="text-sm text-blue-600"><a href={c.website} target="_blank" rel="noreferrer">Сайт</a></div>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-gray-500">Контактная информация недоступна</div>
-            )}
-            <div className="mt-6">
-              <button onClick={closeModal} className="w-full py-3 rounded-xl bg-gray-100 text-gray-700">Закрыть</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ContactsModal
+        isOpen={isModalOpen && selectedService !== null}
+        onClose={closeModal}
+        contacts={selectedService?.contacts || []}
+      />
     </div>
   );
 }

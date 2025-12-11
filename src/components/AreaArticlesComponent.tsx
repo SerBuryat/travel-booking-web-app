@@ -5,9 +5,15 @@ import { ArticlesList } from './ArticlesList';
 /**
  * Серверный компонент для получения и отображения списка статей по текущей локации пользователя.
  * Статьи отображаются в горизонтальном скролле.
+ * Если статей нет, компонент не отображается.
  */
 export const AreaArticlesComponent: React.FC = async () => {
   const articles = await searchArticles();
+
+  // Не отображаем раздел, если статей нет
+  if (articles.length === 0) {
+    return null;
+  }
 
   return (
     <div className="px-4 py-4">
@@ -26,7 +32,7 @@ export const AreaArticlesComponent: React.FC = async () => {
         </span>
       </div>
 
-      {/* Горизонтальный скролл статей или сообщение об отсутствии */}
+      {/* Горизонтальный скролл статей */}
       <ArticlesList articles={articles} />
     </div>
   );

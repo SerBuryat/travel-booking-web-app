@@ -1,5 +1,5 @@
 import {CategoryEntity} from '@/entity/CategoryEntity';
-import {CategoryType, ParentCategoryWithChildren} from '@/model/CategoryType';
+import {CategoryType} from '@/model/CategoryType';
 import {CategoryRepository} from '@/repository/CategoryRepository';
 import {getGeneralCategoryCodes} from '@/utils/generalCategories';
 
@@ -48,12 +48,5 @@ export class CategoryService {
       categoryWithRelations.children, 
       categoryWithRelations.parent
     );
-  }
-
-  /**
-   * Get all parent categories with their children for service registration
-   */
-  async getAllParentWithChildren(): Promise<ParentCategoryWithChildren[]> {
-    return this.categoryRepository.findAllParentWithChildren();
   }
 }

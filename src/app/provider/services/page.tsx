@@ -33,7 +33,7 @@ export default async function ProviderServicesPage() {
   const parentToServices: Record<number, typeof services> = {} as Record<number, typeof services>;
   (parents as CategoryEntity[]).forEach((p) => { parentToServices[p.id] = []; });
   for (const s of services) {
-    const parentId = s.category?.parent_id ?? null;
+    const parentId = s.category?.parent_id ?? s.category?.id ?? null;
     if (parentId && parentToServices[parentId]) {
       parentToServices[parentId].push(s);
     }

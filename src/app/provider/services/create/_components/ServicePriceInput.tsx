@@ -16,7 +16,7 @@ export const ServicePriceInput: React.FC<ServicePriceInputProps> = ({
   return (
     <div className="relative">
       <label htmlFor="price" className="block text-sm font-medium mb-0 pl-2" style={{ color: '#A2ACB0', marginLeft: '8px', marginTop: '4px', marginBottom: '-8px', zIndex: 10, position: 'relative', width: 'fit-content', background: '#F9FAFB', paddingLeft: '4px', paddingRight: '4px' }}>
-        Стоимость *
+        Стоимость от <span style={{ color: '#A2ACB0' }}>*</span>
       </label>
       <div className="relative">
                        <input

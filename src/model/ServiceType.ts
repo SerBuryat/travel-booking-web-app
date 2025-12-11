@@ -17,6 +17,7 @@ export interface ServiceType {
   options: string[];
   address: string;
   preview_photo_url: string;
+  event_date?: string | Date | null;
 }
 
 export interface Photos {

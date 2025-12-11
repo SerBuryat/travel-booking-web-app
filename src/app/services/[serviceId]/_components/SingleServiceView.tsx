@@ -5,6 +5,10 @@ import {ServiceTypeFull} from '@/model/ServiceType';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {DEFAULT_SERVICE_IMAGE_3} from '@/utils/images';
+import {createOrUpdateClick} from '@/lib/service/clickService';
+import ContactsModal from '@/components/ContactsModal';
+import {formatRating} from '@/utils/rating';
+import {formatDateTime, formatDateOnly} from '@/utils/date';
 
 export default function SingleServiceView({ 
   service
@@ -23,35 +27,25 @@ export default function SingleServiceView({
   const closeModal = useCallback(() => setIsModalOpen(false), []);
 
   async function handleContactClick() {
-    // todo -  переделать на server action
     try {
-      const res = await fetch(`/api/services/${service.id}/click`, { method: 'POST' });
-      if (res.status === 401) {
+      // Создаем или обновляем клик через server action
+      await createOrUpdateClick(service.id);
+    } catch (error) {
+      // Если ошибка авторизации (JWT is required, Invalid JWT и т.д.), перенаправляем на страницу входа
+      if (error instanceof Error && (
+        error.message.includes('JWT') || 
+        error.message.includes('auth') ||
+        error.message.includes('Unauthorized')
+      )) {
         router.push(PAGE_ROUTES.NO_AUTH);
         return;
       }
-    } catch (e) {
-      // ignore for MVP
+      // Игнорируем другие ошибки для MVP
     } finally {
       openModal();
     }
   }
 
-  const formatDate = (dateValue?: string | Date): string => {
-    if (!dateValue) return '';
-    try {
-      const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
-      if (isNaN(date.getTime())) return '';
-      const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
-                     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-      const day = date.getDate();
-      const month = months[date.getMonth()];
-      const year = date.getFullYear();
-      return `${day} ${month} ${year}`;
-    } catch {
-      return '';
-    }
-  };
 
   // Безопасная обработка options - может быть null или не массивом
   const serviceOptions = Array.isArray(service.options) ? service.options : [];
@@ -83,7 +77,7 @@ export default function SingleServiceView({
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
                   <span className="text-gray-400" style={{ fontSize: '12px' }}>
-                  {formatDate(service.created_at)}
+                  {formatDateOnly(service.created_at)}
                 </span>
                 </>
             )}
@@ -114,6 +108,32 @@ export default function SingleServiceView({
         >
           {service.name}
         </h1>
+        
+        {/* Event Date for Afisha category */}
+        {service.category?.type === 'afisha' && service.event_date && (
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="#007AFF"
+              strokeWidth="2"
+            >
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+              <line x1="16" y1="2" x2="16" y2="6" />
+              <line x1="8" y1="2" x2="8" y2="6" />
+              <line x1="3" y1="10" x2="21" y2="10" />
+            </svg>
+            <span 
+              className="text-blue-600 font-semibold"
+              style={{ fontSize: '16px', fontWeight: 600 }}
+            >
+              {formatDateTime(service.event_date)}
+            </span>
+          </div>
+        )}
+        
         {/* Address */}
         <p 
           className="text-gray-500 mb-3 text-center"
@@ -132,7 +152,7 @@ export default function SingleServiceView({
           </h2>
           <p 
             className="text-black leading-relaxed"
-            style={{ fontSize: '17px', color: 'black', fontWeight: 400 }}
+            style={{ fontSize: '17px', color: 'black', fontWeight: 400, whiteSpace: 'pre-line' }}
           >
             {service.description}
           </p>
@@ -162,7 +182,7 @@ export default function SingleServiceView({
         {/* Additional Service Info */}
         <div className="mt-4 space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-gray-600">Цена:</span>
+            <span className="text-gray-600">Цена от:</span>
             <span className="text-2xl font-bold text-blue-600">
               {service.price} ₽
             </span>
@@ -170,11 +190,7 @@ export default function SingleServiceView({
           <div className="flex justify-between items-center">
             <span className="text-gray-600">Рейтинг:</span>
             <span className="text-xl font-bold text-blue-600">
-              {
-                service.rating && service.view_count && service.view_count > 0
-                    ? `${service.rating}/5`
-                    : 'Нет оценок'
-              }
+              {formatRating(service.rating)}
             </span>
           </div>
         </div>
@@ -194,35 +210,11 @@ export default function SingleServiceView({
       </div>
 
       {/* Contacts Modal */}
-      {isModalOpen && (
-        <div className="fixed inset-0 flex items-end sm:items-center justify-center" style={{ zIndex: 60 }}>
-          <div className="absolute inset-0 bg-black/40" onClick={closeModal} />
-          <div className="relative bg-white w-full sm:max-w-md rounded-t-2xl sm:rounded-2xl p-6 m-0 sm:m-4">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">Контакты</h3>
-              <button onClick={closeModal} className="text-gray-500">✕</button>
-            </div>
-            {service.contacts && service.contacts.length > 0 ? (
-              <div className="space-y-3">
-                {service.contacts.map((c) => (
-                  <div key={c.id} className="rounded-lg border border-gray-100 p-4">
-                    {c.phone && <div className="text-sm text-gray-700"><span className="font-medium">Телефон:</span> {c.phone}</div>}
-                    {c.email && <div className="text-sm text-gray-700"><span className="font-medium">Email:</span> {c.email}</div>}
-                    {c.tg_username && <div className="text-sm text-gray-700"><span className="font-medium">Telegram:</span> @{c.tg_username}</div>}
-                    {c.whatsap && <div className="text-sm text-gray-700"><span className="font-medium">WhatsApp:</span> {c.whatsap}</div>}
-                    {c.website && <div className="text-sm text-blue-600"><a href={c.website} target="_blank" rel="noreferrer">Сайт</a></div>}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="text-sm text-gray-500">Контактная информация недоступна</div>
-            )}
-            <div className="mt-6">
-              <button onClick={closeModal} className="w-full py-3 rounded-xl bg-gray-100 text-gray-700">Закрыть</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ContactsModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        contacts={service.contacts || []}
+      />
     </div>
   );
 } 

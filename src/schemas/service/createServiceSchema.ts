@@ -10,8 +10,8 @@ export const createServiceSchema = z.object({
   .max(100, 'Название не должно превышать 100 символов'),
 
   description: z.string()
-  .min(10, 'Описание должно содержать минимум 10 символов')
-  .max(500, 'Описание не должно превышать 500 символов'),
+  .max(1000, 'Описание не должно превышать 1000 символов')
+  .optional(),
 
   price: z.string()
   .regex(/^\d+(\.\d{1,2})?$/, 'Цена должна быть числом с максимум 2 знаками после запятой')
@@ -28,15 +28,48 @@ export const createServiceSchema = z.object({
   .min(1, 'Выберите зону'),
 
   phone: z.string()
-  .regex(/^\+?[\d\s\-()]+$/, 'Неверный формат телефона')
-  .optional(),
+  .min(1, 'Телефон обязателен для заполнения')
+  .regex(/^\+?[\d\s\-()]+$/, 'Неверный формат телефона'),
 
   tg_username: z.string()
-  .regex(/^@?[a-zA-Z0-9_]{5,32}$/, 'Неверный формат username Telegram')
+  .refine(
+    (val) => !val || val.trim() === '' || 
+      // Username: может начинаться с @, содержит буквы, цифры, подчеркивания (5-32 символа)
+      /^@?[a-zA-Z0-9_]{5,32}$/.test(val) ||
+      // Или телефон: начинается с +, содержит цифры, пробелы, дефисы, скобки
+      /^\+?[\d\s\-()]+$/.test(val),
+    'Неверный формат. Введите юзернейм (5-32 символа) или номер телефона'
+  )
+  .optional(),
+
+  website: z.string()
+  .refine(
+    (val) => !val || val.trim() === '' || /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$|^([а-яА-ЯёЁ0-9]([а-яА-ЯёЁ0-9\-]{0,61}[а-яА-ЯёЁ0-9])?\.)+[а-яА-ЯёЁ]{2,}$/.test(val),
+    'Неверный формат домена'
+  )
+  .optional(),
+
+  whatsap: z.string()
+  .refine(
+    (val) => !val || val.trim() === '' || /^\+?[\d\s\-()]+$/.test(val),
+    'Неверный формат телефона'
+  )
   .optional(),
 
   serviceOptions: z.array(z.string())
-  .optional()
+  .optional(),
+
+  event_date: z.preprocess(
+    (val) => {
+      if (!val || val === '' || (typeof val === 'string' && val.trim() === '')) {
+        return undefined;
+      }
+      // datetime-local возвращает строку в формате "YYYY-MM-DDTHH:mm"
+      // Преобразуем в Date объект
+      return new Date(val as string);
+    },
+    z.date().optional()
+  )
 });
 
 export type CreateProviderData = z.infer<typeof createProviderSchema>;

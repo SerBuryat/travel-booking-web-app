@@ -119,6 +119,33 @@ else
     exit 1
 fi
 
+echo "🔒 Настраиваем правила iptables для порта 3000..."
+
+# Устанавливаем iptables-persistent для сохранения правил после перезагрузки
+if ! command -v iptables &> /dev/null; then
+    echo "Устанавливаем iptables..."
+    sudo apt-get update
+    sudo apt-get install -y iptables iptables-persistent
+fi
+
+# Разрешаем подключения с localhost к порту 3000
+sudo iptables -I INPUT 1 -i lo -p tcp --dport 3000 -j ACCEPT
+
+# Блокируем все остальные подключения к порту 3000
+sudo iptables -I INPUT 2 -p tcp --dport 3000 -j DROP
+
+# Сохраняем правила iptables
+if command -v netfilter-persistent &> /dev/null; then
+    sudo netfilter-persistent save
+elif [ -f /etc/init.d/netfilter-persistent ]; then
+    sudo /etc/init.d/netfilter-persistent save
+else
+    echo "⚠️  Предупреждение: не удалось сохранить правила iptables автоматически"
+    echo "Выполните вручную: sudo netfilter-persistent save"
+fi
+
+echo "✅ Правила iptables настроены: порт 3000 доступен только через localhost"
+
 echo "🎉 Подготовка VPS завершена успешно!"
 echo ""
 echo "Следующие шаги:"

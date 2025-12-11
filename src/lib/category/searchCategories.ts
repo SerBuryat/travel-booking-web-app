@@ -3,6 +3,8 @@
 import { prisma } from '@/lib/db/prisma';
 import { redirect } from 'next/navigation';
 import { PAGE_ROUTES } from '@/utils/routes';
+import { ParentCategoryWithChildren } from '@/model/CategoryType';
+import { CategoryEntity } from '@/entity/CategoryEntity';
 
 /**
  * Получение названия категории по ID
@@ -36,7 +38,16 @@ export async function parentCategories() {
   try {
     const categories = await prisma.tcategories.findMany({
       where: { parent_id: null },
-      select: { id: true, code: true, sysname: true, name: true, photo: true, parent_id: true, priority: true }
+      select: { 
+        id: true, 
+        code: true, 
+        sysname: true, 
+        name: true, 
+        photo: true, 
+        parent_id: true, 
+        priority: true,
+        type: true
+      }
     });
 
     // Сортируем: сначала с priority (по возрастанию), затем без priority
@@ -133,5 +144,63 @@ export async function getCategoryWithChildren(id: number): Promise<CategoryWithC
   } catch (error) {
     console.error('Ошибка при получении категории:', error);
     redirect(PAGE_ROUTES.ERROR);
+  }
+}
+
+/**
+ * Получение всех родительских категорий с их дочерними категориями
+ * Используется для выбора категории при создании сервиса
+ * @returns Promise<ParentCategoryWithChildren[]> Массив родительских категорий с дочерними
+ */
+export async function getAllParentCategoriesWithChildren(): Promise<ParentCategoryWithChildren[]> {
+  try {
+    const parentCategories = await prisma.tcategories.findMany({
+      where: { parent_id: null },
+      select: {
+        id: true,
+        code: true,
+        sysname: true,
+        name: true,
+        photo: true,
+        other_tcategories: {
+          select: {
+            id: true,
+            code: true,
+            sysname: true,
+            name: true,
+            photo: true,
+            parent_id: true,
+            priority: true,
+          },
+          orderBy: { name: 'asc' },
+        }
+      },
+      orderBy: { name: 'asc' },
+    });
+
+    // Сортируем родительские категории по имени (на случай, если БД не отсортировала)
+    const sortedParentCategories = parentCategories.sort((a, b) => 
+      a.name.localeCompare(b.name, 'ru', { sensitivity: 'base' })
+    );
+
+    return sortedParentCategories.map(parent => ({
+      id: parent.id,
+      code: parent.code,
+      sysname: parent.sysname,
+      name: parent.name,
+      photo: parent.photo,
+      children: parent.other_tcategories.map(child => ({
+        id: child.id,
+        code: child.code,
+        sysname: child.sysname,
+        name: child.name,
+        photo: child.photo,
+        parent_id: child.parent_id,
+        priority: child.priority,
+      } as CategoryEntity))
+    }));
+  } catch (error) {
+    console.error('Ошибка при получении родительских категорий с дочерними:', error);
+    return [];
   }
 }
