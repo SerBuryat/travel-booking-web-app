@@ -10,6 +10,7 @@ import {useAuth} from '@/contexts/AuthContext';
 import {createService} from "@/lib/service/createService";
 import { PhotoItem } from '@/lib/service/hooks/useServicePhotos';
 import {log} from '@/lib/utils/logger';
+import {generateTraceId} from '@/lib/utils/traceId';
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -30,12 +31,17 @@ export const useProvideCreateService = () => {
   });
 
   const onSubmit = async (data: CreateServiceData, photos?: PhotoItem[]) => {
+    // Генерируем traceId для отслеживания процесса
+    const traceId = generateTraceId();
+
     if (!user) {
       log(
         'useProvideCreateService',
         'Попытка создания сервиса без аутентификации',
         'warn',
-        { formData: { name: data.name, categoryId: data.tcategories_id } }
+        { formData: { name: data.name, categoryId: data.tcategories_id } },
+        undefined,
+        traceId
       );
       setResult({
         success: false,
@@ -50,7 +56,9 @@ export const useProvideCreateService = () => {
         'useProvideCreateService',
         'Попытка создания сервиса без providerId',
         'error',
-        { userId: user.userId, serviceName: data.name }
+        { userId: user.userId, serviceName: data.name },
+        undefined,
+        traceId
       );
       setResult({
         success: false,
@@ -82,12 +90,14 @@ export const useProvideCreateService = () => {
         photosCount,
         newPhotosCount,
         totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
-      }
+      },
+      undefined,
+      traceId
     );
 
     try {
       // Создаем сервис
-      const responseData = await createService(data, user.providerId, photos);
+      const responseData = await createService(data, user.providerId, photos, traceId);
 
       log(
         'useProvideCreateService',
@@ -98,7 +108,9 @@ export const useProvideCreateService = () => {
           providerId: user.providerId,
           serviceId: responseData.serviceId,
           serviceName: data.name
-        }
+        },
+        undefined,
+        traceId
       );
 
       setResult({
@@ -127,7 +139,8 @@ export const useProvideCreateService = () => {
           totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2),
           formErrors: form.formState.errors
         },
-        error
+        error,
+        traceId
       );
       setResult({
         success: false,

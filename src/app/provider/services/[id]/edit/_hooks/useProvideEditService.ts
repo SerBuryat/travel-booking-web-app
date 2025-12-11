@@ -11,6 +11,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { updateService } from '@/lib/provider/servicesEdit';
 import type { ServiceEditData, PhotoUpdateData } from '@/lib/provider/servicesEdit';
 import {log} from '@/lib/utils/logger';
+import {generateTraceId} from '@/lib/utils/traceId';
 
 export interface ServiceUpdateResult {
   success: boolean;
@@ -65,12 +66,17 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
   }, [initialData, form]);
 
   const onSubmit = async (data: CreateServiceData, photos?: PhotoUpdateData) => {
+    // Генерируем traceId для отслеживания процесса
+    const traceId = generateTraceId();
+
     if (!user) {
       log(
         'useProvideEditService',
         'Попытка обновления сервиса без аутентификации',
         'warn',
-        { serviceId, formData: { name: data.name, categoryId: data.tcategories_id } }
+        { serviceId, formData: { name: data.name, categoryId: data.tcategories_id } },
+        undefined,
+        traceId
       );
       setResult({
         success: false,
@@ -85,7 +91,9 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
         'useProvideEditService',
         'Попытка обновления сервиса без providerId',
         'error',
-        { userId: user.userId, serviceId, serviceName: data.name }
+        { userId: user.userId, serviceId, serviceName: data.name },
+        undefined,
+        traceId
       );
       setResult({
         success: false,
@@ -100,7 +108,9 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
         'useProvideEditService',
         'Попытка обновления сервиса без фото',
         'error',
-        { userId: user.userId, providerId: user.providerId, serviceId, serviceName: data.name }
+        { userId: user.userId, providerId: user.providerId, serviceId, serviceName: data.name },
+        undefined,
+        traceId
       );
       setResult({
         success: false,
@@ -132,12 +142,14 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
         existingPhotosCount,
         newPhotosCount,
         totalNewPhotosSizeMB: totalNewPhotosSizeMB.toFixed(2)
-      }
+      },
+      undefined,
+      traceId
     );
 
     try {
       // Обновляем сервис
-      await updateService(serviceId, data, photos);
+      await updateService(serviceId, data, photos, traceId);
 
       log(
         'useProvideEditService',
@@ -148,7 +160,9 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
           providerId: user.providerId,
           serviceId,
           serviceName: data.name
-        }
+        },
+        undefined,
+        traceId
       );
 
       setResult({
@@ -174,7 +188,8 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
           totalNewPhotosSizeMB: totalNewPhotosSizeMB.toFixed(2),
           formErrors: form.formState.errors
         },
-        error
+        error,
+        traceId
       );
       setResult({
         success: false,

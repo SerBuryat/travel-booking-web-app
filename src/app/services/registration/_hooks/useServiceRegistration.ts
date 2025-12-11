@@ -10,6 +10,7 @@ import {useAuth} from '@/contexts/AuthContext';
 import {createServiceWithProvider} from "@/lib/service/createService";
 import {PhotoItem} from "@/lib/service/hooks/useServicePhotos";
 import {log} from '@/lib/utils/logger';
+import {generateTraceId} from '@/lib/utils/traceId';
 
 export interface ServiceCreationResult {
   success: boolean;
@@ -30,12 +31,17 @@ export const useServiceRegistration = () => {
   });
 
   const onSubmit = async (data: CreateServiceWithProviderData, photos?: PhotoItem[]) => {
+    // Генерируем traceId для отслеживания процесса
+    const traceId = generateTraceId();
+
     if (!user) {
       log(
         'useServiceRegistration',
         'Попытка создания сервиса без аутентификации',
         'warn',
-        { formData: { name: data.name, categoryId: data.tcategories_id } }
+        { formData: { name: data.name, categoryId: data.tcategories_id } },
+        undefined,
+        traceId
       );
       setResult({
         success: false,
@@ -66,11 +72,13 @@ export const useServiceRegistration = () => {
         photosCount,
         newPhotosCount,
         totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
-      }
+      },
+      undefined,
+      traceId
     );
 
     try {
-      const responseData = await createServiceWithProvider(data, user.userId, photos);
+      const responseData = await createServiceWithProvider(data, user.userId, photos, traceId);
 
       log(
         'useServiceRegistration',
@@ -81,7 +89,9 @@ export const useServiceRegistration = () => {
           serviceId: responseData.serviceId,
           providerId: responseData.providerId,
           serviceName: data.name
-        }
+        },
+        undefined,
+        traceId
       );
 
       setResult({
@@ -109,7 +119,8 @@ export const useServiceRegistration = () => {
           totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2),
           formErrors: form.formState.errors
         },
-        error
+        error,
+        traceId
       );
       setResult({
         success: false,

@@ -2,7 +2,7 @@
  * Утилита для единообразного логирования в проекте.
  * Согласно BACKEND_REFACTORING.MD пункт 6.
  * 
- * Формат: [functionName] message | context: {...} | error: ... | stack: ...
+ * Формат: [traceId] [functionName] message | context: {...} | error: ... | stack: ...
  */
 
 export type LogLevel = 'info' | 'error' | 'warn';
@@ -19,20 +19,27 @@ interface LogContext {
  * @param level - Уровень логирования (info, error, warn)
  * @param context - Дополнительный контекст (userId, serviceId, и т.д.)
  * @param error - Объект ошибки (если есть)
+ * @param traceId - Уникальный идентификатор для отслеживания процесса (опционально)
  */
 export function log(
   functionName: string,
   message: string,
   level: LogLevel = 'info',
   context?: LogContext,
-  error?: Error | unknown
+  error?: Error | unknown,
+  traceId?: string
 ): void {
-  const prefix = `[${functionName}]`;
+  // Формируем префикс с traceId (если есть)
+  const tracePrefix = traceId ? `[${traceId}]` : '';
+  const prefix = tracePrefix ? `${tracePrefix} [${functionName}]` : `[${functionName}]`;
   const parts: string[] = [message];
 
+  // Добавляем traceId в контекст, если он передан
+  const enrichedContext = traceId ? { ...context, traceId } : context;
+
   // Добавляем контекст
-  if (context && Object.keys(context).length > 0) {
-    const contextStr = Object.entries(context)
+  if (enrichedContext && Object.keys(enrichedContext).length > 0) {
+    const contextStr = Object.entries(enrichedContext)
       .map(([key, value]) => {
         // Безопасная сериализация значений
         if (value === null || value === undefined) {

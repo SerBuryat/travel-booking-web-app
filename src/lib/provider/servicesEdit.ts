@@ -260,7 +260,8 @@ export async function getServiceForEdit(serviceId: number): Promise<ServiceEditD
 export async function updateService(
   serviceId: number,
   data: CreateServiceData,
-  photos: PhotoUpdateData
+  photos: PhotoUpdateData,
+  traceId?: string
 ): Promise<void> {
   const existingPhotosCount = photos.existing?.length || 0;
   const newPhotosCount = photos.new?.length || 0;
@@ -292,7 +293,8 @@ export async function updateService(
       'Ошибка авторизации пользователя',
       'error',
       { serviceId },
-      error
+      error,
+      traceId
     );
     throw error;
   }
@@ -303,7 +305,9 @@ export async function updateService(
       'updateService',
       'Доступ запрещен: пользователь не является провайдером',
       'error',
-      { serviceId, userId: userAuth.userId, role: userAuth.role, providerId: userAuth.providerId }
+      { serviceId, userId: userAuth.userId, role: userAuth.role, providerId: userAuth.providerId },
+      undefined,
+      traceId
     );
     throw new Error('Access denied: Only providers can update services');
   }
@@ -312,7 +316,9 @@ export async function updateService(
     'updateService',
     'Поиск сервиса в БД',
     'info',
-    { serviceId, providerId: userAuth.providerId }
+    { serviceId, providerId: userAuth.providerId },
+    undefined,
+    traceId
   );
 
   // Находим сервис
@@ -328,7 +334,8 @@ export async function updateService(
       'Ошибка поиска сервиса в БД',
       'error',
       { serviceId, providerId: userAuth.providerId },
-      error
+      error,
+      traceId
     );
     throw error;
   }
@@ -338,7 +345,9 @@ export async function updateService(
       'updateService',
       'Сервис не найден',
       'error',
-      { serviceId, providerId: userAuth.providerId }
+      { serviceId, providerId: userAuth.providerId },
+      undefined,
+      traceId
     );
     throw new Error('Service not found');
   }
@@ -349,7 +358,9 @@ export async function updateService(
       'updateService',
       'Доступ запрещен: сервис не принадлежит провайдеру',
       'error',
-      { serviceId, providerId: userAuth.providerId, serviceProviderId: service.provider_id }
+      { serviceId, providerId: userAuth.providerId, serviceProviderId: service.provider_id },
+      undefined,
+      traceId
     );
     throw new Error('Access denied: This service does not belong to you');
   }
@@ -360,7 +371,9 @@ export async function updateService(
       'updateService',
       'Невозможно обновить архивированный сервис',
       'error',
-      { serviceId, providerId: userAuth.providerId, active: service.active, status: service.status }
+      { serviceId, providerId: userAuth.providerId, active: service.active, status: service.status },
+      undefined,
+      traceId
     );
     throw new Error('Cannot update archived service');
   }
@@ -373,7 +386,9 @@ export async function updateService(
       serviceId,
       providerId: userAuth.providerId,
       serviceName: data.name
-    }
+    },
+    undefined,
+    traceId
   );
 
   try {
@@ -389,7 +404,9 @@ export async function updateService(
           serviceName: data.name,
           categoryId: data.tcategories_id,
           price: data.price
-        }
+        },
+        undefined,
+        traceId
       );
 
       try {
@@ -407,7 +424,9 @@ export async function updateService(
           'updateService',
           'Основные данные сервиса обновлены',
           'info',
-          { serviceId }
+          { serviceId },
+          undefined,
+          traceId
         );
       } catch (error) {
         log(
@@ -415,7 +434,8 @@ export async function updateService(
           'Ошибка обновления основных данных сервиса',
           'error',
           { serviceId, serviceName: data.name },
-          error
+          error,
+          traceId
         );
         throw error;
       }
@@ -425,7 +445,9 @@ export async function updateService(
         'updateService',
         'Обновление локации сервиса',
         'info',
-        { serviceId, address: data.address, areaId: data.tarea_id }
+        { serviceId, address: data.address, areaId: data.tarea_id },
+        undefined,
+        traceId
       );
 
       try {
@@ -445,7 +467,9 @@ export async function updateService(
             'updateService',
             'Локация сервиса обновлена',
             'info',
-            { serviceId, locationId: existingLocation.id }
+            { serviceId, locationId: existingLocation.id },
+            undefined,
+            traceId
           );
         } else {
           const newLocation = await tx.tlocations.create({
@@ -459,7 +483,9 @@ export async function updateService(
             'updateService',
             'Локация сервиса создана',
             'info',
-            { serviceId, locationId: newLocation.id }
+            { serviceId, locationId: newLocation.id },
+            undefined,
+            traceId
           );
         }
       } catch (error) {
@@ -468,7 +494,8 @@ export async function updateService(
           'Ошибка обновления локации сервиса',
           'error',
           { serviceId, address: data.address },
-          error
+          error,
+          traceId
         );
         throw error;
       }
@@ -478,7 +505,9 @@ export async function updateService(
         'updateService',
         'Обновление контактов сервиса',
         'info',
-        { serviceId }
+        { serviceId },
+        undefined,
+        traceId
       );
 
       try {
@@ -500,7 +529,9 @@ export async function updateService(
             'updateService',
             'Контакты сервиса обновлены',
             'info',
-            { serviceId, contactId: existingContact.id }
+            { serviceId, contactId: existingContact.id },
+            undefined,
+            traceId
           );
         } else {
           const newContact = await tx.tcontacts.create({
@@ -517,7 +548,9 @@ export async function updateService(
             'updateService',
             'Контакты сервиса созданы',
             'info',
-            { serviceId, contactId: newContact.id }
+            { serviceId, contactId: newContact.id },
+            undefined,
+            traceId
           );
         }
       } catch (error) {
@@ -526,7 +559,8 @@ export async function updateService(
           'Ошибка обновления контактов сервиса',
           'error',
           { serviceId },
-          error
+          error,
+          traceId
         );
         throw error;
       }
@@ -540,10 +574,12 @@ export async function updateService(
           serviceId,
           existingPhotosCount,
           newPhotosCount
-        }
+        },
+        undefined,
+        traceId
       );
 
-      await handlePhotoUpdatesInTransaction(tx, serviceId, photos);
+      await handlePhotoUpdatesInTransaction(tx, serviceId, photos, traceId);
     });
 
     log(
@@ -554,7 +590,9 @@ export async function updateService(
         serviceId,
         providerId: userAuth.providerId,
         serviceName: data.name
-      }
+      },
+      undefined,
+      traceId
     );
 
   } catch (error) {
@@ -569,7 +607,8 @@ export async function updateService(
         existingPhotosCount,
         newPhotosCount
       },
-      error
+      error,
+      traceId
     );
     throw new Error('Failed to update service');
   }
@@ -585,7 +624,7 @@ export async function updateService(
  * @param {number} serviceId - ID сервиса
  * @param {PhotoUpdateData} photos - Данные фотографий
  */
-async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photos: PhotoUpdateData): Promise<void> {
+async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photos: PhotoUpdateData, traceId?: string): Promise<void> {
   log(
     'handlePhotoUpdatesInTransaction',
     'Начало обработки фотографий',
@@ -594,7 +633,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       serviceId,
       existingPhotosCount: photos.existing?.length || 0,
       newPhotosCount: photos.new?.length || 0
-    }
+    },
+    undefined,
+    traceId
   );
 
   // Получаем текущие фото из БД
@@ -609,7 +650,8 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       'Ошибка получения текущих фото из БД',
       'error',
       { serviceId },
-      error
+      error,
+      traceId
     );
     throw error;
   }
@@ -636,7 +678,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       serviceId,
       photosToDeleteCount: photosToDelete.length,
       currentPhotosCount: currentPhotos.length
-    }
+    },
+    undefined,
+    traceId
   );
 
   for (const photo of photosToDelete) {
@@ -646,7 +690,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       'handlePhotoUpdatesInTransaction',
       'Удаление фото из БД',
       'info',
-      { serviceId, photoId: photo.id, fileName, photoUrl: photo.url }
+      { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
+      undefined,
+      traceId
     );
 
     try {
@@ -657,7 +703,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
         'handlePhotoUpdatesInTransaction',
         'Фото удалено из БД, удаление из S3',
         'info',
-        { serviceId, photoId: photo.id, fileName, photoUrl: photo.url }
+        { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
+        undefined,
+        traceId
       );
 
       // Удаляем файл из S3
@@ -667,7 +715,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
           'handlePhotoUpdatesInTransaction',
           'Фото успешно удалено из S3',
           'info',
-          { serviceId, photoId: photo.id, fileName, photoUrl: photo.url }
+          { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
+          undefined,
+          traceId
         );
       } catch (error) {
         log(
@@ -675,7 +725,8 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
           'Ошибка удаления фото из S3 (продолжаем выполнение)',
           'warn',
           { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
-          error
+          error,
+          traceId
         );
         // Продолжаем выполнение даже если удаление из S3 не удалось
         // Запись из БД уже удалена, файл в S3 останется (можно очистить позже)
@@ -686,7 +737,8 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
         'Ошибка удаления фото из БД',
         'error',
         { serviceId, photoId: photo.id, fileName },
-        error
+        error,
+        traceId
       );
       throw error;
     }
@@ -697,7 +749,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
     'handlePhotoUpdatesInTransaction',
     'Обновление isPrimary для существующих фото',
     'info',
-    { serviceId, existingPhotosCount: photos.existing?.length || 0 }
+    { serviceId, existingPhotosCount: photos.existing?.length || 0 },
+    undefined,
+    traceId
   );
 
   for (const existingPhoto of photos.existing) {
@@ -713,7 +767,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
           fileName: existingPhoto.fileName,
           oldIsPrimary: dbPhoto.is_primary,
           newIsPrimary: existingPhoto.isPrimary
-        }
+        },
+        undefined,
+        traceId
       );
 
       try {
@@ -725,7 +781,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
           'handlePhotoUpdatesInTransaction',
           'isPrimary успешно обновлен',
           'info',
-          { serviceId, photoId: dbPhoto.id, fileName: existingPhoto.fileName }
+          { serviceId, photoId: dbPhoto.id, fileName: existingPhoto.fileName },
+          undefined,
+          traceId
         );
       } catch (error) {
         log(
@@ -733,7 +791,8 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
           'Ошибка обновления isPrimary',
           'error',
           { serviceId, photoId: dbPhoto.id, fileName: existingPhoto.fileName },
-          error
+          error,
+          traceId
         );
         throw error;
       }
@@ -749,7 +808,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
         'handlePhotoUpdatesInTransaction',
         'Ошибка конфигурации: OBJECT_STORAGE_BUCKET_ENDPOINT не установлен',
         'error',
-        { serviceId }
+        { serviceId },
+        undefined,
+        traceId
       );
       throw new Error('OBJECT_STORAGE_BUCKET_ENDPOINT is not set');
     }
@@ -762,7 +823,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
         serviceId,
         newPhotosCount: photos.new.length,
         totalSizeMB: (photos.new.reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024).toFixed(2)
-      }
+      },
+      undefined,
+      traceId
     );
 
     // Загружаем все фото в S3 параллельно и сохраняем результаты
@@ -780,7 +843,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
             fileName,
             fileSizeMB,
             isPrimary: photo.isPrimary
-          }
+          },
+          undefined,
+          traceId
         );
 
         try {
@@ -795,7 +860,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
               s3FileName: uploadResult.fileName,
               fileSizeMB,
               isPrimary: photo.isPrimary
-            }
+            },
+            undefined,
+            traceId
           );
           return {
             fileName: uploadResult.fileName,
@@ -813,7 +880,8 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
               fileSizeMB,
               isPrimary: photo.isPrimary
             },
-            error
+            error,
+            traceId
           );
           throw error; // Прерываем транзакцию при ошибке загрузки
         }
@@ -827,7 +895,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       {
         serviceId,
         uploadResultsCount: uploadResults.length
-      }
+      },
+      undefined,
+      traceId
     );
 
     // После успешной загрузки в S3 сохраняем записи в БД (внутри транзакции)
@@ -844,7 +914,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
           s3FileName: uploadResult.fileName,
           photoUrl,
           isPrimary: uploadResult.isPrimary
-        }
+        },
+        undefined,
+        traceId
       );
 
       try {
@@ -867,7 +939,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
             s3FileName: uploadResult.fileName,
             photoUrl: savedPhoto.url,
             isPrimary: uploadResult.isPrimary
-          }
+          },
+          undefined,
+          traceId
         );
       } catch (error) {
         log(
@@ -880,7 +954,8 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
             s3FileName: uploadResult.fileName,
             photoUrl
           },
-          error
+          error,
+          traceId
         );
         throw error;
       }
@@ -891,7 +966,9 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
     'handlePhotoUpdatesInTransaction',
     'Обработка фотографий завершена',
     'info',
-    { serviceId }
+    { serviceId },
+    undefined,
+    traceId
   );
 }
 

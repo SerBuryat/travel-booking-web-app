@@ -22,7 +22,8 @@ export interface CreatedServiceWithProviderResponse extends CreatedServiceRespon
 export async function createServiceWithProvider(
     createServiceData: CreateServiceWithProviderData,
     clientId: number,
-    photos?: PhotoItem[]
+    photos?: PhotoItem[],
+    traceId?: string
 ): Promise<CreatedServiceWithProviderResponse> {
   const photosCount = photos?.length || 0;
   const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
@@ -31,7 +32,9 @@ export async function createServiceWithProvider(
     'createServiceWithProvider',
     'Проверка существования провайдера',
     'info',
-    { clientId, serviceName: createServiceData.name }
+    { clientId, serviceName: createServiceData.name },
+    undefined,
+    traceId
   );
 
   const providerId = await prisma.tproviders.findFirst({
@@ -44,7 +47,9 @@ export async function createServiceWithProvider(
       'createServiceWithProvider',
       'Провайдер уже существует',
       'error',
-      { clientId, existingProviderId: providerId.id, serviceName: createServiceData.name }
+      { clientId, existingProviderId: providerId.id, serviceName: createServiceData.name },
+      undefined,
+      traceId
     );
     throw new Error('[createServiceWithProvider]: Provider already exists!');
   }
@@ -58,7 +63,9 @@ export async function createServiceWithProvider(
       companyName: createServiceData.providerCompanyName,
       contactPerson: createServiceData.providerContactPerson,
       phone: createServiceData.providerPhone ? '***' : null // Не логируем полный телефон
-    }
+    },
+    undefined,
+    traceId
   );
 
   // todo - пока без транзакции
@@ -84,7 +91,8 @@ export async function createServiceWithProvider(
         companyName: createServiceData.providerCompanyName,
         serviceName: createServiceData.name
       },
-      error
+      error,
+      traceId
     );
     throw error;
   }
@@ -94,7 +102,9 @@ export async function createServiceWithProvider(
       'createServiceWithProvider',
       'Провайдер не был создан (null результат)',
       'error',
-      { clientId, companyName: createServiceData.providerCompanyName }
+      { clientId, companyName: createServiceData.providerCompanyName },
+      undefined,
+      traceId
     );
     throw new Error('[createServiceWithProvider]: Cant create provider!');
   }
@@ -103,7 +113,9 @@ export async function createServiceWithProvider(
     'createServiceWithProvider',
     'Провайдер успешно создан',
     'info',
-    { clientId, providerId: createdProvider.id, companyName: createServiceData.providerCompanyName }
+    { clientId, providerId: createdProvider.id, companyName: createServiceData.providerCompanyName },
+    undefined,
+    traceId
   );
 
   log(
@@ -116,10 +128,12 @@ export async function createServiceWithProvider(
       categoryId: createServiceData.tcategories_id,
       photosCount,
       newPhotosCount
-    }
+    },
+    undefined,
+    traceId
   );
 
-  const createdService = await createService(createServiceData, createdProvider.id, photos);
+  const createdService = await createService(createServiceData, createdProvider.id, photos, traceId);
 
   log(
     'createServiceWithProvider',
@@ -130,7 +144,9 @@ export async function createServiceWithProvider(
       providerId: createdProvider.id,
       serviceId: createdService.serviceId,
       serviceName: createServiceData.name
-    }
+    },
+    undefined,
+    traceId
   );
 
   return {serviceId: createdService.serviceId, providerId: createdProvider.id};
@@ -143,7 +159,8 @@ export async function createServiceWithProvider(
 export async function createService(
     createServiceData: CreateServiceData,
     providerId: number,
-    photos?: PhotoItem[]
+    photos?: PhotoItem[],
+    traceId?: string
 ): Promise<CreatedServiceResponse> {
 
   try {
@@ -152,7 +169,9 @@ export async function createService(
         'createService',
         'Ошибка валидации: providerId не указан',
         'error',
-        { providerId, serviceName: createServiceData.name }
+        { providerId, serviceName: createServiceData.name },
+        undefined,
+        traceId
       );
       throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
     }
@@ -176,7 +195,9 @@ export async function createService(
         photosCount,
         newPhotosCount,
         totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
-      }
+      },
+      undefined,
+      traceId
     );
 
     let createdService;
@@ -221,7 +242,8 @@ export async function createService(
           categoryId: createServiceData.tcategories_id,
           areaId: createServiceData.tarea_id
         },
-        error
+        error,
+        traceId
       );
       throw error;
     }
@@ -231,7 +253,9 @@ export async function createService(
         'createService',
         'Сервис не был создан (null результат)',
         'error',
-        { providerId, serviceName: createServiceData.name }
+        { providerId, serviceName: createServiceData.name },
+        undefined,
+        traceId
       );
       throw new Error('[createService]: Cant create service!');
     }
@@ -240,7 +264,9 @@ export async function createService(
       'createService',
       'Сервис успешно создан в БД',
       'info',
-      { providerId, serviceId: createdService.id, serviceName: createServiceData.name }
+      { providerId, serviceId: createdService.id, serviceName: createServiceData.name },
+      undefined,
+      traceId
     );
 
     // Сохраняем фото в storage, потом в БД
@@ -256,7 +282,9 @@ export async function createService(
           totalPhotos: photos.length,
           newPhotos: newPhotos.length,
           existingPhotos: photos.length - newPhotos.length
-        }
+        },
+        undefined,
+        traceId
       );
 
       await Promise.all(
@@ -274,7 +302,9 @@ export async function createService(
                 fileName,
                 fileSizeMB,
                 isPrimary: photo.isPrimary
-              }
+              },
+              undefined,
+              traceId
             );
 
             const uploadResult = await loadServicePhotoToS3Storage(createdService.id, photo.file!);
@@ -287,7 +317,9 @@ export async function createService(
                 serviceId: createdService.id,
                 fileName: uploadResult.fileName,
                 isPrimary: photo.isPrimary
-              }
+              },
+              undefined,
+              traceId
             );
 
             const savedPhoto = await saveServicePhoto(createdService.id, {
@@ -306,7 +338,9 @@ export async function createService(
                 photoId: savedPhoto.id,
                 photoUrl: savedPhoto.url,
                 isPrimary: photo.isPrimary
-              }
+              },
+              undefined,
+              traceId
             );
           } catch (photoError) {
             log(
@@ -320,7 +354,8 @@ export async function createService(
                 isPrimary: photo.isPrimary,
                 errorType: photoError instanceof Error ? photoError.constructor.name : 'Unknown'
               },
-              photoError
+              photoError,
+              traceId
             );
             // Не прерываем процесс, продолжаем с остальными фото
           }
@@ -335,7 +370,8 @@ export async function createService(
       'Критическая ошибка при создании сервиса',
       'error',
       { providerId, serviceName: createServiceData.name },
-      error
+      error,
+      traceId
     );
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`[createService]: Ошибка при создании сервиса! ${errorMessage}`);
