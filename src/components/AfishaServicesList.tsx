@@ -69,12 +69,6 @@ const AfishaServiceCard: React.FC<{ service: AfishaServiceType }> = ({ service }
     return `${Math.round(numPrice).toLocaleString('ru-RU')} ₽`;
   };
 
-  // Форматируем дату события
-  const formatEventDate = (dateStr: string | null) => {
-    if (!dateStr) return 'Дата уточняется';
-    return dateStr;
-  };
-
   return (
     <div
       className="bg-white rounded-[24px] overflow-hidden shadow-sm cursor-pointer hover:shadow-md transition-shadow"
@@ -110,7 +104,7 @@ const AfishaServiceCard: React.FC<{ service: AfishaServiceType }> = ({ service }
               className="text-xs"
               style={{ color: '#707579', fontWeight: 400 }}
             >
-              {formatEventDate(service.event_date)}
+              {service.event_date}
             </span>
             <span
               className="text-xs font-semibold"

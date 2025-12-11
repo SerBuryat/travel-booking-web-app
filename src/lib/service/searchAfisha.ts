@@ -3,6 +3,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { withUserAuth } from '@/lib/auth/withUserAuth';
 import { DEFAULT_SERVICE_IMAGE_3 } from '@/utils/images';
+import { formatDateTime } from '@/utils/date';
 
 /**
  * Тип для сервиса афиши (только необходимые поля для отображения)
@@ -93,15 +94,7 @@ export async function getAfishaServices(take: number = DEFAULT_TAKE_AFISHA): Pro
       // Форматируем дату события с временем
       let eventDateStr: string | null = null;
       if (service.event_date) {
-        const date = new Date(service.event_date);
-        const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
-                       'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-        const day = date.getDate();
-        const month = months[date.getMonth()];
-        const year = date.getFullYear();
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        eventDateStr = `${day} ${month} ${year}, ${hours}:${minutes}`;
+        eventDateStr = formatDateTime(service.event_date);
       }
 
       return {

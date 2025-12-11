@@ -32,11 +32,11 @@ export default async function HomePage() {
           <AllCategoriesForHomeComponent categories={categories} />
         </div>
 
-        {/* Статьи по району */}
-        <AreaArticlesComponent />
-
         {/* Афиша */}
         <AreaAfishaComponent />
+
+        {/* Статьи по району */}
+        <AreaArticlesComponent />
 
         {/* Популярные сервисы */}
         <div>

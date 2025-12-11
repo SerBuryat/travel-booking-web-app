@@ -8,6 +8,7 @@ import {DEFAULT_SERVICE_IMAGE_3} from '@/utils/images';
 import {createOrUpdateClick} from '@/lib/service/clickService';
 import ContactsModal from '@/components/ContactsModal';
 import {formatRating} from '@/utils/rating';
+import {formatDateTime, formatDateOnly} from '@/utils/date';
 
 export default function SingleServiceView({ 
   service
@@ -45,23 +46,6 @@ export default function SingleServiceView({
     }
   }
 
-  const formatDate = (dateValue?: string | Date): string => {
-    if (!dateValue) return '';
-    try {
-      const date = dateValue instanceof Date ? dateValue : new Date(dateValue);
-      if (isNaN(date.getTime())) return '';
-      const months = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня', 
-                     'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
-      const day = date.getDate();
-      const month = months[date.getMonth()];
-      const year = date.getFullYear();
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${day} ${month} ${year}, ${hours}:${minutes}`;
-    } catch {
-      return '';
-    }
-  };
 
   // Безопасная обработка options - может быть null или не массивом
   const serviceOptions = Array.isArray(service.options) ? service.options : [];
@@ -93,7 +77,7 @@ export default function SingleServiceView({
                     <line x1="3" y1="10" x2="21" y2="10" />
                   </svg>
                   <span className="text-gray-400" style={{ fontSize: '12px' }}>
-                  {formatDate(service.created_at)}
+                  {formatDateOnly(service.created_at)}
                 </span>
                 </>
             )}
@@ -145,7 +129,7 @@ export default function SingleServiceView({
               className="text-blue-600 font-semibold"
               style={{ fontSize: '16px', fontWeight: 600 }}
             >
-              {formatDate(service.event_date)}
+              {formatDateTime(service.event_date)}
             </span>
           </div>
         )}
