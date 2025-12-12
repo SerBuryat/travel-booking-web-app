@@ -34,12 +34,14 @@ export const ServiceRegistrationForm: React.FC = () => {
     removePhoto,
     setPrimaryPhoto,
     clearPhotos,
+    getPhotosForSubmit,
     error: photosError,
     isSizeLimitExceeded
   } = useServicePhotos();
 
   const handleSubmit = (data: any) => {
-    onSubmit(data, photos);
+    const photosForSubmit = getPhotosForSubmit().new;
+    onSubmit(data, photosForSubmit);
   };
   
   // Текст условий сотрудничества
