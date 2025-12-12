@@ -5,6 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { EntertainmentRequestData, entertainmentRequestSchema } from '@/schemas/requests/create';
 import {createEntertainmentRequest} from "@/lib/request/client/create/createRequest";
+import { log } from '@/lib/utils/logger';
+import { generateTraceId } from '@/lib/utils/traceId';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface RequestSubmissionResult {
   success: boolean;
@@ -16,6 +19,7 @@ export interface RequestSubmissionResult {
 export const useEntertainmentRequest = () => {
   const [result, setResult] = useState<RequestSubmissionResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<EntertainmentRequestData>({
     resolver: zodResolver(entertainmentRequestSchema),
@@ -32,11 +36,37 @@ export const useEntertainmentRequest = () => {
   });
 
   const onSubmit = async (data: EntertainmentRequestData) => {
+    const traceId = generateTraceId();
     setIsSubmitting(true);
     setResult(null);
 
+    log(
+      'useEntertainmentRequest',
+      'Начало создания заявки на туры/активности',
+      'info',
+      {
+        userId: user?.userId,
+        budget: data.budget
+      },
+      undefined,
+      traceId
+    );
+
     try {
-      const responseData = await createEntertainmentRequest(data);
+      const responseData = await createEntertainmentRequest(data, traceId);
+      
+      log(
+        'useEntertainmentRequest',
+        'Заявка на туры/активности успешно создана',
+        'info',
+        {
+          userId: user?.userId,
+          requestId: responseData.id
+        },
+        undefined,
+        traceId
+      );
+
       setResult({
         success: true,
         message: 'Заявка на туры/активности успешно отправлена!',
@@ -47,7 +77,17 @@ export const useEntertainmentRequest = () => {
       form.reset();
 
     } catch (error) {
-      console.error('Ошибка отправки заявки:', error);
+      log(
+        'useEntertainmentRequest',
+        'Ошибка создания заявки на туры/активности',
+        'error',
+        {
+          userId: user?.userId,
+          budget: data.budget
+        },
+        error,
+        traceId
+      );
       setResult({
         success: false,
         message: 'Произошла ошибка при отправке заявки',
