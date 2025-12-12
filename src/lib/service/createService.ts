@@ -2,7 +2,6 @@
 
 import {CreateServiceData, CreateServiceWithProviderData} from "@/schemas/service/createServiceSchema";
 import {prisma} from "@/lib/db/prisma";
-import { PhotoItem } from "./hooks/useServicePhotos";
 import { loadServicePhotoToS3Storage } from '@/lib/service/media';
 import { saveServicePhoto } from "./photos";
 import {createLogger} from '@/lib/utils/logger';
@@ -23,10 +22,15 @@ export interface CreatedServiceWithProviderResponse extends CreatedServiceRespon
 * Создание сервиса вместе с провайдером.
 * (первое создание сервиса пользователем)
 * **/
+export interface NewServicePhoto {
+  file: File;
+  isPrimary: boolean;
+}
+
 export async function createServiceWithProvider(
     createServiceData: CreateServiceWithProviderData,
     clientId: number,
-    photos?: PhotoItem[],
+    photos?: NewServicePhoto[],
     traceId?: string
 ): Promise<CreatedServiceWithProviderResponse> {
   const logger = createLogger('createServiceWithProvider', traceId);
@@ -57,7 +61,7 @@ export async function createServiceWithProvider(
 export async function createService(
     createServiceData: CreateServiceData,
     providerId: number,
-    photos?: PhotoItem[],
+    photos?: NewServicePhoto[],
     traceId?: string
 ): Promise<CreatedServiceResponse> {
   const logger = createLogger('createService', traceId);
@@ -239,11 +243,11 @@ async function createServiceInDb(
  */
 async function processServicePhotos(
   serviceId: number,
-  photos: PhotoItem[],
+  photos: NewServicePhoto[],
   traceId?: string
 ): Promise<void> {
   const logger = createLogger('processServicePhotos', traceId);
-  const newPhotos = photos.filter(p => !p.isExisting && p.file);
+  const newPhotos = photos.filter(p => p.file);
   
   await Promise.all(
     newPhotos.map(async (photo) => {

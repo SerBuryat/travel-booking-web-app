@@ -7,8 +7,7 @@ import {
   CreateServiceData, createServiceSchema
 } from '@/schemas/service/createServiceSchema';
 import {useAuth} from '@/contexts/AuthContext';
-import {createService} from "@/lib/service/createService";
-import { PhotoItem } from '@/lib/service/hooks/useServicePhotos';
+import {createService, NewServicePhoto} from "@/lib/service/createService";
 import {log} from '@/lib/utils/logger';
 import {generateTraceId} from '@/lib/utils/traceId';
 
@@ -30,7 +29,7 @@ export const useProvideCreateService = () => {
     reValidateMode: 'onChange' // Перевалидация при изменении после первой валидации
   });
 
-  const onSubmit = async (data: CreateServiceData, photos?: PhotoItem[], forceError?: boolean) => {
+  const onSubmit = async (data: CreateServiceData, photos?: NewServicePhoto[], forceError?: boolean) => {
     // Генерируем traceId для отслеживания процесса
     const traceId = generateTraceId();
 
