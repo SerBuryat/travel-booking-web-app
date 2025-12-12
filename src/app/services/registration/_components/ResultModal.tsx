@@ -6,7 +6,6 @@ import {ServiceCreationResult} from '../_hooks/useServiceRegistration';
 import {PAGE_ROUTES} from "@/utils/routes";
 import {switchToProvider} from "@/lib/auth/role/switchToProvider";
 import {useAuth} from "@/contexts/AuthContext";
-import {useToast} from "@/components/Toast";
 
 interface ResultModalProps {
   result: ServiceCreationResult;
@@ -16,40 +15,31 @@ interface ResultModalProps {
 export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => {
   const router = useRouter();
   const { refreshUser } = useAuth();
-  const { showToast, updateToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [switchError, setSwitchError] = useState<string | null>(null);
 
   const handleGoToBusinessAccount = async () => {
     setIsLoading(true);
-    const toastId = showToast('Переключение на бизнес-аккаунт...', 'loading');
+    setSwitchError(null);
 
     try {
       const data = await switchToProvider()!;
 
       if (data!.success) {
         // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт
-        updateToast(toastId, 'Успешно переключено на бизнес-аккаунт', 'success');
         await refreshUser();
         onClose();
         router.push(PAGE_ROUTES.PROVIDER.SERVICES);
       } else {
         console.error('Failed to switch to provider role:', data!.error);
         const errorMessage = data!.error || 'Неизвестная ошибка';
-        updateToast(
-          toastId, 
-          `Ошибка переключения на роль провайдера: ${errorMessage}. Попробуйте перейти в профиль и переключиться через кнопку "Перейти в бизнес-аккаунт"`, 
-          'error'
-        );
+        setSwitchError(`Ошибка переключения на роль провайдера: ${errorMessage}. Попробуйте перейти в профиль и переключиться через кнопку "Перейти в бизнес-аккаунт"`);
         setIsLoading(false);
       }
     } catch (error) {
       console.error('Error switching to provider role:', error);
       const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
-      updateToast(
-        toastId, 
-        `Ошибка переключения на роль провайдера: ${errorMessage}. Попробуйте перейти в профиль и переключиться через кнопку "Перейти в бизнес-аккаунт"`, 
-        'error'
-      );
+      setSwitchError(`Ошибка переключения на роль провайдера: ${errorMessage}. Попробуйте перейти в профиль и переключиться через кнопку "Перейти в бизнес-аккаунт"`);
       setIsLoading(false);
     }
   };
@@ -71,6 +61,23 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
             <p className="text-gray-600 mb-6">
               {result.message}
             </p>
+
+            {switchError && (
+              <div className="bg-red-50 border-l-4 border-red-400 rounded-lg p-4 mb-4 text-left">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 mt-0.5">
+                    <svg className="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-red-900">
+                      {switchError}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex flex-col space-y-3">
               <button
