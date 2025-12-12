@@ -5,6 +5,9 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FoodRequestData, foodRequestSchema } from '@/schemas/requests/create';
 import { createFoodRequest } from "@/lib/request/client/create/createRequest";
+import { log } from '@/lib/utils/logger';
+import { generateTraceId } from '@/lib/utils/traceId';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface RequestSubmissionResult {
   success: boolean;
@@ -16,6 +19,7 @@ export interface RequestSubmissionResult {
 export const useFoodRequest = () => {
   const [result, setResult] = useState<RequestSubmissionResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { user } = useAuth();
 
   const form = useForm<FoodRequestData>({
     resolver: zodResolver(foodRequestSchema),
@@ -33,11 +37,37 @@ export const useFoodRequest = () => {
   });
 
   const onSubmit = async (data: FoodRequestData) => {
+    const traceId = generateTraceId();
     setIsSubmitting(true);
     setResult(null);
 
+    log(
+      'useFoodRequest',
+      'Начало создания заявки на питание',
+      'info',
+      {
+        userId: user?.userId,
+        budget: data.budget
+      },
+      undefined,
+      traceId
+    );
+
     try {
-      const responseData = await createFoodRequest(data);
+      const responseData = await createFoodRequest(data, traceId);
+      
+      log(
+        'useFoodRequest',
+        'Заявка на питание успешно создана',
+        'info',
+        {
+          userId: user?.userId,
+          requestId: responseData.id
+        },
+        undefined,
+        traceId
+      );
+
       setResult({
         success: true,
         message: 'Заявка на питание успешно отправлена!',
@@ -48,7 +78,17 @@ export const useFoodRequest = () => {
       form.reset();
 
     } catch (error) {
-      console.error('Ошибка отправки заявки:', error);
+      log(
+        'useFoodRequest',
+        'Ошибка создания заявки на питание',
+        'error',
+        {
+          userId: user?.userId,
+          budget: data.budget
+        },
+        error,
+        traceId
+      );
       setResult({
         success: false,
         message: 'Произошла ошибка при отправке заявки',

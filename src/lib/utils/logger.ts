@@ -7,9 +7,7 @@
 
 export type LogLevel = 'info' | 'error' | 'warn';
 
-interface LogContext {
-  [key: string]: any;
-}
+export type LogContext = Record<string, any>;
 
 /**
  * Логирует сообщение с указанным уровнем и контекстом
@@ -81,5 +79,29 @@ export function log(
   } else {
     console.log(logMessage);
   }
+}
+
+/**
+ * Создает логгер с привязкой к functionName и traceId.
+ * Позволяет использовать компактный синтаксис: logger.info(), logger.error(), logger.warn()
+ * 
+ * @param functionName - Имя функции, где происходит логирование
+ * @param traceId - Уникальный идентификатор для отслеживания процесса (опционально)
+ * @returns Объект с методами info, error, warn для логирования
+ * 
+ * @example
+ * const logger = createLogger('myFunction', traceId);
+ * logger.info('Начало выполнения', { userId: 123 });
+ * logger.error('Ошибка выполнения', { userId: 123 }, error);
+ */
+export function createLogger(functionName: string, traceId?: string) {
+  return {
+    info: (message: string, context?: LogContext) => 
+      log(functionName, message, 'info', context, undefined, traceId),
+    error: (message: string, context?: LogContext, error?: unknown) => 
+      log(functionName, message, 'error', context, error, traceId),
+    warn: (message: string, context?: LogContext) => 
+      log(functionName, message, 'warn', context, undefined, traceId),
+  };
 }
 

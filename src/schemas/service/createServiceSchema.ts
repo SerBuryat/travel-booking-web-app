@@ -7,7 +7,7 @@ export const createServiceSchema = z.object({
   // Основная информация о сервисе
   name: z.string()
   .min(3, 'Название должно содержать минимум 3 символа')
-  .max(100, 'Название не должно превышать 100 символов'),
+  .max(255, 'Название не должно превышать 255 символов'),
 
   description: z.string()
   .max(1000, 'Описание не должно превышать 1000 символов')
@@ -15,7 +15,25 @@ export const createServiceSchema = z.object({
 
   price: z.string()
   .regex(/^\d+(\.\d{1,2})?$/, 'Цена должна быть числом с максимум 2 знаками после запятой')
-  .refine(val => parseFloat(val) > 0, 'Цена должна быть больше 0'),
+  .refine(val => parseFloat(val) > 0, 'Цена должна быть больше 0')
+  .refine(
+    (val) => {
+      const num = parseFloat(val);
+      // DECIMAL(12, 2) означает максимум 12 цифр всего, 2 после запятой
+      // Максимальное значение: 9999999999.99
+      return num <= 9999999999.99;
+    },
+    'Цена не должна превышать 9999999999.99'
+  )
+  .refine(
+    (val) => {
+      // Проверяем, что до запятой не более 10 цифр
+      const parts = val.split('.');
+      const integerPart = parts[0];
+      return integerPart.length <= 10;
+    },
+    'Цена не должна содержать более 10 цифр до запятой'
+  ),
 
   tcategories_id: z.number()
   .min(1, 'Выберите категорию'),
@@ -29,9 +47,11 @@ export const createServiceSchema = z.object({
 
   phone: z.string()
   .min(1, 'Телефон обязателен для заполнения')
+  .max(14, 'Телефон не должен превышать 14 символов')
   .regex(/^\+?[\d\s\-()]+$/, 'Неверный формат телефона'),
 
   tg_username: z.string()
+  .max(255, 'Telegram username не должен превышать 255 символов')
   .refine(
     (val) => !val || val.trim() === '' || 
       // Username: может начинаться с @, содержит буквы, цифры, подчеркивания (5-32 символа)
@@ -43,6 +63,7 @@ export const createServiceSchema = z.object({
   .optional(),
 
   website: z.string()
+  .max(255, 'Веб-сайт не должен превышать 255 символов')
   .refine(
     (val) => !val || val.trim() === '' || /^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$|^([а-яА-ЯёЁ0-9]([а-яА-ЯёЁ0-9\-]{0,61}[а-яА-ЯёЁ0-9])?\.)+[а-яА-ЯёЁ]{2,}$/.test(val),
     'Неверный формат домена'
@@ -50,6 +71,7 @@ export const createServiceSchema = z.object({
   .optional(),
 
   whatsap: z.string()
+  .max(255, 'WhatsApp не должен превышать 255 символов')
   .refine(
     (val) => !val || val.trim() === '' || /^\+?[\d\s\-()]+$/.test(val),
     'Неверный формат телефона'

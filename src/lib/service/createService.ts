@@ -5,7 +5,7 @@ import {prisma} from "@/lib/db/prisma";
 import { PhotoItem } from "./hooks/useServicePhotos";
 import { loadServicePhotoToS3Storage } from '@/lib/service/media';
 import { saveServicePhoto } from "./photos";
-import {log} from '@/lib/utils/logger';
+import {createLogger} from '@/lib/utils/logger';
 
 export interface CreatedServiceResponse {
   serviceId: number
@@ -14,6 +14,10 @@ export interface CreatedServiceResponse {
 export interface CreatedServiceWithProviderResponse extends CreatedServiceResponse {
   providerId: number
 }
+
+// ============================================================================
+// Публичные функции
+// ============================================================================
 
 /*
 * Создание сервиса вместе с провайдером.
@@ -25,129 +29,23 @@ export async function createServiceWithProvider(
     photos?: PhotoItem[],
     traceId?: string
 ): Promise<CreatedServiceWithProviderResponse> {
-  const photosCount = photos?.length || 0;
-  const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
-
-  log(
-    'createServiceWithProvider',
-    'Проверка существования провайдера',
-    'info',
-    { clientId, serviceName: createServiceData.name },
-    undefined,
-    traceId
-  );
-
-  const providerId = await prisma.tproviders.findFirst({
-    where: { tclients_id: clientId },
-    select: {id: true}
+  const logger = createLogger('createServiceWithProvider', traceId);
+  
+  logger.info('Начало создания сервиса с провайдером', {
+    clientId,
+    serviceName: createServiceData.name
   });
 
-  if(providerId) {
-    log(
-      'createServiceWithProvider',
-      'Провайдер уже существует',
-      'error',
-      { clientId, existingProviderId: providerId.id, serviceName: createServiceData.name },
-      undefined,
-      traceId
-    );
-    throw new Error('[createServiceWithProvider]: Provider already exists!');
-  }
-
-  log(
-    'createServiceWithProvider',
-    'Создание нового провайдера',
-    'info',
-    {
-      clientId,
-      companyName: createServiceData.providerCompanyName,
-      contactPerson: createServiceData.providerContactPerson,
-      phone: createServiceData.providerPhone ? '***' : null // Не логируем полный телефон
-    },
-    undefined,
-    traceId
-  );
-
-  // todo - пока без транзакции
-  let createdProvider;
-  try {
-    createdProvider = await prisma.tproviders.create({
-      data: {
-        tclients_id: clientId,
-        company_name: createServiceData.providerCompanyName,
-        phone: createServiceData.providerPhone,
-        contact_info: {contact_person: createServiceData.providerContactPerson},
-        status: 'active', // По умолчанию активный
-      },
-      select: {id: true}
-    });
-  } catch (error) {
-    log(
-      'createServiceWithProvider',
-      'Ошибка создания провайдера в БД',
-      'error',
-      {
-        clientId,
-        companyName: createServiceData.providerCompanyName,
-        serviceName: createServiceData.name
-      },
-      error,
-      traceId
-    );
-    throw error;
-  }
-
-  if(!createdProvider) {
-    log(
-      'createServiceWithProvider',
-      'Провайдер не был создан (null результат)',
-      'error',
-      { clientId, companyName: createServiceData.providerCompanyName },
-      undefined,
-      traceId
-    );
-    throw new Error('[createServiceWithProvider]: Cant create provider!');
-  }
-
-  log(
-    'createServiceWithProvider',
-    'Провайдер успешно создан',
-    'info',
-    { clientId, providerId: createdProvider.id, companyName: createServiceData.providerCompanyName },
-    undefined,
-    traceId
-  );
-
-  log(
-    'createServiceWithProvider',
-    'Создание сервиса для провайдера',
-    'info',
-    {
-      providerId: createdProvider.id,
-      serviceName: createServiceData.name,
-      categoryId: createServiceData.tcategories_id,
-      photosCount,
-      newPhotosCount
-    },
-    undefined,
-    traceId
-  );
-
+  await checkProviderExists(clientId, createServiceData.name, traceId);
+  const createdProvider = await createProviderInDb(clientId, createServiceData, traceId);
   const createdService = await createService(createServiceData, createdProvider.id, photos, traceId);
 
-  log(
-    'createServiceWithProvider',
-    'Сервис с провайдером успешно создан',
-    'info',
-    {
-      clientId,
-      providerId: createdProvider.id,
-      serviceId: createdService.serviceId,
-      serviceName: createServiceData.name
-    },
-    undefined,
-    traceId
-  );
+  logger.info('Сервис с провайдером успешно создан', {
+    clientId,
+    providerId: createdProvider.id,
+    serviceId: createdService.serviceId,
+    serviceName: createServiceData.name
+  });
 
   return {serviceId: createdService.serviceId, providerId: createdProvider.id};
 }
@@ -162,218 +60,207 @@ export async function createService(
     photos?: PhotoItem[],
     traceId?: string
 ): Promise<CreatedServiceResponse> {
+  const logger = createLogger('createService', traceId);
+  
+  logger.info('Начало создания сервиса', {
+    providerId,
+    serviceName: createServiceData.name,
+    categoryId: createServiceData.tcategories_id,
+    areaId: createServiceData.tarea_id
+  });
 
   try {
-    if(!providerId) {
-      log(
-        'createService',
-        'Ошибка валидации: providerId не указан',
-        'error',
-        { providerId, serviceName: createServiceData.name },
-        undefined,
-        traceId
-      );
-      throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
-    }
+    validateServiceInput(providerId);
+    const createdService = await createServiceInDb(createServiceData, providerId, traceId);
 
-    const photosCount = photos?.length || 0;
-    const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
-    const totalPhotosSizeMB = photos
-      ?.filter(p => !p.isExisting && p.file)
-      .reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
-
-    log(
-      'createService',
-      'Создание сервиса в БД',
-      'info',
-      {
-        providerId,
-        serviceName: createServiceData.name,
-        categoryId: createServiceData.tcategories_id,
-        areaId: createServiceData.tarea_id,
-        price: createServiceData.price,
-        photosCount,
-        newPhotosCount,
-        totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
-      },
-      undefined,
-      traceId
-    );
-
-    let createdService;
-    try {
-      createdService = await prisma.tservices.create({
-        data: {
-          name: createServiceData.name,
-          description: createServiceData.description,
-          price: parseFloat(createServiceData.price),
-          tcategories_id: createServiceData.tcategories_id,
-          provider_id: providerId,
-          active: true,
-          status: 'published',
-          service_options: createServiceData.serviceOptions || null,
-          event_date: createServiceData.event_date || null,
-          tcontacts: {
-            create: {
-              email: 'default@example.com', // Обязательное поле в БД, проставляем мок
-              phone: createServiceData.phone || null,
-              tg_username: createServiceData.tg_username || null,
-              website: createServiceData.website || null,
-              whatsap: createServiceData.whatsap || null,
-            }
-          },
-          tlocations: {
-            create: {
-              address: createServiceData.address,
-              tarea_id: createServiceData.tarea_id,
-            }
-          }
-        },
-        select: {id: true}
-      });
-    } catch (error) {
-      log(
-        'createService',
-        'Ошибка создания сервиса в БД (Prisma)',
-        'error',
-        {
-          providerId,
-          serviceName: createServiceData.name,
-          categoryId: createServiceData.tcategories_id,
-          areaId: createServiceData.tarea_id
-        },
-        error,
-        traceId
-      );
-      throw error;
-    }
-
-    if(!createdService) {
-      log(
-        'createService',
-        'Сервис не был создан (null результат)',
-        'error',
-        { providerId, serviceName: createServiceData.name },
-        undefined,
-        traceId
-      );
-      throw new Error('[createService]: Cant create service!');
-    }
-
-    log(
-      'createService',
-      'Сервис успешно создан в БД',
-      'info',
-      { providerId, serviceId: createdService.id, serviceName: createServiceData.name },
-      undefined,
-      traceId
-    );
-
-    // Сохраняем фото в storage, потом в БД
     if (photos && photos.length > 0) {
-      const newPhotos = photos.filter(p => !p.isExisting && p.file);
-      
-      log(
-        'createService',
-        'Начало загрузки фото',
-        'info',
-        {
-          serviceId: createdService.id,
-          totalPhotos: photos.length,
-          newPhotos: newPhotos.length,
-          existingPhotos: photos.length - newPhotos.length
-        },
-        undefined,
-        traceId
-      );
-
-      await Promise.all(
-        newPhotos.map(async (photo) => {
-          const fileName = photo.file!.name;
-          const fileSizeMB = (photo.file!.size / 1024 / 1024).toFixed(2);
-
-          try {
-            log(
-              'createService',
-              'Загрузка фото в S3',
-              'info',
-              {
-                serviceId: createdService.id,
-                fileName,
-                fileSizeMB,
-                isPrimary: photo.isPrimary
-              },
-              undefined,
-              traceId
-            );
-
-            const uploadResult = await loadServicePhotoToS3Storage(createdService.id, photo.file!);
-
-            log(
-              'createService',
-              'Сохранение фото в БД',
-              'info',
-              {
-                serviceId: createdService.id,
-                fileName: uploadResult.fileName,
-                isPrimary: photo.isPrimary
-              },
-              undefined,
-              traceId
-            );
-
-            const savedPhoto = await saveServicePhoto(createdService.id, {
-              fileName: uploadResult.fileName,
-              isPrimary: photo.isPrimary
-            });
-
-            log(
-              'createService',
-              'Фото успешно сохранено',
-              'info',
-              {
-                serviceId: createdService.id,
-                originalFileName: fileName,
-                s3FileName: uploadResult.fileName,
-                photoId: savedPhoto.id,
-                photoUrl: savedPhoto.url,
-                isPrimary: photo.isPrimary
-              },
-              undefined,
-              traceId
-            );
-          } catch (photoError) {
-            log(
-              'createService',
-              'Ошибка при обработке фото',
-              'error',
-              {
-                serviceId: createdService.id,
-                fileName,
-                fileSizeMB,
-                isPrimary: photo.isPrimary,
-                errorType: photoError instanceof Error ? photoError.constructor.name : 'Unknown'
-              },
-              photoError,
-              traceId
-            );
-            // Не прерываем процесс, продолжаем с остальными фото
-          }
-        })
-      );
+      await processServicePhotos(createdService.id, photos, traceId);
     }
+
+    logger.info('Сервис успешно создан', {
+      providerId,
+      serviceId: createdService.id,
+      serviceName: createServiceData.name
+    });
 
     return {serviceId: createdService.id};
   } catch (error) {
-    log(
-      'createService',
-      'Критическая ошибка при создании сервиса',
-      'error',
-      { providerId, serviceName: createServiceData.name },
-      error,
-      traceId
-    );
+    logger.error('Критическая ошибка при создании сервиса', {
+      providerId,
+      serviceName: createServiceData.name
+    }, error);
     const errorMessage = error instanceof Error ? error.message : String(error);
     throw new Error(`[createService]: Ошибка при создании сервиса! ${errorMessage}`);
   }
+}
+
+// ============================================================================
+// Приватные функции (в порядке использования)
+// ============================================================================
+
+/**
+ * Проверяет существование провайдера для клиента
+ */
+async function checkProviderExists(
+  clientId: number, 
+  serviceName: string,
+  traceId?: string
+): Promise<void> {
+  const logger = createLogger('checkProviderExists', traceId);
+  
+  const providerId = await prisma.tproviders.findFirst({
+    where: { tclients_id: clientId },
+    select: {id: true}
+  });
+
+  if(providerId) {
+    logger.error('Провайдер уже существует', {
+      clientId,
+      existingProviderId: providerId.id,
+      serviceName
+    });
+    throw new Error('[createServiceWithProvider]: Provider already exists!');
+  }
+}
+
+/**
+ * Создает провайдера в БД
+ */
+async function createProviderInDb(
+  clientId: number,
+  createServiceData: CreateServiceWithProviderData,
+  traceId?: string
+): Promise<{id: number}> {
+  const logger = createLogger('createProviderInDb', traceId);
+  
+  try {
+    const createdProvider = await prisma.tproviders.create({
+      data: {
+        tclients_id: clientId,
+        company_name: createServiceData.providerCompanyName,
+        phone: createServiceData.providerPhone,
+        contact_info: {contact_person: createServiceData.providerContactPerson},
+        status: 'active',
+      },
+      select: {id: true}
+    });
+
+    if(!createdProvider) {
+      logger.error('Провайдер не был создан (null результат)', {
+        clientId,
+        companyName: createServiceData.providerCompanyName
+      });
+      throw new Error('[createServiceWithProvider]: Cant create provider!');
+    }
+
+    return createdProvider;
+  } catch (error) {
+    logger.error('Ошибка создания провайдера в БД', {
+      clientId,
+      companyName: createServiceData.providerCompanyName,
+      serviceName: createServiceData.name
+    }, error);
+    throw error;
+  }
+}
+
+/**
+ * Валидирует входные данные для создания сервиса
+ */
+function validateServiceInput(providerId: number): void {
+  if(!providerId) {
+    throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
+  }
+}
+
+/**
+ * Создает сервис в БД с контактами и локацией
+ */
+async function createServiceInDb(
+  createServiceData: CreateServiceData,
+  providerId: number,
+  traceId?: string
+): Promise<{id: number}> {
+  const logger = createLogger('createServiceInDb', traceId);
+  
+  try {
+    const createdService = await prisma.tservices.create({
+      data: {
+        name: createServiceData.name,
+        description: createServiceData.description,
+        price: parseFloat(createServiceData.price),
+        tcategories_id: createServiceData.tcategories_id,
+        provider_id: providerId,
+        active: true,
+        status: 'published',
+        service_options: createServiceData.serviceOptions || null,
+        event_date: createServiceData.event_date || null,
+        tcontacts: {
+          create: {
+            email: 'default@example.com',
+            phone: createServiceData.phone || null,
+            tg_username: createServiceData.tg_username || null,
+            website: createServiceData.website || null,
+            whatsap: createServiceData.whatsap || null,
+          }
+        },
+        tlocations: {
+          create: {
+            address: createServiceData.address,
+            tarea_id: createServiceData.tarea_id,
+          }
+        }
+      },
+      select: {id: true}
+    });
+
+    if(!createdService) {
+      logger.error('Сервис не был создан (null результат)', {
+        providerId,
+        serviceName: createServiceData.name
+      });
+      throw new Error('[createService]: Cant create service!');
+    }
+
+    return createdService;
+  } catch (error) {
+    logger.error('Ошибка создания сервиса в БД (Prisma)', {
+      providerId,
+      serviceName: createServiceData.name,
+      categoryId: createServiceData.tcategories_id,
+      areaId: createServiceData.tarea_id
+    }, error);
+    throw error;
+  }
+}
+
+/**
+ * Обрабатывает загрузку фотографий для сервиса
+ */
+async function processServicePhotos(
+  serviceId: number,
+  photos: PhotoItem[],
+  traceId?: string
+): Promise<void> {
+  const logger = createLogger('processServicePhotos', traceId);
+  const newPhotos = photos.filter(p => !p.isExisting && p.file);
+  
+  await Promise.all(
+    newPhotos.map(async (photo) => {
+      try {
+        const uploadResult = await loadServicePhotoToS3Storage(serviceId, photo.file!);
+        await saveServicePhoto(serviceId, {
+          fileName: uploadResult.fileName,
+          isPrimary: photo.isPrimary
+        });
+      } catch (photoError) {
+        logger.error('Ошибка при обработке фото', {
+          serviceId,
+          fileName: photo.file!.name,
+          isPrimary: photo.isPrimary
+        }, photoError);
+        // Не прерываем процесс, продолжаем с остальными фото
+      }
+    })
+  );
 }

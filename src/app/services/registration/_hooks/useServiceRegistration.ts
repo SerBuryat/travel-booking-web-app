@@ -54,12 +54,6 @@ export const useServiceRegistration = () => {
     setIsSubmitting(true);
     setResult(null);
 
-    const photosCount = photos?.length || 0;
-    const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
-    const totalPhotosSizeMB = photos
-      ?.filter(p => !p.isExisting && p.file)
-      .reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
-
     log(
       'useServiceRegistration',
       'Начало создания сервиса с провайдером',
@@ -68,10 +62,7 @@ export const useServiceRegistration = () => {
         userId: user.userId,
         serviceName: data.name,
         categoryId: data.tcategories_id,
-        areaId: data.tarea_id,
-        photosCount,
-        newPhotosCount,
-        totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
+        areaId: data.tarea_id
       },
       undefined,
       traceId
@@ -113,11 +104,7 @@ export const useServiceRegistration = () => {
           userId: user.userId,
           serviceName: data.name,
           categoryId: data.tcategories_id,
-          areaId: data.tarea_id,
-          photosCount,
-          newPhotosCount,
-          totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2),
-          formErrors: form.formState.errors
+          areaId: data.tarea_id
         },
         error,
         traceId

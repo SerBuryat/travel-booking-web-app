@@ -5,6 +5,9 @@ import { useRouter } from 'next/navigation';
 import { ProposalServiceType } from '@/lib/request/provider/proposal/getProviderServicesForRequest';
 import { HorizontalViewServiceComponent } from '@/components/HorizontalViewServiceComponent';
 import { createProposal } from '@/lib/request/provider/proposal/createProposal';
+import { log } from '@/lib/utils/logger';
+import { generateTraceId } from '@/lib/utils/traceId';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface CreateProposalFormProps {
   requestId: number;
@@ -22,6 +25,7 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
   const [error, setError] = useState<string>('');
   
   const router = useRouter();
+  const { user } = useAuth();
 
   // Проверяем, все ли сервисы использованы
   const allServicesUsed = services.length > 0 && services.every(service => service.isUsedInProposal);
@@ -50,6 +54,9 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
     e.preventDefault();
     setError('');
 
+    // Генерируем traceId для отслеживания процесса
+    const traceId = generateTraceId();
+
     if (selectedServices.size === 0) {
       setError('Выберите хотя бы один сервис');
       return;
@@ -67,20 +74,75 @@ export function CreateProposalForm({ requestId, services }: CreateProposalFormPr
 
     setIsSubmitting(true);
 
+    log(
+      'CreateProposalForm',
+      'Начало создания предложения',
+      'info',
+      {
+        requestId,
+        userId: user?.userId,
+        providerId: user?.providerId,
+        serviceIds: Array.from(selectedServices),
+        servicesCount: selectedServices.size
+      },
+      undefined,
+      traceId
+    );
+
     try {
       const result = await createProposal({
         requestId,
         serviceIds: Array.from(selectedServices),
         price: priceValue,
         comment: comment.trim() || undefined
-      });
+      }, traceId);
 
       if (result.success) {
+        log(
+          'CreateProposalForm',
+          'Предложение успешно создано',
+          'info',
+          {
+            requestId,
+            userId: user?.userId,
+            providerId: user?.providerId,
+            serviceIds: Array.from(selectedServices)
+          },
+          undefined,
+          traceId
+        );
         router.push('/provider/requests?success=proposal_created');
       } else {
+        log(
+          'CreateProposalForm',
+          'Ошибка создания предложения',
+          'error',
+          {
+            requestId,
+            userId: user?.userId,
+            providerId: user?.providerId,
+            serviceIds: Array.from(selectedServices),
+            errorMessage: result.message
+          },
+          undefined,
+          traceId
+        );
         setError(result.message);
       }
     } catch (error) {
+      log(
+        'CreateProposalForm',
+        'Ошибка создания предложения',
+        'error',
+        {
+          requestId,
+          userId: user?.userId,
+          providerId: user?.providerId,
+          serviceIds: Array.from(selectedServices)
+        },
+        error,
+        traceId
+      );
       setError('Произошла ошибка при создании предложения');
     } finally {
       setIsSubmitting(false);

@@ -263,11 +263,6 @@ export async function updateService(
   photos: PhotoUpdateData,
   traceId?: string
 ): Promise<void> {
-  const existingPhotosCount = photos.existing?.length || 0;
-  const newPhotosCount = photos.new?.length || 0;
-  const totalNewPhotosSizeMB = photos.new
-    ?.reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
-
   log(
     'updateService',
     'Начало обновления сервиса',
@@ -276,11 +271,10 @@ export async function updateService(
       serviceId,
       serviceName: data.name,
       categoryId: data.tcategories_id,
-      areaId: data.tarea_id,
-      existingPhotosCount,
-      newPhotosCount,
-      totalNewPhotosSizeMB: totalNewPhotosSizeMB.toFixed(2)
-    }
+      areaId: data.tarea_id
+    },
+    undefined,
+    traceId
   );
 
   // Получаем авторизованного пользователя
@@ -311,15 +305,6 @@ export async function updateService(
     );
     throw new Error('Access denied: Only providers can update services');
   }
-
-  log(
-    'updateService',
-    'Поиск сервиса в БД',
-    'info',
-    { serviceId, providerId: userAuth.providerId },
-    undefined,
-    traceId
-  );
 
   // Находим сервис
   let service;
@@ -378,37 +363,10 @@ export async function updateService(
     throw new Error('Cannot update archived service');
   }
 
-  log(
-    'updateService',
-    'Начало транзакции обновления',
-    'info',
-    {
-      serviceId,
-      providerId: userAuth.providerId,
-      serviceName: data.name
-    },
-    undefined,
-    traceId
-  );
-
   try {
     // Выполняем все операции в транзакции для атомарности
     await prisma.$transaction(async (tx) => {
       // 1. Обновляем основные данные сервиса
-      log(
-        'updateService',
-        'Обновление основных данных сервиса',
-        'info',
-        {
-          serviceId,
-          serviceName: data.name,
-          categoryId: data.tcategories_id,
-          price: data.price
-        },
-        undefined,
-        traceId
-      );
-
       try {
         await tx.tservices.update({
           where: { id: serviceId },
@@ -420,14 +378,6 @@ export async function updateService(
             service_options: data.serviceOptions || null,
           },
         });
-        log(
-          'updateService',
-          'Основные данные сервиса обновлены',
-          'info',
-          { serviceId },
-          undefined,
-          traceId
-        );
       } catch (error) {
         log(
           'updateService',
@@ -441,15 +391,6 @@ export async function updateService(
       }
 
       // 2. Обновляем локацию (обновляем первую запись или создаем новую)
-      log(
-        'updateService',
-        'Обновление локации сервиса',
-        'info',
-        { serviceId, address: data.address, areaId: data.tarea_id },
-        undefined,
-        traceId
-      );
-
       try {
         const existingLocation = await tx.tlocations.findFirst({
           where: { tservices_id: serviceId },
@@ -463,30 +404,14 @@ export async function updateService(
               tarea_id: data.tarea_id,
             },
           });
-          log(
-            'updateService',
-            'Локация сервиса обновлена',
-            'info',
-            { serviceId, locationId: existingLocation.id },
-            undefined,
-            traceId
-          );
         } else {
-          const newLocation = await tx.tlocations.create({
+          await tx.tlocations.create({
             data: {
               tservices_id: serviceId,
               address: data.address,
               tarea_id: data.tarea_id,
             },
           });
-          log(
-            'updateService',
-            'Локация сервиса создана',
-            'info',
-            { serviceId, locationId: newLocation.id },
-            undefined,
-            traceId
-          );
         }
       } catch (error) {
         log(
@@ -501,15 +426,6 @@ export async function updateService(
       }
 
       // 3. Обновляем контакты (обновляем первую запись или создаем новую)
-      log(
-        'updateService',
-        'Обновление контактов сервиса',
-        'info',
-        { serviceId },
-        undefined,
-        traceId
-      );
-
       try {
         const existingContact = await tx.tcontacts.findFirst({
           where: { tservices_id: serviceId },
@@ -525,16 +441,8 @@ export async function updateService(
               whatsap: data.whatsap || null,
             },
           });
-          log(
-            'updateService',
-            'Контакты сервиса обновлены',
-            'info',
-            { serviceId, contactId: existingContact.id },
-            undefined,
-            traceId
-          );
         } else {
-          const newContact = await tx.tcontacts.create({
+          await tx.tcontacts.create({
             data: {
               tservices_id: serviceId,
               email: 'default@example.com', // обязательное поле
@@ -544,14 +452,6 @@ export async function updateService(
               whatsap: data.whatsap || null,
             },
           });
-          log(
-            'updateService',
-            'Контакты сервиса созданы',
-            'info',
-            { serviceId, contactId: newContact.id },
-            undefined,
-            traceId
-          );
         }
       } catch (error) {
         log(
@@ -566,19 +466,6 @@ export async function updateService(
       }
 
       // 4. Обрабатываем фотографии (внутри транзакции)
-      log(
-        'updateService',
-        'Обработка фотографий сервиса',
-        'info',
-        {
-          serviceId,
-          existingPhotosCount,
-          newPhotosCount
-        },
-        undefined,
-        traceId
-      );
-
       await handlePhotoUpdatesInTransaction(tx, serviceId, photos, traceId);
     });
 
@@ -603,9 +490,7 @@ export async function updateService(
       {
         serviceId,
         providerId: userAuth.providerId,
-        serviceName: data.name,
-        existingPhotosCount,
-        newPhotosCount
+        serviceName: data.name
       },
       error,
       traceId
@@ -625,19 +510,6 @@ export async function updateService(
  * @param {PhotoUpdateData} photos - Данные фотографий
  */
 async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photos: PhotoUpdateData, traceId?: string): Promise<void> {
-  log(
-    'handlePhotoUpdatesInTransaction',
-    'Начало обработки фотографий',
-    'info',
-    {
-      serviceId,
-      existingPhotosCount: photos.existing?.length || 0,
-      newPhotosCount: photos.new?.length || 0
-    },
-    undefined,
-    traceId
-  );
-
   // Получаем текущие фото из БД
   let currentPhotos;
   try {
@@ -670,73 +542,31 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
     (p: any) => !submittedFileNames.has(extractFileNameFromUrl(p.url))
   );
 
-  log(
-    'handlePhotoUpdatesInTransaction',
-    'Удаление фото',
-    'info',
-    {
-      serviceId,
-      photosToDeleteCount: photosToDelete.length,
-      currentPhotosCount: currentPhotos.length
-    },
-    undefined,
-    traceId
-  );
-
   for (const photo of photosToDelete) {
-    const fileName = extractFileNameFromUrl(photo.url);
-    
-    log(
-      'handlePhotoUpdatesInTransaction',
-      'Удаление фото из БД',
-      'info',
-      { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
-      undefined,
-      traceId
-    );
-
     try {
       // Удаляем запись из БД
       await tx.tphotos.delete({ where: { id: photo.id } });
       
-      log(
-        'handlePhotoUpdatesInTransaction',
-        'Фото удалено из БД, удаление из S3',
-        'info',
-        { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
-        undefined,
-        traceId
-      );
-
       // Удаляем файл из S3
       try {
         await deleteServicePhotoFromS3Storage(photo.url);
-        log(
-          'handlePhotoUpdatesInTransaction',
-          'Фото успешно удалено из S3',
-          'info',
-          { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
-          undefined,
-          traceId
-        );
       } catch (error) {
         log(
           'handlePhotoUpdatesInTransaction',
           'Ошибка удаления фото из S3 (продолжаем выполнение)',
           'warn',
-          { serviceId, photoId: photo.id, fileName, photoUrl: photo.url },
+          { serviceId, photoId: photo.id, photoUrl: photo.url },
           error,
           traceId
         );
         // Продолжаем выполнение даже если удаление из S3 не удалось
-        // Запись из БД уже удалена, файл в S3 останется (можно очистить позже)
       }
     } catch (error) {
       log(
         'handlePhotoUpdatesInTransaction',
         'Ошибка удаления фото из БД',
         'error',
-        { serviceId, photoId: photo.id, fileName },
+        { serviceId, photoId: photo.id },
         error,
         traceId
       );
@@ -745,46 +575,14 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
   }
 
   // 2. Обновляем isPrimary для существующих фото
-  log(
-    'handlePhotoUpdatesInTransaction',
-    'Обновление isPrimary для существующих фото',
-    'info',
-    { serviceId, existingPhotosCount: photos.existing?.length || 0 },
-    undefined,
-    traceId
-  );
-
   for (const existingPhoto of photos.existing) {
     const dbPhoto = currentPhotoMap.get(existingPhoto.fileName) as { id: number; is_primary: boolean } | undefined;
     if (dbPhoto && dbPhoto.is_primary !== existingPhoto.isPrimary) {
-      log(
-        'handlePhotoUpdatesInTransaction',
-        'Изменение isPrimary для фото',
-        'info',
-        {
-          serviceId,
-          photoId: dbPhoto.id,
-          fileName: existingPhoto.fileName,
-          oldIsPrimary: dbPhoto.is_primary,
-          newIsPrimary: existingPhoto.isPrimary
-        },
-        undefined,
-        traceId
-      );
-
       try {
         await tx.tphotos.update({
           where: { id: dbPhoto.id },
           data: { is_primary: existingPhoto.isPrimary },
         });
-        log(
-          'handlePhotoUpdatesInTransaction',
-          'isPrimary успешно обновлен',
-          'info',
-          { serviceId, photoId: dbPhoto.id, fileName: existingPhoto.fileName },
-          undefined,
-          traceId
-        );
       } catch (error) {
         log(
           'handlePhotoUpdatesInTransaction',
@@ -800,7 +598,6 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
   }
 
   // 3. Загружаем новые фото в S3 (вне транзакции, но перед сохранением в БД)
-  // Сначала загружаем все новые фото в S3
   if (photos.new.length > 0) {
     const bucketEndpoint = process.env.OBJECT_STORAGE_BUCKET_ENDPOINT;
     if (!bucketEndpoint) {
@@ -815,55 +612,11 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       throw new Error('OBJECT_STORAGE_BUCKET_ENDPOINT is not set');
     }
 
-    log(
-      'handlePhotoUpdatesInTransaction',
-      'Загрузка новых фото в S3',
-      'info',
-      {
-        serviceId,
-        newPhotosCount: photos.new.length,
-        totalSizeMB: (photos.new.reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024).toFixed(2)
-      },
-      undefined,
-      traceId
-    );
-
     // Загружаем все фото в S3 параллельно и сохраняем результаты
     const uploadResults = await Promise.all(
       photos.new.map(async (photo) => {
-        const fileName = photo.file.name;
-        const fileSizeMB = (photo.file.size / 1024 / 1024).toFixed(2);
-
-        log(
-          'handlePhotoUpdatesInTransaction',
-          'Загрузка фото в S3',
-          'info',
-          {
-            serviceId,
-            fileName,
-            fileSizeMB,
-            isPrimary: photo.isPrimary
-          },
-          undefined,
-          traceId
-        );
-
         try {
           const uploadResult = await loadServicePhotoToS3Storage(serviceId, photo.file);
-          log(
-            'handlePhotoUpdatesInTransaction',
-            'Фото успешно загружено в S3',
-            'info',
-            {
-              serviceId,
-              originalFileName: fileName,
-              s3FileName: uploadResult.fileName,
-              fileSizeMB,
-              isPrimary: photo.isPrimary
-            },
-            undefined,
-            traceId
-          );
           return {
             fileName: uploadResult.fileName,
             isPrimary: photo.isPrimary,
@@ -876,8 +629,7 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
             'error',
             {
               serviceId,
-              fileName,
-              fileSizeMB,
+              fileName: photo.file.name,
               isPrimary: photo.isPrimary
             },
             error,
@@ -888,61 +640,18 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       })
     );
 
-    log(
-      'handlePhotoUpdatesInTransaction',
-      'Сохранение новых фото в БД',
-      'info',
-      {
-        serviceId,
-        uploadResultsCount: uploadResults.length
-      },
-      undefined,
-      traceId
-    );
-
     // После успешной загрузки в S3 сохраняем записи в БД (внутри транзакции)
     for (const uploadResult of uploadResults) {
       const photoUrl = `${bucketEndpoint}/services/${serviceId}/${uploadResult.fileName}`;
       
-      log(
-        'handlePhotoUpdatesInTransaction',
-        'Создание записи фото в БД',
-        'info',
-        {
-          serviceId,
-          originalFileName: uploadResult.originalName,
-          s3FileName: uploadResult.fileName,
-          photoUrl,
-          isPrimary: uploadResult.isPrimary
-        },
-        undefined,
-        traceId
-      );
-
       try {
-        const savedPhoto = await tx.tphotos.create({
+        await tx.tphotos.create({
           data: {
             tservices_id: serviceId,
             url: photoUrl,
             is_primary: uploadResult.isPrimary,
           },
         });
-        
-        log(
-          'handlePhotoUpdatesInTransaction',
-          'Фото успешно сохранено в БД',
-          'info',
-          {
-            serviceId,
-            photoId: savedPhoto.id,
-            originalFileName: uploadResult.originalName,
-            s3FileName: uploadResult.fileName,
-            photoUrl: savedPhoto.url,
-            isPrimary: uploadResult.isPrimary
-          },
-          undefined,
-          traceId
-        );
       } catch (error) {
         log(
           'handlePhotoUpdatesInTransaction',
@@ -951,8 +660,7 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
           {
             serviceId,
             originalFileName: uploadResult.originalName,
-            s3FileName: uploadResult.fileName,
-            photoUrl
+            s3FileName: uploadResult.fileName
           },
           error,
           traceId
@@ -961,14 +669,5 @@ async function handlePhotoUpdatesInTransaction(tx: any, serviceId: number, photo
       }
     }
   }
-
-  log(
-    'handlePhotoUpdatesInTransaction',
-    'Обработка фотографий завершена',
-    'info',
-    { serviceId },
-    undefined,
-    traceId
-  );
 }
 

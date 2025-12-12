@@ -71,12 +71,6 @@ export const useProvideCreateService = () => {
     setIsSubmitting(true);
     setResult(null);
 
-    const photosCount = photos?.length || 0;
-    const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
-    const totalPhotosSizeMB = photos
-      ?.filter(p => !p.isExisting && p.file)
-      .reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
-
     log(
       'useProvideCreateService',
       'Начало создания сервиса провайдером',
@@ -86,10 +80,7 @@ export const useProvideCreateService = () => {
         providerId: user.providerId,
         serviceName: data.name,
         categoryId: data.tcategories_id,
-        areaId: data.tarea_id,
-        photosCount,
-        newPhotosCount,
-        totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
+        areaId: data.tarea_id
       },
       undefined,
       traceId
@@ -133,11 +124,7 @@ export const useProvideCreateService = () => {
           providerId: user.providerId,
           serviceName: data.name,
           categoryId: data.tcategories_id,
-          areaId: data.tarea_id,
-          photosCount,
-          newPhotosCount,
-          totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2),
-          formErrors: form.formState.errors
+          areaId: data.tarea_id
         },
         error,
         traceId
