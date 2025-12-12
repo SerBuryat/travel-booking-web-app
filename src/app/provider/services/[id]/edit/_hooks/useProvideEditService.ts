@@ -123,11 +123,6 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
     setIsSubmitting(true);
     setResult(null);
 
-    const existingPhotosCount = photos.existing?.length || 0;
-    const newPhotosCount = photos.new?.length || 0;
-    const totalNewPhotosSizeMB = photos.new
-      ?.reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
-
     log(
       'useProvideEditService',
       'Начало обновления сервиса',
@@ -138,10 +133,7 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
         serviceId,
         serviceName: data.name,
         categoryId: data.tcategories_id,
-        areaId: data.tarea_id,
-        existingPhotosCount,
-        newPhotosCount,
-        totalNewPhotosSizeMB: totalNewPhotosSizeMB.toFixed(2)
+        areaId: data.tarea_id
       },
       undefined,
       traceId
@@ -182,11 +174,7 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
           serviceId,
           serviceName: data.name,
           categoryId: data.tcategories_id,
-          areaId: data.tarea_id,
-          existingPhotosCount,
-          newPhotosCount,
-          totalNewPhotosSizeMB: totalNewPhotosSizeMB.toFixed(2),
-          formErrors: form.formState.errors
+          areaId: data.tarea_id
         },
         error,
         traceId

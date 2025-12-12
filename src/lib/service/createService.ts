@@ -25,12 +25,9 @@ export async function createServiceWithProvider(
     photos?: PhotoItem[],
     traceId?: string
 ): Promise<CreatedServiceWithProviderResponse> {
-  const photosCount = photos?.length || 0;
-  const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
-
   log(
     'createServiceWithProvider',
-    'Проверка существования провайдера',
+    'Начало создания сервиса с провайдером',
     'info',
     { clientId, serviceName: createServiceData.name },
     undefined,
@@ -53,20 +50,6 @@ export async function createServiceWithProvider(
     );
     throw new Error('[createServiceWithProvider]: Provider already exists!');
   }
-
-  log(
-    'createServiceWithProvider',
-    'Создание нового провайдера',
-    'info',
-    {
-      clientId,
-      companyName: createServiceData.providerCompanyName,
-      contactPerson: createServiceData.providerContactPerson,
-      phone: createServiceData.providerPhone ? '***' : null // Не логируем полный телефон
-    },
-    undefined,
-    traceId
-  );
 
   // todo - пока без транзакции
   let createdProvider;
@@ -109,30 +92,6 @@ export async function createServiceWithProvider(
     throw new Error('[createServiceWithProvider]: Cant create provider!');
   }
 
-  log(
-    'createServiceWithProvider',
-    'Провайдер успешно создан',
-    'info',
-    { clientId, providerId: createdProvider.id, companyName: createServiceData.providerCompanyName },
-    undefined,
-    traceId
-  );
-
-  log(
-    'createServiceWithProvider',
-    'Создание сервиса для провайдера',
-    'info',
-    {
-      providerId: createdProvider.id,
-      serviceName: createServiceData.name,
-      categoryId: createServiceData.tcategories_id,
-      photosCount,
-      newPhotosCount
-    },
-    undefined,
-    traceId
-  );
-
   const createdService = await createService(createServiceData, createdProvider.id, photos, traceId);
 
   log(
@@ -162,6 +121,19 @@ export async function createService(
     photos?: PhotoItem[],
     traceId?: string
 ): Promise<CreatedServiceResponse> {
+  log(
+    'createService',
+    'Начало создания сервиса',
+    'info',
+    {
+      providerId,
+      serviceName: createServiceData.name,
+      categoryId: createServiceData.tcategories_id,
+      areaId: createServiceData.tarea_id
+    },
+    undefined,
+    traceId
+  );
 
   try {
     if(!providerId) {
@@ -175,30 +147,6 @@ export async function createService(
       );
       throw new Error(`[createService]: 'providerId' (${providerId}) required!`);
     }
-
-    const photosCount = photos?.length || 0;
-    const newPhotosCount = photos?.filter(p => !p.isExisting && p.file).length || 0;
-    const totalPhotosSizeMB = photos
-      ?.filter(p => !p.isExisting && p.file)
-      .reduce((sum, p) => sum + (p.file?.size || 0), 0) / 1024 / 1024 || 0;
-
-    log(
-      'createService',
-      'Создание сервиса в БД',
-      'info',
-      {
-        providerId,
-        serviceName: createServiceData.name,
-        categoryId: createServiceData.tcategories_id,
-        areaId: createServiceData.tarea_id,
-        price: createServiceData.price,
-        photosCount,
-        newPhotosCount,
-        totalPhotosSizeMB: totalPhotosSizeMB.toFixed(2)
-      },
-      undefined,
-      traceId
-    );
 
     let createdService;
     try {
@@ -260,88 +208,18 @@ export async function createService(
       throw new Error('[createService]: Cant create service!');
     }
 
-    log(
-      'createService',
-      'Сервис успешно создан в БД',
-      'info',
-      { providerId, serviceId: createdService.id, serviceName: createServiceData.name },
-      undefined,
-      traceId
-    );
-
     // Сохраняем фото в storage, потом в БД
     if (photos && photos.length > 0) {
       const newPhotos = photos.filter(p => !p.isExisting && p.file);
       
-      log(
-        'createService',
-        'Начало загрузки фото',
-        'info',
-        {
-          serviceId: createdService.id,
-          totalPhotos: photos.length,
-          newPhotos: newPhotos.length,
-          existingPhotos: photos.length - newPhotos.length
-        },
-        undefined,
-        traceId
-      );
-
       await Promise.all(
         newPhotos.map(async (photo) => {
-          const fileName = photo.file!.name;
-          const fileSizeMB = (photo.file!.size / 1024 / 1024).toFixed(2);
-
           try {
-            log(
-              'createService',
-              'Загрузка фото в S3',
-              'info',
-              {
-                serviceId: createdService.id,
-                fileName,
-                fileSizeMB,
-                isPrimary: photo.isPrimary
-              },
-              undefined,
-              traceId
-            );
-
             const uploadResult = await loadServicePhotoToS3Storage(createdService.id, photo.file!);
-
-            log(
-              'createService',
-              'Сохранение фото в БД',
-              'info',
-              {
-                serviceId: createdService.id,
-                fileName: uploadResult.fileName,
-                isPrimary: photo.isPrimary
-              },
-              undefined,
-              traceId
-            );
-
-            const savedPhoto = await saveServicePhoto(createdService.id, {
+            await saveServicePhoto(createdService.id, {
               fileName: uploadResult.fileName,
               isPrimary: photo.isPrimary
             });
-
-            log(
-              'createService',
-              'Фото успешно сохранено',
-              'info',
-              {
-                serviceId: createdService.id,
-                originalFileName: fileName,
-                s3FileName: uploadResult.fileName,
-                photoId: savedPhoto.id,
-                photoUrl: savedPhoto.url,
-                isPrimary: photo.isPrimary
-              },
-              undefined,
-              traceId
-            );
           } catch (photoError) {
             log(
               'createService',
@@ -349,10 +227,8 @@ export async function createService(
               'error',
               {
                 serviceId: createdService.id,
-                fileName,
-                fileSizeMB,
-                isPrimary: photo.isPrimary,
-                errorType: photoError instanceof Error ? photoError.constructor.name : 'Unknown'
+                fileName: photo.file!.name,
+                isPrimary: photo.isPrimary
               },
               photoError,
               traceId
@@ -362,6 +238,15 @@ export async function createService(
         })
       );
     }
+
+    log(
+      'createService',
+      'Сервис успешно создан',
+      'info',
+      { providerId, serviceId: createdService.id, serviceName: createServiceData.name },
+      undefined,
+      traceId
+    );
 
     return {serviceId: createdService.id};
   } catch (error) {
