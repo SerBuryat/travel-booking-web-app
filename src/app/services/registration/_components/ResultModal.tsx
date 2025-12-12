@@ -4,6 +4,9 @@ import React, { useState } from 'react';
 import {useRouter} from 'next/navigation';
 import {ServiceCreationResult} from '../_hooks/useServiceRegistration';
 import {PAGE_ROUTES} from "@/utils/routes";
+import {switchToProvider} from "@/lib/auth/role/switchToProvider";
+import {useAuth} from "@/contexts/AuthContext";
+import {useToast} from "@/components/Toast";
 
 interface ResultModalProps {
   result: ServiceCreationResult;
@@ -12,17 +15,47 @@ interface ResultModalProps {
 
 export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => {
   const router = useRouter();
-  const [isNavigating, setIsNavigating] = useState(false);
+  const { refreshUser } = useAuth();
+  const { showToast, updateToast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleGoToMyServices = () => {
-    if (isNavigating) return;
-    onClose();
-    router.push(PAGE_ROUTES.PROVIDER.SERVICES);
+  const handleGoToBusinessAccount = async () => {
+    setIsLoading(true);
+    const toastId = showToast('Переключение на бизнес-аккаунт...', 'loading');
+
+    try {
+      const data = await switchToProvider()!;
+
+      if (data!.success) {
+        // Роль успешно изменена, обновляем контекст и переходим в бизнес-аккаунт
+        updateToast(toastId, 'Успешно переключено на бизнес-аккаунт', 'success');
+        await refreshUser();
+        onClose();
+        router.push(PAGE_ROUTES.PROVIDER.SERVICES);
+      } else {
+        console.error('Failed to switch to provider role:', data!.error);
+        const errorMessage = data!.error || 'Неизвестная ошибка';
+        updateToast(
+          toastId, 
+          `Ошибка переключения на роль провайдера: ${errorMessage}. Попробуйте перейти в профиль и переключиться через кнопку "Перейти в бизнес-аккаунт"`, 
+          'error'
+        );
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Error switching to provider role:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Неизвестная ошибка';
+      updateToast(
+        toastId, 
+        `Ошибка переключения на роль провайдера: ${errorMessage}. Попробуйте перейти в профиль и переключиться через кнопку "Перейти в бизнес-аккаунт"`, 
+        'error'
+      );
+      setIsLoading(false);
+    }
   };
 
   if (result.success) {
     return (
-      <>
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg max-w-md w-full p-6 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -30,42 +63,37 @@ export const ResultModal: React.FC<ResultModalProps> = ({ result, onClose }) => 
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            
+
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Успешно!
             </h3>
-            
+
             <p className="text-gray-600 mb-6">
               {result.message}
             </p>
-            
+
             <div className="flex flex-col space-y-3">
               <button
-                onClick={handleGoToMyServices}
-                disabled={isNavigating}
-                className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={handleGoToBusinessAccount}
+                  disabled={isLoading}
+                  className={`w-full bg-blue-600 text-white px-4 py-2 rounded-lg transition-colors font-medium ${
+                    isLoading 
+                      ? 'opacity-50 cursor-not-allowed' 
+                      : 'hover:bg-blue-700'
+                  }`}
               >
-                Перейти в 'Мои объекты'
+                {isLoading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                    Переключение...
+                  </span>
+                ) : (
+                  'Перейти в бизнес-аккаунт'
+                )}
               </button>
             </div>
           </div>
         </div>
-        
-        {/* Overlay загрузки при переходе на страницу сервиса */}
-        {isNavigating && (
-          <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60]">
-            <div className="bg-white rounded-lg max-w-sm w-full mx-4 p-8 text-center">
-              <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-              <p className="text-lg font-medium text-gray-900">
-                Переход на страницу сервиса...
-              </p>
-              <p className="text-sm text-gray-600 mt-2">
-                Пожалуйста, подождите
-              </p>
-            </div>
-          </div>
-        )}
-      </>
     );
   }
 
