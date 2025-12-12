@@ -30,7 +30,7 @@ export const useServiceRegistration = () => {
     reValidateMode: 'onChange' // Перевалидация при изменении после первой валидации
   });
 
-  const onSubmit = async (data: CreateServiceWithProviderData, photos?: PhotoItem[]) => {
+  const onSubmit = async (data: CreateServiceWithProviderData, photos?: PhotoItem[], forceError?: boolean) => {
     // Генерируем traceId для отслеживания процесса
     const traceId = generateTraceId();
 
@@ -69,6 +69,11 @@ export const useServiceRegistration = () => {
     );
 
     try {
+      // Принудительная ошибка для тестирования в development режиме
+      if (forceError) {
+        throw new Error('Тестовая ошибка: принудительное прерывание создания сервиса');
+      }
+
       const responseData = await createServiceWithProvider(data, user.userId, photos, traceId);
 
       log(
