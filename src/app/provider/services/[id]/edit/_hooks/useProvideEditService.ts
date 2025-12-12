@@ -17,6 +17,7 @@ export interface ServiceUpdateResult {
   success: boolean;
   message: string;
   error?: string;
+  serviceId?: number;
 }
 
 interface UseProvideEditServiceProps {
@@ -160,6 +161,7 @@ export const useProvideEditService = ({ serviceId, initialData }: UseProvideEdit
       setResult({
         success: true,
         message: 'Сервис успешно обновлен!',
+        serviceId: serviceId
       });
 
     } catch (error) {
