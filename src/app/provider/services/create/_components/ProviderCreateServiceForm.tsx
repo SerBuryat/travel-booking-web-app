@@ -215,6 +215,26 @@ export const ProviderCreateServiceForm: React.FC = () => {
         >
           {isSubmitting ? 'Отправка...' : 'отправить заявку'}
         </button>
+
+        {/* Кнопка для тестирования ошибок (только в development) */}
+        {process.env.NODE_ENV === 'development' && (
+          <button
+            type="button"
+            onClick={() => {
+              const formData = form.getValues();
+              onSubmit(formData, photos, true);
+            }}
+            disabled={!form.formState.isValid || isSubmitting || isSizeLimitExceeded}
+            className="w-full py-2 transition-all duration-300 text-lg mt-3"
+            style={{
+              backgroundColor: isSubmitting || !form.formState.isValid || isSizeLimitExceeded ? '#ccc' : '#ff6b6b',
+              color: 'white',
+              borderRadius: '128px'
+            }}
+          >
+            {isSubmitting ? 'Отправка...' : 'Создать с ошибкой (DEV)'}
+          </button>
+        )}
       </form>
     </>
   );
