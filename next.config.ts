@@ -11,8 +11,7 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     serverActions: {
-      allowedOrigins: ['travel-app-service.ru', 'dev.travel-app-service.ru'],
-      bodySizeLimit: '10mb',
+      bodySizeLimit: '15mb',
     },
   },
   webpack: (config, { isServer }) => {
