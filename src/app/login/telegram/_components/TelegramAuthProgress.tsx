@@ -20,7 +20,6 @@ function getCurrentStepByAuthState(authState: TelegramAuthState): number {
     case TelegramAuthState.LOGGING_IN: return 2;
     case TelegramAuthState.ERROR: return 1;
     case TelegramAuthState.NO_DATA: return 0;
-    case TelegramAuthState.INVALID_ACCESS: return 0;
     case TelegramAuthState.ALREADY_AUTHENTICATED: return 3;
     default: return 0;
   }

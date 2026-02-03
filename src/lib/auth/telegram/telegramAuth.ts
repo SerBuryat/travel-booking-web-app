@@ -3,15 +3,20 @@
 import { prisma } from '@/lib/db/prisma';
 import { generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction } from '@/lib/auth/authUtils';
 import { TelegramUserInitData, TelegramUserData } from '@/types/telegram';
-import { TelegramService } from '@/service/TelegramService';
+import { validateTelegramInitData } from '@/lib/telegram/validateTelegramInitData';
 import { UserAuth } from '@/lib/auth/getUserAuth';
 import {tarea, tclients_auth} from "@prisma/client";
 import { SELECTABLE_AREA_TIER } from '@/lib/location/constants';
 import {getActiveProviderIdBYClientId} from "@/lib/provider/searchProvider";
 
+/** Тип аутентификации в tclients_auth для входа через Telegram */
 const TELEGRAM_AUTH_TYPE = 'telegram';
+/** Роль по умолчанию для нового пользователя при первом входе */
 const DEFAULT_AUTH_ROLE = 'user';
+/** Системное имя области по умолчанию при создании клиента (tarea.sysname) */
 const DEFAULT_AREA_SYSNAME = 'Olkhon';
+/** Срок жизни записи сессии (tclients_auth.token_expires_at), в миллисекундах. По умолчанию 24 часа */
+const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // часы · минуты · секунды · мс
 
 /**
  * Аутентификация пользователя через Telegram
@@ -29,7 +34,7 @@ const DEFAULT_AREA_SYSNAME = 'Olkhon';
  */
 export async function authWithTelegram(telegramUserInitData: TelegramUserInitData): Promise<UserAuth> {
   // Валидация Telegram данных пользователя при помощи Bot Token и либы telegram-init-data-validator
-  const validation = TelegramService.validateTelegramInitData(telegramUserInitData);
+  const validation = await validateTelegramInitData(telegramUserInitData);
   if (!validation.success) {
     throw new Error(`Telegram validation failed: ${validation.error}`);
   }
@@ -215,9 +220,7 @@ function createClientAuthData(
     role: string,
     telegramData: TelegramUserData
 ): CreateClientAuthData {
-  // todo - сейчас для `tclients_auth.token_expires_at` проставляется таким образом без `.env` (цель для рефакторинга)
-  const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 1);
+  const expiresAt = new Date(Date.now() + TOKEN_EXPIRY_MS);
   return {
     auth_type: authType,
     auth_id: authAuthId,

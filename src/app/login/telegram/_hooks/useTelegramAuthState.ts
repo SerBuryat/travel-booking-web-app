@@ -2,9 +2,9 @@ import {useCallback, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {TelegramUserInitData} from '@/types/telegram';
 import {getInitData} from '@/lib/telegram/telegramInitData';
+import {validateTelegramInitData} from '@/lib/telegram/validateTelegramInitData';
 import {useAuth} from '@/contexts/AuthContext';
 import {PAGE_ROUTES} from '@/utils/routes';
-import {ApiService} from "@/service/ApiService";
 
 export enum TelegramAuthState {
   LOADING,
@@ -12,7 +12,6 @@ export enum TelegramAuthState {
   SUCCESS,
   ERROR,
   NO_DATA,
-  INVALID_ACCESS,
   LOGGING_IN,
   ALREADY_AUTHENTICATED
 }
@@ -36,7 +35,7 @@ export function useTelegramAuthState() {
 
     try {
       const telegramUserDataValidation =
-          await ApiService.validateTelegramInitData(telegramUserInitData);
+          await validateTelegramInitData(telegramUserInitData);
 
       if (telegramUserDataValidation.success) {
         setUserData(telegramUserInitData);

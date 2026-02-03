@@ -6,7 +6,6 @@ import {TelegramAuthLoggingIn} from './states/TelegramAuthLoggingIn';
 import {TelegramAuthSuccess} from './states/TelegramAuthSuccess';
 import {TelegramAuthError} from './states/TelegramAuthError';
 import {TelegramAuthNoData} from './states/TelegramAuthNoData';
-import {TelegramAuthInvalidAccess} from './states/TelegramAuthInvalidAccess';
 import {TelegramAuthAlreadyAuthenticated} from './states/TelegramAuthAlreadyAuthenticated';
 
 interface TelegramAuthContentProps {
@@ -30,8 +29,6 @@ export function TelegramAuthContent({ state, userData, error, onLogin }: Telegra
       return <TelegramAuthError error={error} />;
     case TelegramAuthState.NO_DATA:
       return <TelegramAuthNoData />;
-    case TelegramAuthState.INVALID_ACCESS:
-      return <TelegramAuthInvalidAccess error={error} />;
     case TelegramAuthState.ALREADY_AUTHENTICATED:
       return <TelegramAuthAlreadyAuthenticated />;
     default:

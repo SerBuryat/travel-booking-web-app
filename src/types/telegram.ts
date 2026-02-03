@@ -14,3 +14,9 @@ export interface TelegramUserData {
   username?: string
   photo_url?: string
 }
+
+export interface TelegramUserDataValidationResponse {
+  success: boolean
+  error?: string
+  details?: string
+}
