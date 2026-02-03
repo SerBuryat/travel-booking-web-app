@@ -4,7 +4,7 @@ import React, {useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {useAuth} from '@/contexts/AuthContext';
 import {PAGE_ROUTES} from '@/utils/routes';
-import {switchToProvider} from "@/lib/auth/role/switchToProvider";
+import {switchToProvider} from "@/lib/auth/roles/switchToProvider";
 
 interface ProviderProfile {
   id: number;

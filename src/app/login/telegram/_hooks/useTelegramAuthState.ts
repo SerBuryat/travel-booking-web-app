@@ -1,10 +1,10 @@
 import {useCallback, useEffect, useState} from 'react';
 import {useRouter} from 'next/navigation';
 import {TelegramUserInitData} from '@/types/telegram';
-import {getInitData} from '@/lib/telegram/telegramInitData';
-import {validateTelegramInitData} from '@/lib/telegram/validateTelegramInitData';
+import {validateInitData} from '@/lib/auth/telegram/initData/validateInitData';
 import {useAuth} from '@/contexts/AuthContext';
 import {PAGE_ROUTES} from '@/utils/routes';
+import {getInitData} from "@/lib/auth/telegram/initData/getInitData";
 
 export enum TelegramAuthState {
   LOADING,
@@ -35,7 +35,7 @@ export function useTelegramAuthState() {
 
     try {
       const telegramUserDataValidation =
-          await validateTelegramInitData(telegramUserInitData);
+          await validateInitData(telegramUserInitData);
 
       if (telegramUserDataValidation.success) {
         setUserData(telegramUserInitData);

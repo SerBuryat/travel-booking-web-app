@@ -2,7 +2,7 @@
 
 import React, {useState} from 'react';
 import BaseMenuItem from './BaseMenuItem';
-import {ClientSwitchResult, switchToClient} from '@/lib/auth/role/switchToClient';
+import {ClientSwitchResult, switchToClient} from '@/lib/auth/roles/switchToClient';
 import {useAuth} from '@/contexts/AuthContext';
 
 interface ClientMenuItemProps {

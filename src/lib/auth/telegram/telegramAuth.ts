@@ -3,7 +3,7 @@
 import { prisma } from '@/lib/db/prisma';
 import { generateTokens, setJWTCookieInAction, setRefreshTokenCookieInAction } from '@/lib/auth/authUtils';
 import { TelegramUserInitData, TelegramUserData } from '@/types/telegram';
-import { validateTelegramInitData } from '@/lib/telegram/validateTelegramInitData';
+import { validateInitData } from '@/lib/auth/telegram/initData/validateInitData';
 import { UserAuth } from '@/lib/auth/getUserAuth';
 import {tarea, tclients_auth} from "@prisma/client";
 import { SELECTABLE_AREA_TIER } from '@/lib/location/constants';
@@ -34,7 +34,7 @@ const TOKEN_EXPIRY_MS = 24 * 60 * 60 * 1000; // часы · минуты · се
  */
 export async function authWithTelegram(telegramUserInitData: TelegramUserInitData): Promise<UserAuth> {
   // Валидация Telegram данных пользователя при помощи Bot Token и либы telegram-init-data-validator
-  const validation = await validateTelegramInitData(telegramUserInitData);
+  const validation = await validateInitData(telegramUserInitData);
   if (!validation.success) {
     throw new Error(`Telegram validation failed: ${validation.error}`);
   }

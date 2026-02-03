@@ -10,7 +10,7 @@ import {
  * Валидирует Telegram initData на сервере (подпись через BOT_TOKEN).
  * Вызывается из клиента как server action и из authWithTelegram.
  */
-export async function validateTelegramInitData(
+export async function validateInitData(
   telegramUserInitData: TelegramUserInitData
 ): Promise<TelegramUserDataValidationResponse> {
   const botToken = process.env.BOT_TOKEN;

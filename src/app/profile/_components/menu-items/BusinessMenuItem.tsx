@@ -2,7 +2,7 @@
 
 import React, {useState, useEffect} from 'react';
 import BaseMenuItem from './BaseMenuItem';
-import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/role/switchToProvider";
+import {ProviderSwitchResult, switchToProvider} from "@/lib/auth/roles/switchToProvider";
 import {useAuth} from "@/contexts/AuthContext";
 import {PAGE_ROUTES} from "@/utils/routes";
 import {useRouter} from "next/navigation";
