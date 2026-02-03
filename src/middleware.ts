@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 import { PAGE_ROUTES } from '@/utils/routes';
 
+// todo — вынести список страниц-исключений (без auth, без отображения layout-контента) в одно место (см. CurrentLocation, Footer)
 const PUBLIC_PATHS = new Set([
   PAGE_ROUTES.TELEGRAM_AUTH,
+  PAGE_ROUTES.WEB_AUTH,
   PAGE_ROUTES.NO_AUTH,
 ]);
 
@@ -28,7 +30,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // allow static assets and explicitly public pages
-  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith(`${PAGE_ROUTES.TELEGRAM_AUTH}/`) || pathname.startsWith(`${PAGE_ROUTES.NO_AUTH}/`)) {
+  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith(`${PAGE_ROUTES.TELEGRAM_AUTH}/`) || pathname.startsWith(`${PAGE_ROUTES.WEB_AUTH}/`) || pathname.startsWith(`${PAGE_ROUTES.NO_AUTH}/`)) {
     return NextResponse.next();
   }
 

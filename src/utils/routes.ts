@@ -6,6 +6,7 @@
 export const PAGE_ROUTES = {
   // Authentication routes
   TELEGRAM_AUTH: '/login/telegram',
+  WEB_AUTH: '/login/web',
   
   // Main pages
   HOME: '/home',

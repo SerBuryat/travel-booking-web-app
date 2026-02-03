@@ -29,8 +29,8 @@ export const Footer: React.FC = () => {
   const pathname = usePathname();
   const { user, isLoading } = useAuth();
   
-  // Скрываем навбар на странице авторизации Telegram
-  if (pathname === PAGE_ROUTES.TELEGRAM_AUTH || pathname === PAGE_ROUTES.NO_AUTH) {
+  // todo — вынести исключения страниц в одно место (см. middleware PUBLIC_PATHS, CurrentLocation)
+  if (pathname === PAGE_ROUTES.TELEGRAM_AUTH || pathname === PAGE_ROUTES.WEB_AUTH || pathname === PAGE_ROUTES.NO_AUTH) {
     return null;
   }
 
