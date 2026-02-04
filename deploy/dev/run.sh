@@ -78,8 +78,8 @@ echo "✅ Образы успешно обновлены"
 if docker-compose -f docker-compose-dev.yml ps | grep -q "Up"; then
     echo "🔄 Обновляем запущенные сервисы..."
     
-    # Обновляем сервисы с zero-downtime
-    docker-compose -f docker-compose-dev.yml up -d --no-deps --build
+    # Обновляем сервисы с zero-downtime (образ уже собран в CI и получен через pull)
+    docker-compose -f docker-compose-dev.yml up -d --no-deps
     
     if [ $? -ne 0 ]; then
         echo "❌ Ошибка при обновлении сервисов"

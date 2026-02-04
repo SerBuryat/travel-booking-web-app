@@ -79,7 +79,7 @@ if docker-compose -f docker-compose-prod.yml ps | grep -q "Up"; then
     echo "🔄 Обновляем запущенные сервисы..."
     
     # Обновляем сервисы с zero-downtime
-    docker-compose -f docker-compose-prod.yml up -d --no-deps --build
+    docker-compose -f docker-compose-prod.yml up -d --no-deps
     
     if [ $? -ne 0 ]; then
         echo "❌ Ошибка при обновлении сервисов"
