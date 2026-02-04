@@ -7,6 +7,8 @@ import { popularServices } from '@/lib/service/searchServices';
 import { currentLocation } from '@/lib/location/currentLocation';
 import { PAGE_ROUTES } from '@/utils/routes';
 
+export const dynamic = 'force-dynamic';
+
 export default async function PopularServicesPage() {
   try {
     // Получаем текущую локацию

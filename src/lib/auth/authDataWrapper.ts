@@ -4,6 +4,7 @@ import type { UserAuthRequest } from '@/lib/auth/types';
 
 const TELEGRAM_AUTH_TYPE = 'telegram';
 const VKID_AUTH_TYPE = 'vkid';
+const YANDEX_AUTH_TYPE = 'yandex';
 
 /**
  * Преобразует данные пользователя Telegram в универсальный UserAuthRequest.
@@ -34,5 +35,35 @@ export function vkidToUserAuthRequest(userInfoResult: UserInfoResult): UserAuthR
     last_name: u?.last_name,
     photo_url: u?.avatar,
     raw_context: u,
+  };
+}
+
+/** Данные пользователя Yandex из GET login.yandex.ru/info */
+export interface YandexUserInfo {
+  id: string;
+  login?: string;
+  display_name?: string;
+  real_name?: { first_name?: string; last_name?: string };
+  default_avatar_id?: string;
+  default_email?: string;
+  emails?: string[];
+}
+
+/**
+ * Преобразует ответ Yandex /info в универсальный UserAuthRequest.
+ */
+export function yandexToUserAuthRequest(userInfo: YandexUserInfo): UserAuthRequest {
+  const first = userInfo.real_name?.first_name ?? userInfo.display_name ?? userInfo.login ?? '';
+  const last = userInfo.real_name?.last_name;
+  const photoUrl = userInfo.default_avatar_id
+    ? `https://avatars.yandex.net/get-yapic/${userInfo.default_avatar_id}/islands-200`
+    : undefined;
+  return {
+    auth_type: YANDEX_AUTH_TYPE,
+    auth_id: `${YANDEX_AUTH_TYPE}_${userInfo.id}`,
+    first_name: first,
+    last_name: last,
+    photo_url: photoUrl,
+    raw_context: userInfo,
   };
 }
