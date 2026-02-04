@@ -3,7 +3,7 @@
  * Используется для создания/обновления записей в tclients и tclients_auth и выдачи JWT.
  */
 export interface UserAuthRequest {
-  auth_type: 'telegram' | 'vkid' | 'yandex';
+  auth_type: 'telegram' | 'vkid' | 'yandex' | 'google';
   auth_id: string;
   first_name: string;
   last_name?: string;

@@ -33,7 +33,8 @@ export async function middleware(request: NextRequest) {
     PUBLIC_PATHS.has(pathname) ||
     pathname.startsWith(`${PAGE_ROUTES.TELEGRAM_AUTH}/`) ||
     pathname.startsWith(`${PAGE_ROUTES.WEB_AUTH}/`) ||
-    pathname === PAGE_ROUTES.YANDEX_CALLBACK
+    pathname === PAGE_ROUTES.YANDEX_CALLBACK ||
+    pathname === PAGE_ROUTES.GOOGLE_CALLBACK
   ) {
     return NextResponse.next();
   }

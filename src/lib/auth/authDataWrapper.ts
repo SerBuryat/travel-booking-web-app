@@ -5,6 +5,7 @@ import type { UserAuthRequest } from '@/lib/auth/types';
 const TELEGRAM_AUTH_TYPE = 'telegram';
 const VKID_AUTH_TYPE = 'vkid';
 const YANDEX_AUTH_TYPE = 'yandex';
+const GOOGLE_AUTH_TYPE = 'google';
 
 /**
  * Преобразует данные пользователя Telegram в универсальный UserAuthRequest.
@@ -64,6 +65,33 @@ export function yandexToUserAuthRequest(userInfo: YandexUserInfo): UserAuthReque
     first_name: first,
     last_name: last,
     photo_url: photoUrl,
+    raw_context: userInfo,
+  };
+}
+
+/** Данные пользователя Google из GET www.googleapis.com/oauth2/v2/userinfo */
+export interface GoogleUserInfo {
+  id: string;
+  email?: string;
+  name?: string;
+  given_name?: string;
+  family_name?: string;
+  picture?: string;
+  verified_email?: boolean;
+}
+
+/**
+ * Преобразует ответ Google userinfo в универсальный UserAuthRequest.
+ */
+export function googleToUserAuthRequest(userInfo: GoogleUserInfo): UserAuthRequest {
+  const first = userInfo.given_name ?? userInfo.name ?? '';
+  const last = userInfo.family_name;
+  return {
+    auth_type: GOOGLE_AUTH_TYPE,
+    auth_id: `${GOOGLE_AUTH_TYPE}_${userInfo.id}`,
+    first_name: first,
+    last_name: last,
+    photo_url: userInfo.picture,
     raw_context: userInfo,
   };
 }

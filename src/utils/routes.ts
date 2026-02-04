@@ -9,6 +9,8 @@ export const PAGE_ROUTES = {
   WEB_AUTH: '/login/web',
   /** OAuth callback: Yandex (и др.) редиректят сюда с code — страница должна быть доступна без JWT */
   YANDEX_CALLBACK: '/login/yandex/callback',
+  /** OAuth callback: Google */
+  GOOGLE_CALLBACK: '/login/google/callback',
   
   // Main pages
   HOME: '/home',
