@@ -1,0 +1,82 @@
+"use client";
+
+import React, { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { exchangeYandexCode } from "@/lib/auth/yandex/exchangeYandexCode";
+import { PAGE_ROUTES } from "@/utils/routes";
+
+function YandexCallbackContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [status, setStatus] = useState<"waiting" | "error">("waiting");
+
+  useEffect(() => {
+    const code = searchParams.get("code");
+    const error = searchParams.get("error");
+
+    if (error) {
+      console.error("[Yandex Callback] OAuth error:", error, searchParams.get("error_description"));
+      setStatus("error");
+      setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
+      return;
+    }
+
+    if (!code) {
+      setStatus("error");
+      setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
+      return;
+    }
+
+    exchangeYandexCode(code)
+      .then((data) => {
+        if (data.success) {
+          router.replace(PAGE_ROUTES.HOME);
+        } else {
+          setStatus("error");
+          setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
+        }
+      })
+      .catch(() => {
+        setStatus("error");
+        setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
+      });
+  }, [searchParams, router]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col items-center justify-center p-4">
+      <div className="bg-white/80 backdrop-blur rounded-2xl shadow-xl border border-white/20 p-8 max-w-sm w-full text-center">
+        {status === "waiting" ? (
+          <>
+            <div className="animate-spin w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4" />
+            <p className="text-gray-700">Ожидание авторизации...</p>
+            <p className="text-sm text-gray-500 mt-2">Завершаем вход через Yandex ID</p>
+          </>
+        ) : (
+          <>
+            <p className="text-red-600">Ошибка авторизации</p>
+            <p className="text-sm text-gray-500 mt-2">Перенаправление на страницу входа</p>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CallbackFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex flex-col items-center justify-center p-4">
+      <div className="bg-white/80 backdrop-blur rounded-2xl shadow-xl border border-white/20 p-8 max-w-sm w-full text-center">
+        <div className="animate-spin w-10 h-10 border-2 border-indigo-500 border-t-transparent rounded-full mx-auto mb-4" />
+        <p className="text-gray-700">Загрузка...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function YandexCallbackPage() {
+  return (
+    <Suspense fallback={<CallbackFallback />}>
+      <YandexCallbackContent />
+    </Suspense>
+  );
+}

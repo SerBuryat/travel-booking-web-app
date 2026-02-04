@@ -8,6 +8,8 @@ import { parentCategories } from '@/lib/category/searchCategories';
 import { CategoryEntity } from '@/entity/CategoryEntity';
 import { ToastProvider, ToastContainer } from '@/components/Toast';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ProviderServicesPage() {
 
   let userAuth: UserAuth;

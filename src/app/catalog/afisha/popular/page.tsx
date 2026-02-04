@@ -7,6 +7,8 @@ import { getAfishaServices } from '@/lib/service/searchAfisha';
 import { currentLocation } from '@/lib/location/currentLocation';
 import { PAGE_ROUTES } from '@/utils/routes';
 
+export const dynamic = 'force-dynamic';
+
 export default async function AfishaPopularPage() {
   try {
     // Получаем текущую локацию
