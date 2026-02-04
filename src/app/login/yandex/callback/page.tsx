@@ -34,7 +34,9 @@ function YandexCallbackContent() {
     exchangeYandexCode(code)
       .then((data) => {
         if (data.success) {
-          router.replace(PAGE_ROUTES.HOME);
+          // Полная перезагрузка страницы, чтобы браузер точно отправил cookie в следующем запросе
+          // и AuthProvider при монтировании подхватил авторизованного пользователя (нет гонки со стейтом).
+          window.location.replace(PAGE_ROUTES.HOME);
         } else {
           const errMsg = data.error ?? "unknown";
           console.error("[Yandex Callback] exchangeYandexCode failed:", errMsg);
