@@ -9,19 +9,23 @@ function YandexCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<"waiting" | "error">("waiting");
+  const [errorCode, setErrorCode] = useState<string | null>(null);
 
   useEffect(() => {
     const code = searchParams.get("code");
     const error = searchParams.get("error");
 
     if (error) {
-      console.error("[Yandex Callback] OAuth error:", error, searchParams.get("error_description"));
+      const desc = searchParams.get("error_description") ?? error;
+      console.error("[Yandex Callback] OAuth error:", error, desc);
+      setErrorCode(`oauth: ${error}`);
       setStatus("error");
       setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
       return;
     }
 
     if (!code) {
+      setErrorCode("no_code");
       setStatus("error");
       setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
       return;
@@ -32,11 +36,16 @@ function YandexCallbackContent() {
         if (data.success) {
           router.replace(PAGE_ROUTES.HOME);
         } else {
+          const errMsg = data.error ?? "unknown";
+          console.error("[Yandex Callback] exchangeYandexCode failed:", errMsg);
+          setErrorCode(errMsg);
           setStatus("error");
           setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
         }
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("[Yandex Callback] exchangeYandexCode threw:", err);
+        setErrorCode(err instanceof Error ? err.message : "server_error");
         setStatus("error");
         setTimeout(() => router.replace(PAGE_ROUTES.WEB_AUTH), 2000);
       });
@@ -54,6 +63,11 @@ function YandexCallbackContent() {
         ) : (
           <>
             <p className="text-red-600">Ошибка авторизации</p>
+            {errorCode && (
+              <p className="text-xs text-gray-500 mt-1 font-mono" title="Код ошибки для отладки">
+                {errorCode}
+              </p>
+            )}
             <p className="text-sm text-gray-500 mt-2">Перенаправление на страницу входа</p>
           </>
         )}
