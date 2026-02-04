@@ -17,22 +17,30 @@ export async function exchangeYandexCode(code: string): Promise<{ success: boole
 
   const clientId = process.env.YANDEX_CLIENT_ID;
   const clientSecret = process.env.YANDEX_CLIENT_SECRET;
+  const callbackUrl = process.env.YANDEX_CALLBACK_URL;
 
   if (!clientId || !clientSecret) {
     console.error('[Yandex Auth] Не заданы YANDEX_CLIENT_ID или YANDEX_CLIENT_SECRET');
     return { success: false, error: 'config' };
   }
 
+  if (!callbackUrl) {
+    console.error('[Yandex Auth] YANDEX_CALLBACK_URL не задан (нужен для обмена code на token)');
+    return { success: false, error: 'config' };
+  }
+
   try {
+    const tokenParams: Record<string, string> = {
+      grant_type: 'authorization_code',
+      code,
+      client_id: clientId,
+      client_secret: clientSecret,
+      redirect_uri: callbackUrl,
+    };
     const tokenRes = await fetch(YANDEX_TOKEN_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        client_id: clientId,
-        client_secret: clientSecret,
-      }),
+      body: new URLSearchParams(tokenParams),
     });
 
     if (!tokenRes.ok) {
