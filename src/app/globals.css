@@ -1,5 +1,14 @@
 @import "tailwindcss";
 
+/* YS Text Wide — для буквы «Я» в логотипе на странице входа. Локальный файл в public/fonts имеет приоритет. */
+@font-face {
+  font-family: "YS Text Wide";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: local("YS Text Wide"), url("/fonts/YS-Text-Wide.woff2") format("woff2"), url("https://db.onlinewebfonts.com/t/23a02e8af5ef33a9b496dd524401550f.woff2") format("woff2");
+}
+
 :root {
   --background: #FCFCFC;
   --foreground: #171717;
