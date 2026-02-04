@@ -12,7 +12,7 @@ import {ClientWithAuthType} from "@/model/ClientType";
 export default async function ProfileOrdersPage() {
   const user = await getUser();
   if (!user) {
-    redirect(PAGE_ROUTES.NO_AUTH);
+    redirect(PAGE_ROUTES.WEB_AUTH);
   }
 
   // Получаем клики текущего пользователя через server action

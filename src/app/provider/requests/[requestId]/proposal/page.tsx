@@ -34,7 +34,7 @@ export default async function ProposalPage({params}: ProposalPageProps) {
   try {
     userAuth = await getUserAuthOrThrow();
   } catch (error) {
-    redirect(PAGE_ROUTES.NO_AUTH);
+    redirect(PAGE_ROUTES.WEB_AUTH);
   }
 
   // Проверяем, что пользователь - провайдер

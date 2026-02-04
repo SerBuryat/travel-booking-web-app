@@ -11,7 +11,6 @@ export const PAGE_ROUTES = {
   // Main pages
   HOME: '/home',
   IN_PROGRESS: '/in-progress',
-  NO_AUTH: '/no-auth',
   PROFILE: '/profile',
   REQUESTS: '/requests',
   MAP: '/map',

@@ -15,7 +15,7 @@ export default async function ProfilePage() {
 
   const user = await getUser();
   if (!user) {
-    redirect(PAGE_ROUTES.NO_AUTH);
+    redirect(PAGE_ROUTES.WEB_AUTH);
   }
 
   // Получаем информацию о провайдере для пользователя

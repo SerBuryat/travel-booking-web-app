@@ -92,7 +92,7 @@ export const ServiceRegistrationBanner: React.FC = () => {
   const handleConnectBusiness = async () => {
     if (!user) {
       // Если пользователь не аутентифицирован, перенаправляем на страницу инструкции
-      router.push(PAGE_ROUTES.NO_AUTH);
+      router.push(PAGE_ROUTES.WEB_AUTH);
       return;
     }
 

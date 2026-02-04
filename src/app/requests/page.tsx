@@ -12,7 +12,7 @@ import MyRequestsList from "./_components/MyRequestsList";
 export default async function RequestsPage() {
   const user = await getUser();
   if(!user) {
-    redirect(PAGE_ROUTES.NO_AUTH);
+    redirect(PAGE_ROUTES.WEB_AUTH);
   }
   const requests: RequestView[] = await clientRequests(user.id);
 

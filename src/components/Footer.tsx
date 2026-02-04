@@ -30,7 +30,7 @@ export const Footer: React.FC = () => {
   const { user, isLoading } = useAuth();
   
   // todo — вынести исключения страниц в одно место (см. middleware PUBLIC_PATHS, CurrentLocation)
-  if (pathname === PAGE_ROUTES.TELEGRAM_AUTH || pathname === PAGE_ROUTES.WEB_AUTH || pathname === PAGE_ROUTES.NO_AUTH) {
+  if (pathname === PAGE_ROUTES.TELEGRAM_AUTH || pathname === PAGE_ROUTES.WEB_AUTH) {
     return null;
   }
 

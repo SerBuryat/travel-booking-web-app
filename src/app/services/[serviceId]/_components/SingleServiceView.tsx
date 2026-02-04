@@ -37,7 +37,7 @@ export default function SingleServiceView({
         error.message.includes('auth') ||
         error.message.includes('Unauthorized')
       )) {
-        router.push(PAGE_ROUTES.NO_AUTH);
+        router.push(PAGE_ROUTES.WEB_AUTH);
         return;
       }
       // Игнорируем другие ошибки для MVP

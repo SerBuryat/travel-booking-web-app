@@ -5,8 +5,7 @@ import { PAGE_ROUTES } from '@/utils/routes';
 // todo — вынести список страниц-исключений (без auth, без отображения layout-контента) в одно место (см. CurrentLocation, Footer)
 const PUBLIC_PATHS = new Set([
   PAGE_ROUTES.TELEGRAM_AUTH,
-  PAGE_ROUTES.WEB_AUTH,
-  PAGE_ROUTES.NO_AUTH,
+  PAGE_ROUTES.WEB_AUTH
 ]);
 
 async function isTokenValid(token: string, secret: string) {
@@ -19,9 +18,9 @@ async function isTokenValid(token: string, secret: string) {
   }
 }
 
-function redirectToNoAuth(request: NextRequest) {
+function redirectToWebAuth(request: NextRequest) {
   const url = request.nextUrl.clone();
-  url.pathname = PAGE_ROUTES.NO_AUTH;
+  url.pathname = PAGE_ROUTES.WEB_AUTH;
   url.search = '';
   return NextResponse.redirect(url);
 }
@@ -30,7 +29,7 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // allow static assets and explicitly public pages
-  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith(`${PAGE_ROUTES.TELEGRAM_AUTH}/`) || pathname.startsWith(`${PAGE_ROUTES.WEB_AUTH}/`) || pathname.startsWith(`${PAGE_ROUTES.NO_AUTH}/`)) {
+  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith(`${PAGE_ROUTES.TELEGRAM_AUTH}/`) || pathname.startsWith(`${PAGE_ROUTES.WEB_AUTH}/`)) {
     return NextResponse.next();
   }
 
@@ -42,12 +41,12 @@ export async function middleware(request: NextRequest) {
 
   const token = request.cookies.get('auth_token')?.value;
   if (!token) {
-    return redirectToNoAuth(request);
+    return redirectToWebAuth(request);
   }
 
   const isValid = await isTokenValid(token, jwtSecret);
   if (!isValid) {
-    return redirectToNoAuth(request);
+    return redirectToWebAuth(request);
   }
 
   return NextResponse.next();
