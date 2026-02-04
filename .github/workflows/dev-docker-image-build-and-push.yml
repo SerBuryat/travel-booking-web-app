@@ -49,9 +49,9 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.ARTIFACT_REGISTRY_URI }}/${{ secrets.ARTIFACT_REGISTRY_NAME }}:latest
-#          build-args: |
-#            NEXT_PUBLIC_YANDEX_METRICA_ID=${{ secrets.NEXT_PUBLIC_YANDEX_METRICA_ID }}
-#            NEXT_PUBLIC_YANDEX_METRICA_LOGS_FOR=${{ secrets.NEXT_PUBLIC_YANDEX_METRICA_LOGS_FOR }}
+          build-args: |
+            NEXT_PUBLIC_VK_APP_ID=${{ secrets.NEXT_PUBLIC_VK_APP_ID }}
+            NEXT_PUBLIC_VK_ID_REDIRECT_URL=${{ secrets.NEXT_PUBLIC_VK_ID_REDIRECT_URL }}
 
   deploy-to-vps:
     runs-on: ubuntu-latest
