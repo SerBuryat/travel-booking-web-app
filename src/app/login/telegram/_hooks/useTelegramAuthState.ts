@@ -5,6 +5,7 @@ import {validateInitData} from '@/lib/auth/telegram/initData/validateInitData';
 import {useAuth} from '@/contexts/AuthContext';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {getInitData} from "@/lib/auth/telegram/initData/getInitData";
+import {telegramToUserAuthRequest} from "@/lib/auth/authDataWrapper";
 
 export enum TelegramAuthState {
   LOADING,
@@ -24,7 +25,7 @@ export interface TelegramAuthValidationError {
 export function useTelegramAuthState() {
   const router = useRouter();
 
-  const { loginViaTelegram, isAuthenticated } = useAuth();
+  const { login, isAuthenticated } = useAuth();
 
   const [authState, setAuthState] = useState<TelegramAuthState>(TelegramAuthState.LOADING);
   const [userData, setUserData] = useState<TelegramUserInitData>();
@@ -69,7 +70,8 @@ export function useTelegramAuthState() {
     setAuthState(TelegramAuthState.LOGGING_IN);
 
     try {
-      await loginViaTelegram(userData);
+      const userAuthRequest = telegramToUserAuthRequest(userData);
+      await login(userAuthRequest);
       router.push(PAGE_ROUTES.HOME);
     } catch (error) {
       setAuthState(TelegramAuthState.ERROR);
@@ -78,7 +80,7 @@ export function useTelegramAuthState() {
         details: `Не удалось создать сессию пользователя. ${error}`
       });
     }
-  }, [userData, loginViaTelegram, router]);
+  }, [userData, login, router]);
 
   useEffect(() => {
     if (isAuthenticated) {

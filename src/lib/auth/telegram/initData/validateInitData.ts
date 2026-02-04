@@ -8,7 +8,7 @@ import {
 
 /**
  * Валидирует Telegram initData на сервере (подпись через BOT_TOKEN).
- * Вызывается из клиента как server action и из authWithTelegram.
+ * Вызывается из клиента как server action (например, из useTelegramAuthState).
  */
 export async function validateInitData(
   telegramUserInitData: TelegramUserInitData

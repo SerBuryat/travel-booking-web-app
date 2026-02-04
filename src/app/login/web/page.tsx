@@ -1,11 +1,24 @@
 "use client";
 
 import React from "react";
-import {useVkIdAuth} from "@/hooks/auth/vk/useVkIdAuth";
+import { useRouter } from "next/navigation";
+import { useVkIdAuth } from "@/hooks/auth/vk/useVkIdAuth";
+import { useAuth } from "@/contexts/AuthContext";
+import { vkidToUserAuthRequest } from "@/lib/auth/authDataWrapper";
+import { PAGE_ROUTES } from "@/utils/routes";
 
 export default function WebLoginPage() {
+  const router = useRouter();
+  const { login } = useAuth();
+
   const handleVKLogin = () => {
-    useVkIdAuth().then(console.log).catch(console.error);
+    useVkIdAuth()
+      .then((userInfoResult) => {
+        const userAuthRequest = vkidToUserAuthRequest(userInfoResult);
+        return login(userAuthRequest);
+      })
+      .then(() => router.push(PAGE_ROUTES.HOME))
+      .catch(console.error);
   };
 
   return (

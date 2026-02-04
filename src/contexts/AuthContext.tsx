@@ -1,11 +1,11 @@
 'use client';
 
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {TelegramUserInitData} from '@/types/telegram';
 import {useRouter} from 'next/navigation';
 import {PAGE_ROUTES} from '@/utils/routes';
 import {getUserAuthOrThrow, UserAuth} from "@/lib/auth/getUserAuth";
-import {authWithTelegram} from "@/lib/auth/telegram/telegramAuth";
+import {userLogin} from "@/lib/auth/userLogin";
+import type { UserAuthRequest } from "@/lib/auth/types";
 import {mockTelegramAuth} from "@/lib/auth/telegram/mockTelegramAuth";
 import {currentLocation, CurrentLocationType} from "@/lib/location/currentLocation";
 import {userLogout} from "@/lib/auth/userLogout";
@@ -22,7 +22,7 @@ interface AuthContextType {
   
   // Функции
   checkAuth: () => Promise<void>;
-  loginViaTelegram: (telegramUserInitData: TelegramUserInitData) => Promise<void>;
+  login: (userAuthRequest: UserAuthRequest) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
 }
@@ -88,12 +88,12 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
   
-  // Функция входа через Telegram
-  const loginViaTelegram = async (telegramUserInitData: TelegramUserInitData) => {
+  // Универсальная функция входа (Telegram, VK ID и т.д.)
+  const login = async (userAuthRequest: UserAuthRequest) => {
     try {
       setIsLoading(true);
 
-      const authUser = await authWithTelegram(telegramUserInitData);
+      const authUser = await userLogin(userAuthRequest);
       setUser(authUser);
 
       const location = await currentLocation();
@@ -144,7 +144,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   
   const value: AuthContextType = {
     isAuthenticated, user, isLoading, location,
-    checkAuth, loginViaTelegram, logout, refreshUser
+    checkAuth, login, logout, refreshUser
   };
   
   return (
