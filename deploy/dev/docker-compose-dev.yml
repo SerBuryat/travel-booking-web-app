@@ -9,6 +9,9 @@ services:
     build:
       context: ../..
       dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_VK_APP_ID=${NEXT_PUBLIC_VK_APP_ID}
+        - NEXT_PUBLIC_VK_ID_REDIRECT_URL=${NEXT_PUBLIC_VK_ID_REDIRECT_URL}
     environment:
       # Application
       - APPLICATION_NAME=${APPLICATION_NAME}
@@ -48,6 +51,7 @@ services:
       # Logger Service Configuration
       - LOGGER_URL=${LOGGER_URL}
       - LOGGER_CHAT_ID=${LOGGER_CHAT_ID}
+      # VK ID
       - NEXT_PUBLIC_VK_APP_ID=${NEXT_PUBLIC_VK_APP_ID}
       - NEXT_PUBLIC_VK_ID_REDIRECT_URL=${NEXT_PUBLIC_VK_ID_REDIRECT_URL}
     env_file:
