@@ -7,6 +7,8 @@ export const PAGE_ROUTES = {
   // Authentication routes
   TELEGRAM_AUTH: '/login/telegram',
   WEB_AUTH: '/login/web',
+  /** OAuth callback: Yandex (и др.) редиректят сюда с code — страница должна быть доступна без JWT */
+  YANDEX_CALLBACK: '/login/yandex/callback',
   
   // Main pages
   HOME: '/home',
