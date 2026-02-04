@@ -28,8 +28,13 @@ function redirectToWebAuth(request: NextRequest) {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // allow static assets and explicitly public pages
-  if (PUBLIC_PATHS.has(pathname) || pathname.startsWith(`${PAGE_ROUTES.TELEGRAM_AUTH}/`) || pathname.startsWith(`${PAGE_ROUTES.WEB_AUTH}/`)) {
+  // allow static assets and explicitly public pages (incl. OAuth callbacks without JWT)
+  if (
+    PUBLIC_PATHS.has(pathname) ||
+    pathname.startsWith(`${PAGE_ROUTES.TELEGRAM_AUTH}/`) ||
+    pathname.startsWith(`${PAGE_ROUTES.WEB_AUTH}/`) ||
+    pathname === PAGE_ROUTES.YANDEX_CALLBACK
+  ) {
     return NextResponse.next();
   }
 
