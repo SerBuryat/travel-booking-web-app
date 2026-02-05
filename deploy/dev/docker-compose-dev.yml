@@ -6,13 +6,14 @@ services:
     container_name: travel-booking-web-app
     network_mode: "host"
     # Build args for NEXT_PUBLIC_* variables (used if building locally)
-    build:
-      context: ../..
-      dockerfile: Dockerfile
-      args:
-        - NEXT_PUBLIC_VK_APP_ID=${NEXT_PUBLIC_VK_APP_ID}
-        - NEXT_PUBLIC_VK_ID_REDIRECT_URL=${NEXT_PUBLIC_VK_ID_REDIRECT_URL}
+#    build:
+#      context: ../..
+#      dockerfile: Dockerfile
+#      args:
+#        - NEXT_PUBLIC_VK_APP_ID=${NEXT_PUBLIC_VK_APP_ID}
+#        - NEXT_PUBLIC_VK_ID_REDIRECT_URL=${NEXT_PUBLIC_VK_ID_REDIRECT_URL}
     environment:
+      # todo - мне кажется тут эти переменные вообще не нужны, достаточно `.env` файла
       # Application
       - APPLICATION_NAME=${APPLICATION_NAME}
       - DEVELOPED_BY=${DEVELOPED_BY}
@@ -51,9 +52,6 @@ services:
       # Logger Service Configuration
       - LOGGER_URL=${LOGGER_URL}
       - LOGGER_CHAT_ID=${LOGGER_CHAT_ID}
-      # VK ID
-      - NEXT_PUBLIC_VK_APP_ID=${NEXT_PUBLIC_VK_APP_ID}
-      - NEXT_PUBLIC_VK_ID_REDIRECT_URL=${NEXT_PUBLIC_VK_ID_REDIRECT_URL}
     env_file:
       - .env
     restart: unless-stopped

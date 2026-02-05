@@ -1,6 +1,6 @@
 'use client';
 
-import { getYandexAuthUrl } from '@/lib/auth/yandex/getYandexAuthUrl';
+import { getYandexAuthUrl } from '@/lib/auth/authConfig';
 
 /**
  * Запускает авторизацию через Yandex ID.

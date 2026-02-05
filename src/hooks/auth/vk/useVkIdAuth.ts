@@ -1,14 +1,14 @@
 'use client'
 
 import * as VKID from "@vkid/sdk";
+import { getVkAuthCreds } from "@/lib/auth/authConfig";
 
-const VK_APP_ID = process.env.NEXT_PUBLIC_VK_APP_ID;
-const REDIRECT_URL = process.env.NEXT_PUBLIC_VK_ID_REDIRECT_URL;
+const initVKID = async () => {
+  const { appId, redirectUrl } = await getVkAuthCreds();
 
-const initVKID = () => {
   VKID.Config.init({
-    app: Number(VK_APP_ID),
-    redirectUrl: REDIRECT_URL,
+    app: appId,
+    redirectUrl,
     responseMode: VKID.ConfigResponseMode.Callback,
     source: VKID.ConfigSource.LOWCODE,
     scope: "phone email",
@@ -16,7 +16,7 @@ const initVKID = () => {
 };
 
 export const useVkIdAuth = async () => {
-  initVKID();
+  await initVKID();
 
   const data = await VKID.Auth.login();
   const anyData = data as unknown as {

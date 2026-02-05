@@ -1,6 +1,6 @@
 'use client';
 
-import { getGoogleAuthUrl } from '@/lib/auth/google/getGoogleAuthUrl';
+import { getGoogleAuthUrl } from '@/lib/auth/authConfig';
 
 /**
  * Запускает авторизацию через Google.

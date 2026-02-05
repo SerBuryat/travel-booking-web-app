@@ -20,13 +20,13 @@ COPY . .
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build arguments for NEXT_PUBLIC_* variables (required at build time)
-ARG NEXT_PUBLIC_VK_APP_ID
-ARG NEXT_PUBLIC_VK_ID_REDIRECT_URL
-
-# Convert ARG to ENV so they're available during npm run build
-ENV NEXT_PUBLIC_VK_APP_ID=${NEXT_PUBLIC_VK_APP_ID}
-ENV NEXT_PUBLIC_VK_ID_REDIRECT_URL=${NEXT_PUBLIC_VK_ID_REDIRECT_URL}
+## Build arguments for NEXT_PUBLIC_* variables (required at build time)
+#ARG NEXT_PUBLIC_VK_APP_ID
+#ARG NEXT_PUBLIC_VK_ID_REDIRECT_URL
+#
+## Convert ARG to ENV so they're available during npm run build
+#ENV NEXT_PUBLIC_VK_APP_ID=${NEXT_PUBLIC_VK_APP_ID}
+#ENV NEXT_PUBLIC_VK_ID_REDIRECT_URL=${NEXT_PUBLIC_VK_ID_REDIRECT_URL}
 
 RUN npx prisma generate
 RUN npm run build
